@@ -52,6 +52,13 @@ vim.opt.confirm = true
 -- Load .nvim.lua from project roots (for per-project settings)
 vim.opt.exrc = true
 
+-- Advertise NVIM in the pane title via OSC so tmux on the host can detect
+-- nvim is running here, even across docker exec/ssh boundaries where its
+-- `ps` based check can't see this process. Pairs with the is_vim fallback
+-- in ~/.tmux.conf.
+vim.opt.title = true
+vim.opt.titlestring = "%t - NVIM"
+
 -- Use spaces instead of tabs
 vim.opt.expandtab = true
 vim.opt.tabstop = 4

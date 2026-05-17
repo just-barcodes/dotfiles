@@ -40,7 +40,15 @@ bind "|" split-window -h -c "#{pane_current_path}"
 bind "-" split-window -v -c "#{pane_current_path}"
 
 # vim-tmux-navigator: seamless navigation between nvim splits and tmux panes
-is_vim="ps -o state= -o comm= -t '#{pane_tty}' | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?(view|l?n?vim?x?|fzf)(diff)?$'"
+# is_vim="ps -o state= -o comm= -t '#{pane_tty}' | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?(view|l?n?vim?x?|fzf)(diff)?$'"
+
+# vim-tmux-navigator: seamless navigation between nvim splits and tmux panes.
+# The ps check works when nvim runs on the same host as tmux. When nvim runs
+# inside a devcontainer (docker exec proxy), its tty is hidden from the host's
+# ps view, so we fall back to pane_title — nvim sets the title via OSC and the
+# sequence passes through the proxy pty unchanged.
+is_vim="ps -o state= -o comm= -t '#{pane_tty}' | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?(view|l?n?vim?x?|fzf)(diff)?$' || printf '%s' '#{pane_title}' | grep -iqE '(^|[^[:alnum:]])(n?vim|view|fzf)([^[:alnum:]]|$)'"
+
 bind -n C-h if-shell "$is_vim" 'send-keys C-h' 'select-pane -L'
 bind -n C-j if-shell "$is_vim" 'send-keys C-j' 'select-pane -D'
 bind -n C-k if-shell "$is_vim" 'send-keys C-k' 'select-pane -U'
