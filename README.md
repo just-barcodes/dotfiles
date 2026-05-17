@@ -28,11 +28,32 @@ command = "tuigreet --cmd start-hyprland"
 user = "greeter"
 ```
 
-## For completely new installation
+## Install
 
-1. Set up ssh keys (give access to `dotfiles-private`)
-2. Run this command to install chezmoi and dotfiles: `sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply git@github.com:just-barcodes/dotfiles.git`
-3. Store the GitHub MCP PAT in the keyring (see below)
+Pick the one-liner that matches the situation. All three pull this repo to `~/.local/share/chezmoi/` and apply it.
+
+**SSH (preferred — also pulls `dotfiles-private` for secrets/identities; requires an authorized SSH key):**
+
+```bash
+sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply git@github.com:just-barcodes/dotfiles.git
+```
+
+**HTTPS (no access assumed — public bits only; the private config is silently skipped):**
+
+```bash
+sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply https://github.com/just-barcodes/dotfiles.git
+```
+
+**HTTPS + extensive apt dev packages (Debian/Ubuntu — adds mise + repo, neovim, db clients, language build deps, network tools, etc. See `packages.apt.extensive` in `.chezmoidata/packages.yaml`):**
+
+```bash
+sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin" init https://github.com/just-barcodes/dotfiles.git \
+  && mkdir -p "$HOME/.config/chezmoi" \
+  && printf '[data]\n    aptExtensive = true\n' > "$HOME/.config/chezmoi/chezmoi.toml" \
+  && "$HOME/.local/bin/chezmoi" apply
+```
+
+After install: store the GitHub MCP PAT in the keyring (see below).
 
 `chezmoi init` renders `.chezmoi.toml.tmpl`, which clones `git@github.com:just-barcodes/dotfiles-private.git` to `~/.config/chezmoi-private/` and inlines its `chezmoi.toml` (git identities, etc.) into `~/.config/chezmoi/chezmoi.toml`. Re-run `chezmoi init` to pull updates to the private data.
 
