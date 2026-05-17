@@ -16,7 +16,7 @@ MINIMAL=(
 sudo apt-get update
 sudo apt-get install -y "${MINIMAL[@]}"
 
-{{ if default false .aptExtensive -}}
+{{ if default false (index . "aptExtensive") -}}
 EXTENSIVE=(
 {{ range .packages.apt.extensive }}	{{ . }}
 {{ end -}}
