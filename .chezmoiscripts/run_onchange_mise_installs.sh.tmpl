@@ -1,6 +1,10 @@
 #!/bin/bash
 set -euo pipefail
 
+# Defensive: if mise was installed to a non-standard prefix, its shim dir is
+# still on PATH for any downstream tooling that runs from this script.
+export PATH="$HOME/.local/share/mise/shims:$PATH"
+
 if ! command -v mise >/dev/null 2>&1; then
 	echo "mise not installed; skipping mise install"
 	exit 0

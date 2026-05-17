@@ -3,6 +3,10 @@
 
 set -euo pipefail
 
+# npm comes from mise-managed node — chezmoi scripts run non-interactively so
+# shell-init activation of mise doesn't fire. Add the shim dir explicitly.
+export PATH="$HOME/.local/share/mise/shims:$PATH"
+
 if ! command -v npm >/dev/null 2>&1; then
 	echo "npm not installed; skipping global package install"
 	exit 0
