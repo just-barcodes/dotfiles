@@ -33,4 +33,10 @@ echo "deb [signed-by=/etc/apt/keyrings/mise-archive-keyring.gpg arch=amd64] http
 sudo apt-get update
 
 sudo apt-get install -y "${EXTENSIVE[@]}"
+
+# tree-sitter-cli from cargo: the prebuilt binary (mise / apt) needs a recent
+# glibc that LTS distros don't have. Cargo builds against the local toolchain.
+if ! command -v tree-sitter >/dev/null 2>&1; then
+	cargo install tree-sitter-cli
+fi
 {{ end -}}

@@ -5,8 +5,12 @@
 # Notes:
 #   - Fast-moving CLIs are managed by mise (see dot_config/mise/config.toml),
 #     not apt/pacman, so they stay current on LTS distros: node, npm, terraform,
-#     helm, kubectl, argocd, direnv, opencode, tree-sitter, age, sops, uv, gh,
-#     neovim, shellcheck, bat, yq.
+#     helm, kubectl, argocd, direnv, opencode, age, sops, uv, gh, neovim,
+#     shellcheck, bat, yq.
+#   - `tree-sitter-cli` is intentionally NOT in mise — the prebuilt binary
+#     requires a recent glibc and breaks on older LTS distros. Pacman ships
+#     `tree-sitter-cli`; on apt extensive we `cargo install` it from source
+#     so it links the local glibc.
 #   - Per-machine extras are selected via `machines:` below, keyed by
 #     `.chezmoi.hostname`. Each entry lists which `packages.pacman.*` groups
 #     to merge in addition to the always-on sets.
@@ -57,6 +61,10 @@ packages:
       - file
       - universal-ctags
       - pipx
+
+      # cargo provides a working tree-sitter-cli on LTS glibc — see
+      # `cargo install tree-sitter-cli` step in the apt install script.
+      - cargo
 
       # network / diagnostics
       - iputils-ping
@@ -173,6 +181,7 @@ packages:
       - mise
       - usage
       - television
+      - tree-sitter-cli
 
     fonts:
       - ttf-fira-code

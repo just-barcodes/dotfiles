@@ -62,11 +62,16 @@ After install: store the GitHub MCP PAT in the keyring (see below).
 These dev CLIs are pinned in `dot_config/mise/config.toml` and installed by
 `.chezmoiscripts/run_onchange_mise_installs.sh.tmpl` on every `chezmoi apply`
 where the config changes: `node`, `kubectl`, `helm`, `argocd`, `terraform`,
-`cloudflared`, `direnv`, `tree-sitter`, `opencode`, `task`, `gh`, `lazygit`,
-`lazydocker`, `yazi`, `age`, `sops`, `neovim`, `shellcheck`, `bat`, `yq`.
+`cloudflared`, `direnv`, `opencode`, `task`, `gh`, `lazygit`, `lazydocker`,
+`yazi`, `age`, `sops`, `neovim`, `shellcheck`, `bat`, `yq`.
 
 Fast-moving tools (notably `neovim`) live in mise rather than apt/pacman so
 they stay current on LTS distros — apt's `neovim` is typically a year+ behind.
+
+`tree-sitter-cli` is the exception: the prebuilt binary requires a recent
+glibc and breaks on Debian/Ubuntu LTS. Arch installs it from pacman
+(`tree-sitter-cli` in `packages.pacman.developer`); the apt extensive flow
+runs `cargo install tree-sitter-cli` so it links the local glibc.
 
 ## Claude Code GitHub MCP — PAT setup
 

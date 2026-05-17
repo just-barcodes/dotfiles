@@ -14,7 +14,6 @@ cloudflared = "2026.5"
 
 # Dev tooling
 direnv = "2.37"
-tree-sitter = "0.26"
 opencode = "1.15"
 devcontainer-cli = "latest"
 uv = "latest"
