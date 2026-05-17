@@ -247,7 +247,7 @@ packages:
 
   npm_global:
     - "@anthropic-ai/claude-code"
-    - "@mariozechner/pi-coding-agent"
+    - "@earendil-works/pi-coding-agent"
     - pnpm
     - yarn
 
