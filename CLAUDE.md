@@ -56,7 +56,7 @@ chezmoi state delete-bucket --bucket=scriptState
 - `.chezmoiscripts/` — all `run_once_*` and `run_onchange_*` scripts live here. This is a chezmoi special directory: scripts run as normal, but the directory itself does not create a matching `~/.chezmoiscripts/` in the target. Notable contents:
   - `run_onchange_pacman_installs.sh.tmpl` — renders the pacman install list from `.chezmoidata/packages.yaml`; per-host extras (laptop/pc) are picked via the `machines:` map keyed by `.chezmoi.hostname`
   - `run_onchange_paru_installs.sh.tmpl` — AUR packages (paru), also rendered from `.chezmoidata/packages.yaml`
-  - `run_onchange_apt_installs.sh.tmpl` — minimal Debian/Ubuntu dev survival kit, rendered from the `apt:` list in `packages.yaml`; no-op on non-Debian hosts
+  - `run_onchange_apt_installs.sh.tmpl` — Debian/Ubuntu installer, rendered from `packages.apt.minimal` in `packages.yaml`. When `aptExtensive = true` is set under `[data]` in `~/.config/chezmoi/chezmoi.toml`, also adds the mise apt repo and installs `packages.apt.extensive` (which includes `mise`). No-op on non-Debian hosts.
   - `run_onchange_npm_global_installs.sh.tmpl` — npm globals from the `npm_global:` list; no-op if npm isn't installed
 - `.chezmoidata/packages.yaml` — single source of truth for `pacman`, `paru`, `apt`, and `npm_global` package lists, plus the per-host `machines:` map. Edit this file (not the scripts) to add or remove packages.
 

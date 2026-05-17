@@ -8,10 +8,29 @@ echo "Not running debian/ubuntu... exiting"
 exit 0
 {{ end -}}
 
-PACKAGES=(
-{{ range .packages.apt }}	{{ . }}
+MINIMAL=(
+{{ range .packages.apt.minimal }}	{{ . }}
 {{ end -}}
 )
 
 sudo apt-get update
-sudo apt-get install -y "${PACKAGES[@]}"
+sudo apt-get install -y "${MINIMAL[@]}"
+
+{{ if default false .aptExtensive -}}
+EXTENSIVE=(
+{{ range .packages.apt.extensive }}	{{ . }}
+{{ end -}}
+)
+
+# Add the mise apt repo so `mise` (in EXTENSIVE) installs cleanly.
+# https://mise.jdx.dev/installing-mise.html#apt
+sudo apt-get install -y ca-certificates gnupg wget
+sudo install -dm 755 /etc/apt/keyrings
+wget -qO - https://mise.jdx.dev/gpg-key.pub \
+	| sudo gpg --dearmor --yes -o /etc/apt/keyrings/mise-archive-keyring.gpg
+echo "deb [signed-by=/etc/apt/keyrings/mise-archive-keyring.gpg arch=amd64] https://mise.jdx.dev/deb stable main" \
+	| sudo tee /etc/apt/sources.list.d/mise.list > /dev/null
+sudo apt-get update
+
+sudo apt-get install -y "${EXTENSIVE[@]}"
+{{ end -}}

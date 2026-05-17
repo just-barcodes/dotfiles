@@ -14,19 +14,95 @@ machines:
   samTPLinux: [laptop]
 
 packages:
-  # Minimal dev survival kit installed on Debian/Ubuntu hosts.
+  # Debian/Ubuntu packages. `minimal` always installs; `extensive` only when
+  # `aptExtensive = true` is set in ~/.config/chezmoi/chezmoi.toml [data].
   apt:
-    - vim
-    - git
-    - zsh
-    - curl
-    - tmux
-    - htop
-    - fzf
-    - fd-find # binary is `fdfind`; alias in .zshrc if desired
-    - ripgrep
-    - jq
-    - build-essential
+    minimal:
+      - vim
+      - git
+      - zsh
+      - curl
+      - tmux
+      - htop
+      - fzf
+      - fd-find # binary is `fdfind`; alias in .zshrc if desired
+      - ripgrep
+      - jq
+      - build-essential
+
+    extensive:
+      # repo / install foundations (also used by the mise repo setup step)
+      - ca-certificates
+      - gnupg
+      - lsb-release
+      - software-properties-common
+      - apt-transport-https
+
+      # runtime/tool manager — installed from the mise apt repo (script adds it)
+      - mise
+
+      # dev tools
+      - neovim
+      - gh
+      - git-lfs
+      - shellcheck
+      - tig
+      - tldr
+      - bat # binary is `batcat` on Debian/Ubuntu
+      - tree
+      - httpie
+      - ncdu
+      - direnv
+      - entr
+      - moreutils
+      - pv
+      - rsync
+      - file
+      - universal-ctags
+      - pipx
+      - yq
+
+      # network / diagnostics
+      - iputils-ping
+      - iproute2
+      - dnsutils
+      - whois
+      - mtr-tiny
+      - traceroute
+      - lsof
+      - strace
+      - net-tools
+
+      # archives
+      - unzip
+      - zip
+      - xz-utils
+
+      # build toolchain (build-essential is in minimal)
+      - cmake
+      - pkg-config
+      - autoconf
+      - automake
+      - libtool
+
+      # python
+      - python3-pip
+      - python3-venv
+      - python3-dev
+
+      # common build deps for language toolchains (pyenv / ruby-build / node-from-source)
+      - libssl-dev
+      - libffi-dev
+      - zlib1g-dev
+      - libbz2-dev
+      - libreadline-dev
+      - libsqlite3-dev
+
+      # database clients
+      - postgresql-client
+      - default-mysql-client
+      - sqlite3
+      - redis-tools
 
   pacman:
     system:
