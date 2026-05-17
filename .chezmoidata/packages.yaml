@@ -62,10 +62,6 @@ packages:
       - universal-ctags
       - pipx
 
-      # cargo provides a working tree-sitter-cli on LTS glibc — see
-      # `cargo install tree-sitter-cli` step in the apt install script.
-      - cargo
-
       # network / diagnostics
       - iputils-ping
       - iproute2

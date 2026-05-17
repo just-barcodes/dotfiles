@@ -36,7 +36,17 @@ sudo apt-get install -y "${EXTENSIVE[@]}"
 
 # tree-sitter-cli from cargo: the prebuilt binary (mise / apt) needs a recent
 # glibc that LTS distros don't have. Cargo builds against the local toolchain.
-if ! command -v tree-sitter >/dev/null 2>&1; then
-	cargo install tree-sitter-cli
+# Rust/cargo come from mise (see dot_config/mise/config.toml); apt's cargo is
+# too old for current tree-sitter-cli (needs Rust 2024 edition).
+export PATH="$HOME/.local/share/mise/shims:$PATH"
+
+# A broken mise shim for tree-sitter (no version set) makes `command -v`
+# succeed but execution fail, so test the binary actually runs.
+if ! tree-sitter --version >/dev/null 2>&1; then
+	if command -v cargo >/dev/null 2>&1; then
+		cargo install tree-sitter-cli
+	else
+		echo "cargo not available; install rust via mise then re-run this script" >&2
+	fi
 fi
 {{ end -}}
