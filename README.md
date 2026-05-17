@@ -63,7 +63,10 @@ These dev CLIs are pinned in `dot_config/mise/config.toml` and installed by
 `.chezmoiscripts/run_onchange_mise_installs.sh.tmpl` on every `chezmoi apply`
 where the config changes: `node`, `kubectl`, `helm`, `argocd`, `terraform`,
 `cloudflared`, `direnv`, `tree-sitter`, `opencode`, `task`, `gh`, `lazygit`,
-`lazydocker`, `yazi`, `age`, `sops`.
+`lazydocker`, `yazi`, `age`, `sops`, `neovim`, `shellcheck`, `bat`, `yq`.
+
+Fast-moving tools (notably `neovim`) live in mise rather than apt/pacman so
+they stay current on LTS distros — apt's `neovim` is typically a year+ behind.
 
 ## Claude Code GitHub MCP — PAT setup
 

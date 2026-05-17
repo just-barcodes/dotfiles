@@ -3,8 +3,10 @@
 # top-level keys (here: `.packages.pacman.*`, `.packages.paru`, `.machines`).
 #
 # Notes:
-#   - node, npm, terraform, helm, kubectl, argocd, direnv, opencode,
-#     tree-sitter, age, sops, uv are managed by mise — see dot_config/mise/config.toml
+#   - Fast-moving CLIs are managed by mise (see dot_config/mise/config.toml),
+#     not apt/pacman, so they stay current on LTS distros: node, npm, terraform,
+#     helm, kubectl, argocd, direnv, opencode, tree-sitter, age, sops, uv, gh,
+#     neovim, shellcheck, bat, yq.
 #   - Per-machine extras are selected via `machines:` below, keyed by
 #     `.chezmoi.hostname`. Each entry lists which `packages.pacman.*` groups
 #     to merge in addition to the always-on sets.
@@ -41,18 +43,13 @@ packages:
       # runtime/tool manager — installed from the mise apt repo (script adds it)
       - mise
 
-      # dev tools
-      - neovim
-      - gh
+      # dev tools (neovim, gh, shellcheck, bat, yq live in mise — see above)
       - git-lfs
-      - shellcheck
       - tig
       - tldr
-      - bat # binary is `batcat` on Debian/Ubuntu
       - tree
       - httpie
       - ncdu
-      - direnv
       - entr
       - moreutils
       - pv
@@ -60,7 +57,6 @@ packages:
       - file
       - universal-ctags
       - pipx
-      - yq
 
       # network / diagnostics
       - iputils-ping
