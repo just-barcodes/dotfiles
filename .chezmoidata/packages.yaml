@@ -6,7 +6,7 @@
 #   - Fast-moving CLIs are managed by mise (see dot_config/mise/config.toml),
 #     not apt/pacman, so they stay current on LTS distros: node, npm, terraform,
 #     helm, kubectl, argocd, direnv, opencode, age, sops, uv, gh, neovim,
-#     shellcheck, bat, yq.
+#     shellcheck, bat, yq, atuin.
 #   - `tree-sitter-cli` is intentionally NOT in mise — the prebuilt binary
 #     requires a recent glibc and breaks on older LTS distros. Pacman ships
 #     `tree-sitter-cli`; on apt extensive we `cargo install` it from source
@@ -222,7 +222,6 @@ packages:
       - libreoffice-fresh
       - spotify-launcher
       - obs-studio
-      - atuin
 
     kde:
       - ark

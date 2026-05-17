@@ -29,6 +29,9 @@ gh = "2"
 lazygit = "0.61"
 lazydocker = "0.25"
 
+# Shell history sync
+atuin = "latest"
+
 # Files
 yazi = "26"
 
