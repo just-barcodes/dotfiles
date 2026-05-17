@@ -98,6 +98,9 @@ packages:
       - libreadline-dev
       - libsqlite3-dev
 
+      # libclang is required to build tree-sitter-cli (rquickjs-sys uses bindgen)
+      - libclang-dev
+
       # database clients
       - postgresql-client
       - default-mysql-client
