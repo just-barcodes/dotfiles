@@ -1,0 +1,16 @@
+#!/bin/bash
+# Rendered from .chezmoidata/packages.yaml. Edit the YAML, not this script.
+
+set -euo pipefail
+
+if ! command -v npm >/dev/null 2>&1; then
+	echo "npm not installed; skipping global package install"
+	exit 0
+fi
+
+PACKAGES=(
+{{ range .packages.npm_global }}	{{ printf "%q" . }}
+{{ end -}}
+)
+
+npm install -g "${PACKAGES[@]}"

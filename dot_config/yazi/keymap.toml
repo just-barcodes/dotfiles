@@ -1,0 +1,25 @@
+# Yazi keymap — extends defaults with a few quality-of-life additions.
+# See https://yazi-rs.github.io/docs/configuration/keymap for the full default set.
+
+[[mgr.prepend_keymap]]
+on = "y"
+run = [
+  "yank",
+  '''shell --confirm 'for p in "$@"; do echo "file://$p"; done | wl-copy -t text/uri-list' ''',
+]
+desc = "Copy selected files to system clipboard (Wayland)"
+
+[[mgr.prepend_keymap]]
+on = ["g", "d"]
+run = "cd ~/Downloads"
+desc = "cd ~/Downloads"
+
+[[mgr.prepend_keymap]]
+on = ["g", "D"]
+run = "cd ~/Documents"
+desc = "cd ~/Documents"
+
+[[mgr.prepend_keymap]]
+on = ["g", "c"]
+run = "cd ~/.config"
+desc = "cd ~/.config"

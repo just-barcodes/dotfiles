@@ -1,0 +1,26 @@
+[default_session]
+startup_command = "nvim"
+
+[[session]]
+name = "Downloads 📥"
+path = "~/Downloads"
+startup_command = "yazi"
+
+[[session]]
+name = "chezmoi (configs)"
+path = "~/.local/share/chezmoi"
+startup_command = 'bash ~/.config/sesh/scripts/chezmoi\ \(configs\).sh'
+
+[[session]]
+name = "homelab"
+path = "~/workspace/homelab/"
+startup_command = "bash ~/.config/sesh/scripts/homelab.sh"
+
+[[directory]]
+path = "~/workspace/"
+max_depth = 1
+
+[zoxide]
+enabled = true
+score_threshold = 20
+

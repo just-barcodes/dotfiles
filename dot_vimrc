@@ -1,0 +1,243 @@
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""" Vundle Plugin Manager """
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+filetype off
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+
+Plugin 'gmarik/Vundle.vim'
+
+Plugin 'mileszs/ack.vim' " ack-grep via <leader>-a
+Plugin 'bling/vim-airline' " statusline at the bottom
+Plugin 'altercation/vim-colors-solarized' " solarized colorscheme
+Plugin 'Lokaltog/vim-easymotion' " use f / F to move around
+Plugin 'tpope/vim-fugitive' " Git wrapper
+Plugin 'junegunn/fzf'  " ctrl p for fuzzy search
+Plugin 'scrooloose/nerdtree' " <leader>-tt to toggle file tree
+Plugin 'tpope/vim-repeat' " allows other plugins to use . to repeat last commands
+Plugin 'ervandew/supertab' " use TAB to complete in inset mode
+Plugin 'scrooloose/syntastic' " syntax checker for a lot of languages
+Plugin 'vim-scripts/TaskList.vim' " show TODO / FIXME in file with <leader>-td
+Plugin 'tomtom/tcomment_vim' " toggle comments with gcc
+Plugin 'tmux-plugins/vim-tmux' " better .tmux.conf editing
+Plugin 'christoomey/vim-tmux-navigator' " allows moving between vim panes and tmux splits with C-h, C-j, ...
+Plugin 'mbbill/undotree' " <leader>-u to toggle undo tree
+Plugin 'hashivim/vim-terraform'
+
+call vundle#end()
+filetype plugin indent on
+
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""" plugin specific settings """
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+"for vim-airline (always display statusbar)
+set laststatus=2
+
+let NERDTreeShowHidden = 1
+
+let g:syntastic_python_checkers = ['flake8']
+" ignore long lines
+let g:syntastic_python_flake8_args = "--ignore=E501"
+
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""" mappings """
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+"""""""""""""""""""""""""""""""""""""""
+""" leader mappings """
+"""""""""""""""""""""""""""""""""""""""
+let mapleader=" "
+
+nnoremap <leader>tt :NERDTreeToggle<CR>
+map <leader>td <Plug>TaskList
+nnoremap <leader>to :TOC<CR>
+nnoremap <leader>u :UndotreeToggle<cr>
+nnoremap <leader>a <Esc>:Ack!
+
+"tabs and buffers
+nnoremap <leader>n :tabnew<CR>
+nnoremap <leader>l :ls<CR>:b<space>
+nnoremap <leader>m :b#<CR>
+
+"easier formatting of paragraphs
+vnoremap <leader>f gq
+nnoremap <leader>f mfgqap'f
+
+"easymotion
+nmap f <Plug>(easymotion-prefix)s
+
+"copy and paste to system clipboard
+vmap <Leader>y "+y
+nmap <Leader>p "+p
+nmap <Leader>P "+P
+vmap <Leader>p "+p
+vmap <Leader>P "+P
+
+"cd into directory of current buffer
+nnoremap <leader>cd :cd %:p:h<CR>
+
+
+
+"""""""""""""""""""""""""""""""""""""""
+""" other mappings """
+"""""""""""""""""""""""""""""""""""""""
+
+nnoremap ; :
+nnoremap <expr> j v:count ? (v:count > 5 ? "m'" . v:count : '') . 'j' : 'gj'
+nnoremap <expr> k v:count ? (v:count > 5 ? "m'" . v:count : '') . 'k' : 'gk'
+
+"unset 'last search pattern' register by hitting return
+nnoremap <CR> :noh<CR><CR>
+
+"reselect visual block after indent/outdent
+vnoremap < <gv
+vnoremap > >gv
+
+"don't immediately jump to next/previous word with * or #
+"(only highlight all matches)
+nnoremap * #*:<C-u>call ScrollToPercent(33)<CR>
+nnoremap # *#:<C-u>call ScrollToPercent(33)<CR>
+
+nnoremap ZZ <nop>
+nnoremap zz :<C-u>call ScrollToPercent(33)<CR>
+
+"in the pattern after v all ASCII characters except
+"'0'-'9', 'a'-'z', 'A'-'Z' and '_' have a special meaning
+nnoremap / /\v
+
+"disable F1 (help)
+nnoremap <F1> <Esc>
+inoremap <F1> <Esc>
+
+"folding with space
+nnoremap <space> zA
+vnoremap <space> zf
+
+"map new window to split window
+nnoremap <C-w>n :split<CR>
+
+nnoremap <C-p> :FZF<CR>
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""" other settings """
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+"""""""""""""""""""""""""""""""""""""""
+""" basic """
+"""""""""""""""""""""""""""""""""""""""
+syntax enable
+set number
+"leave hidden buffers open
+set hidden
+set encoding=utf-8
+set showcmd
+set autoindent
+set smartindent
+
+
+"save last 500 commands and undos
+set history=500
+set undolevels=500
+
+
+""" scrolling """
+set scrolloff=10
+set sidescrolloff=10
+set sidescroll=1
+
+
+""" tabs / spaces """
+"number of spaces a tab counts for
+set tabstop=4
+"Number of spaces to use for each step of (auto)indent.
+set shiftwidth=4
+"In Insert mode: Use the appropriate number of spaces to insert a tab
+set expandtab
+set list listchars=tab:--
+
+
+""" searching """
+"When there is a previous search pattern, highlight all its matches.
+set hlsearch
+"While typing a search command, show where the pattern matches.
+set incsearch
+set ignorecase
+
+
+set cursorline
+set cursorcolumn
+
+set wildmenu
+set wildmode=full
+
+set breakindent
+set showbreak=\\\\\\\
+
+
+
+"""""""""""""""""""""""""""""""""""""""
+""" terminal """
+"""""""""""""""""""""""""""""""""""""""
+
+if has('termguicolors')
+    set termguicolors
+endif
+set background=dark
+if ! empty(globpath(&rtp, 'bundle/vim-colors-solarized/colors/solarized.vim'))
+    let g:solarized_termtrans = 1
+    let g:solarized_visibility = "high"
+    let g:solarized_contrast = "high"
+    colorscheme solarized
+endif
+
+"mouse usage enabled in normal mode.
+set mouse=n
+" Set xterm2 mouse mode to allow resizing of splits with mouse inside Tmux.
+set ttymouse=xterm2
+
+"prevent slow down when lines are exremely long
+set synmaxcol=300
+set ttyfast
+set lazyredraw
+
+"""""""""""""""""""""""""""""""""""""""
+""" Automatic break at 80 chars for tex and md files """
+"""""""""""""""""""""""""""""""""""""""
+au BufRead,BufNewFile *.md setlocal textwidth=80
+au BufRead,BufNewFile *.tex setlocal textwidth=80
+
+
+
+"""""""""""""""""""""""""""""""""""""""
+""" Toggle English spellchecking with Ctrl-c
+"""""""""""""""""""""""""""""""""""""""
+set spelllang=en_gb
+nnoremap <silent> <C-c> :setlocal invspell<CR>
+
+
+"""""""""""""
+""" fix J join behaviour
+"""""""""""""
+if v:version > 703 || v:version == 703 && has('patch541')
+  set formatoptions+=j
+endif
+
+
+""""""""""""""
+""" column 120 guide + red highlight past column 120
+""""""""""""""
+set colorcolumn=120
+match ErrorMsg '\%>120v.\+'
+
+source ~/.vim/vimrcsrc/HighlightTrailingWhitespaces.vim
+source ~/.vim/vimrcsrc/StripTrailingWhitespacesOnSave.vim
+source ~/.vim/vimrcsrc/KeepUndos.vim
+source ~/.vim/vimrcsrc/WatchForChanges.vim
+source ~/.vim/vimrcsrc/DeleteEmptyBuffers.vim
+source ~/.vim/vimrcsrc/ScrollToPercent.vim

@@ -1,0 +1,12 @@
+#!/bin/bash
+set -euo pipefail
+
+if ! command -v mise >/dev/null 2>&1; then
+	echo "mise not installed; skipping mise install"
+	exit 0
+fi
+
+# Re-trigger when the mise config changes by embedding its hash.
+# config hash: {{ include (joinPath .chezmoi.sourceDir "dot_config/mise/config.toml") | sha256sum }}
+
+mise install

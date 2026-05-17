@@ -1,0 +1,18 @@
+{{- /*
+  Bootstraps ~/.config/chezmoi/chezmoi.toml from a private companion repo.
+  Runs on `chezmoi init` (and any `chezmoi init` re-run). Best-effort: if the
+  private repo is unreachable (no SSH access, offline, etc.) the public repo
+  still applies cleanly — templates that reference private data must guard
+  against missing keys (see e.g. dot_zshrc.tmpl).
+*/ -}}
+{{- $privateDir := joinPath .chezmoi.homeDir ".config" "chezmoi-private" -}}
+{{- $repo := "git@github.com:just-barcodes/dotfiles-private.git" -}}
+{{- if stat $privateDir -}}
+{{-   output "sh" "-c" (printf "git -C %q pull --quiet --ff-only >/dev/null 2>&1 || true" $privateDir) -}}
+{{- else -}}
+{{-   output "sh" "-c" (printf "git clone --quiet %q %q >/dev/null 2>&1 || true" $repo $privateDir) -}}
+{{- end -}}
+{{- $privateConfig := joinPath $privateDir "chezmoi.toml" -}}
+{{- if stat $privateConfig }}
+{{ include $privateConfig }}
+{{- end }}

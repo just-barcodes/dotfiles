@@ -1,0 +1,18 @@
+#!/bin/bash
+set -euo pipefail
+
+{{ if not (eq .chezmoi.osRelease.id "arch") -}}
+echo "Not running arch... exiting"
+exit 0
+{{ end -}}
+
+if command -v paru >/dev/null 2>&1; then
+	echo "paru already installed; skipping"
+	exit 0
+fi
+
+build_dir=$(mktemp -d -t paru-build-XXXXXX)
+trap 'rm -rf "$build_dir"' EXIT
+
+git clone --depth 1 https://aur.archlinux.org/paru.git "$build_dir"
+( cd "$build_dir" && makepkg -si --noconfirm )

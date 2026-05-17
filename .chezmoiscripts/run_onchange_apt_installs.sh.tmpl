@@ -1,0 +1,17 @@
+#!/bin/bash
+# Rendered from .chezmoidata/packages.yaml. Edit the YAML, not this script.
+
+set -euo pipefail
+
+{{ if not (or (eq .chezmoi.osRelease.id "debian") (eq .chezmoi.osRelease.id "ubuntu")) -}}
+echo "Not running debian/ubuntu... exiting"
+exit 0
+{{ end -}}
+
+PACKAGES=(
+{{ range .packages.apt }}	{{ . }}
+{{ end -}}
+)
+
+sudo apt-get update
+sudo apt-get install -y "${PACKAGES[@]}"

@@ -1,0 +1,55 @@
+[alias]
+    st = status
+    hist = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+    a = add -A :/
+    ls = log --oneline
+    ca = commit --amend
+    cm = commit -m
+    cam = commit -am
+    co = checkout
+    cob = checkout -b
+[init]
+    defaultBranch = main
+[branch]
+    sort = -committerdate
+[core]
+    editor = vi
+    excludesfile = ~/.gitignore_global
+    autocrlf = false
+[color]
+    ui = true
+[column]
+    ui = auto
+[commit]
+    verbose = true
+[log]
+    date = iso
+    decorate = short
+    graph = true
+    abbrevCommit = true
+    pretty = format:%C(auto)%h %C(auto)%ad | %C(auto)%s%d [%C(auto)%an]
+[merge]
+    tool = vimdiff
+    conflictstyle = zdiff3
+[diff]
+    tool = vimdiff
+    algorithm = histogram
+    colorMoved = plain
+    mnemonicPrefix = true
+    renames = true
+[push]
+    default = simple
+[pull]
+    ff = only
+[rerere]
+    enabled = true
+[filter "lfs"]
+    smudge = git-lfs smudge -- %f
+    process = git-lfs filter-process
+    required = true
+    clean = git-lfs clean -- %f
+[protocol "file"]
+    allow = always
+[tag]
+    sort = version:refname
+

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Terminal=false
+Name=Microsoft Teams
+Comment=Microsoft Teams web app (Chromium, Work profile)
+Exec=/usr/bin/chromium --profile-directory="Work" --app=https://teams.microsoft.com/
+Icon=chromium
+StartupWMClass=chrome-teams.microsoft.com__-Work
+Categories=Network;InstantMessaging;

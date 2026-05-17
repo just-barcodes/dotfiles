@@ -1,0 +1,33 @@
+[tools]
+# Build tools
+task = "3.50.0"
+
+# Languages
+node = "22"
+
+# Kubernetes / cloud
+kubectl = "1.36"
+helm = "4.2"
+argocd = "3.2"
+terraform = "1.15"
+cloudflared = "2026.5"
+
+# Dev tooling
+direnv = "2.37"
+tree-sitter = "0.26"
+opencode = "1.15"
+devcontainer-cli = "latest"
+uv = "latest"
+
+# Git / Docker TUIs
+gh = "2"
+lazygit = "0.61"
+lazydocker = "0.25"
+
+# Files
+yazi = "26"
+
+# Secrets / encryption
+age = "1.3"
+sops = "3.13"
+

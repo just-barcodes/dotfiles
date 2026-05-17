@@ -1,0 +1,142 @@
+# Set F12 and ctrl space as prefix
+set -g prefix F12
+bind F12 send-prefix
+set -g prefix2 C-Space
+
+# Allow prefix hold + key behavior
+# set-option -g repeat-time 500
+
+# Cycle windows with prefix held
+# bind -r n next-window
+# bind -r p previous-window
+
+# Use Alt+n / Alt+p to switch windows
+unbind -n M-n
+unbind -n M-p
+bind -n M-n next-window
+bind -n M-p previous-window
+
+##### History, timing ##########################################################
+set -g history-limit 100000
+set -g display-time 5000
+set -g escape-time 0          # instant key handling for Vim/TUI apps
+set -g focus-events on
+
+##### Indexing, naming #########################################################
+set -g base-index 1
+setw -g pane-base-index 1
+set -g renumber-windows on
+set -g allow-rename off       # apps cannot rename windows
+
+##### Mouse ####################################################################
+set -g mouse on
+
+##### Keys: vi everywhere ######################################################
+set -g status-keys vi
+setw -g mode-keys vi
+
+# Split keep cwd
+bind "|" split-window -h -c "#{pane_current_path}"
+bind "-" split-window -v -c "#{pane_current_path}"
+
+# vim-tmux-navigator: seamless navigation between nvim splits and tmux panes
+is_vim="ps -o state= -o comm= -t '#{pane_tty}' | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?(view|l?n?vim?x?|fzf)(diff)?$'"
+bind -n C-h if-shell "$is_vim" 'send-keys C-h' 'select-pane -L'
+bind -n C-j if-shell "$is_vim" 'send-keys C-j' 'select-pane -D'
+bind -n C-k if-shell "$is_vim" 'send-keys C-k' 'select-pane -U'
+bind -n C-l if-shell "$is_vim" 'send-keys C-l' 'select-pane -R'
+bind -T copy-mode-vi C-h select-pane -L
+bind -T copy-mode-vi C-j select-pane -D
+bind -T copy-mode-vi C-k select-pane -U
+bind -T copy-mode-vi C-l select-pane -R
+
+# Fast resizing with Alt+arrows
+bind -n M-h resize-pane -L 5
+bind -n M-j resize-pane -D 5
+bind -n M-k resize-pane -U 5
+bind -n M-l resize-pane -R 5
+
+##### Copy-mode yanks to system clipboard (Wayland/X fallback) #################
+# Requires wl-copy or xclip installed.
+bind -T copy-mode-vi y send -X copy-pipe-and-cancel 'sh -c "command -v wl-copy >/dev/null && wl-copy || xclip -i -sel clip"'
+
+##### Status bar — Selenized Dark, two-line ###################################
+# Palette: bg0=#103c48 bg1=#184956 bg2=#2d5b69 dim=#72898f fg0=#adbcbc fg1=#cad8d9
+#          orange=#ed8649 blue=#4695f7 cyan=#41c7b9 green=#75b938
+#          yellow=#dbb32d magenta=#f275be violet=#af88eb red=#fa5750
+set -g status on
+set -g status 2
+set -g status-position bottom
+set -g status-interval 5
+set -g status-justify left
+set -g status-style "bg=#103c48,fg=#adbcbc"
+# Clear deprecated options that would otherwise override status-style.
+set -gu status-bg
+set -gu status-fg
+set -g status-left-length 250
+set -g status-right-length 250
+
+# Pane borders
+set -g pane-border-lines heavy
+set -g pane-border-style "fg=#2d5b69"
+set -g pane-active-border-style "fg=#41c7b9"
+set -g window-style ''
+set -g window-active-style ''
+
+# Message / mode styling
+set -g message-style "bg=#dbb32d,fg=#103c48,bold"
+set -g mode-style "bg=#41c7b9,fg=#103c48,bold"
+
+# Line 1 (top) — session, host, git, sys, clock
+set -g status-format[1] "#[bg=#184956,fg=#fa5750,bold] #S#[bg=#103c48,fg=#184956]#[fg=#72898f]  #h #[fg=#2d5b69]│#[fg=#41c7b9]  #(cd '#{pane_current_path}' && git rev-parse --abbrev-ref HEAD 2>/dev/null || echo -) #[align=right,bg=#103c48]#[fg=#72898f]  #(cut -d' ' -f1 /proc/loadavg) #[fg=#2d5b69]│#[fg=#75b938]  #(free -h | awk '/^Mem:/{print $3\"/\"$2}') #[fg=#2d5b69]│#[fg=#ed8649] #(awk '{print $0\"%\"}' /sys/class/power_supply/BAT0/capacity 2>/dev/null || echo -)  #[bg=#184956,fg=#103c48]#[bg=#184956,fg=#cad8d9]  %a %b %d #[bg=#dbb32d,fg=#184956]#[bg=#dbb32d,fg=#103c48,bold]  %H:%M "
+
+# Line 0 (bottom) — windows + cwd
+set -g status-left ""
+set -g status-right "#[fg=#41c7b9] #{devcontainers_workspace} #[fg=#72898f]#{devcontainers_status} #[fg=#2d5b69]│#[fg=#72898f]  #{b:pane_current_path} "
+
+setw -g window-status-separator "#[bg=#103c48,fg=#2d5b69] · "
+setw -g window-status-format "#[bg=#184956,fg=#72898f] #I #[fg=#cad8d9]#W "
+setw -g window-status-current-format "#[bg=#103c48,fg=#dbb32d]#[bg=#dbb32d,fg=#103c48,bold] #I #W #[bg=#103c48,fg=#dbb32d]"
+setw -g window-status-style "bg=#103c48,fg=#cad8d9"
+setw -g window-status-current-style "bg=#dbb32d,fg=#103c48,bold"
+setw -g window-status-activity-style "fg=#dbb32d,blink"
+setw -g window-status-bell-style "fg=#fa5750,bold"
+
+setw -g aggressive-resize on
+
+##### Titles ###################################################################
+set -g set-titles on
+set -g set-titles-string '#S|#W'
+setw -g automatic-rename on
+
+##### Truecolor that doesn’t shift when opening Neovim #########################
+# Use tmux-256color and advertise RGB to the underlying terminal.
+# tmux ≥3.2: use RGB. For older tmux, replace RGB with Tc.
+set -g default-terminal "tmux-256color"
+set -ag terminal-overrides ",*:RGB"
+
+# If your system lacks tmux-256color terminfo, install it once:
+# tic -x -o ~/.terminfo /usr/share/terminfo/t/tmux-256color
+
+##### Plugins (manual, no TPM) #################################################
+# Plugins are cloned by .chezmoiscripts/run_onchange_install_tmux_plugins.sh
+
+# Ensure mise-managed CLIs (devcontainer, etc.) are on PATH for tmux-spawned
+# commands — status-bar updates and popup execs run with the tmux server's
+# environment, not an interactive shell's.
+set-environment -g PATH "{{ .chezmoi.homeDir }}/.local/share/devcontainer-wrapper/bin:{{ .chezmoi.homeDir }}/.local/share/mise/shims:/usr/local/sbin:/usr/local/bin:/usr/bin:/bin"
+
+run-shell '~/.tmux/plugins/tmux-devcontainers/devcontainers.tmux'
+
+# prefix + U: devcontainer up (build/start the container for the current workspace)
+bind U run -b '~/.tmux/plugins/tmux-devcontainers/scripts/commands.sh run_up'
+
+
+##### Server settings ###################################################
+set -g allow-passthrough on
+# set -as terminal-features ',alacritty:extkeys'
+# set -s extended-keys always
+set -s extended-keys on
+set -s extended-keys-format csi-u
+set -as terminal-features ',xterm-ghostty:extkeys'
+set -g xterm-keys on

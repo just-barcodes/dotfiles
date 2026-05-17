@@ -1,0 +1,16 @@
+#!/bin/bash
+# Rendered from .chezmoidata/packages.yaml. Edit the YAML, not this script.
+
+set -euo pipefail
+
+{{ if not (eq .chezmoi.osRelease.id "arch") -}}
+echo "Not running arch... exiting"
+exit 0
+{{ end -}}
+
+PACKAGES=(
+{{ range .packages.paru }}	{{ . }}
+{{ end -}}
+)
+
+paru -Syu --needed "${PACKAGES[@]}"

@@ -1,0 +1,47 @@
+#!/bin/bash
+# Pick a sesh session via walker dmenu.
+# Switches the existing tmux client to the selected session (creating it if
+# needed), then focuses workspace 50. Falls back to opening a new ghostty if
+# no tmux client is running yet.
+
+# Build list, dropping zoxide entries whose path matches a configured session
+# (otherwise e.g. "homelab" shows up alongside "~/workspace/homelab").
+sessions=$(sesh list -d --json)
+configured_paths=$(sesh list -c --json | jq -r '.[].Path | rtrimstr("/")')
+sel=$(echo "$sessions" \
+    | jq -r --arg taken "$configured_paths" '
+        ($taken | split("\n")) as $t
+        | .[]
+        | (.Path | rtrimstr("/")) as $p
+        | select(.Src != "zoxide" or (($t | index($p)) | not))
+        | .Name
+      ' \
+    | walker --dmenu)
+[ -z "$sel" ] && exit 0
+
+name=$(basename "$sel")
+# Resolve absolute path for -c: zoxide entries' Name uses literal "~" which
+# won't expand inside quotes, so look up the absolute Path from the JSON.
+sel_path=$(echo "$sessions" | jq -r --arg n "$sel" 'first(.[] | select(.Name == $n) | .Path) // empty')
+
+# Create the session if it doesn't exist yet
+if ! tmux has-session -t "$name" 2>/dev/null; then
+    if [ -d "$sel_path" ]; then
+        tmux new-session -ds "$name" -c "$sel_path"
+    else
+        tmux new-session -ds "$name"
+    fi
+    # Run session startup script if one exists (mirrors sesh startup_command)
+    startup="$HOME/.config/sesh/scripts/${name}.sh"
+    [ -f "$startup" ] && bash "$startup"
+fi
+
+# Tell the existing tmux client to switch, then focus workspace 50
+client=$(tmux list-clients -F '#{client_name}' | head -1)
+if [ -n "$client" ]; then
+    tmux switch-client -c "$client" -t "$name"
+    hyprctl dispatch 'hl.dsp.focus({ workspace = 50, on_current_monitor = true })'
+else
+    # No tmux running yet — open ghostty as a fallback
+    ghostty -e sesh connect "$sel"
+fi

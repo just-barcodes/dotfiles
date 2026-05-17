@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Simple walker script to select and launch a TUI
+CHOICE=$(printf "🔊 Audio (pulsemixer)\n🌐 Network (wifitui)\n Bluetooth (bluetuith)\n💻 System Monitor (btop)\n📁 Files (yazi)\n📅 Calendar (cal)" | walker --dmenu)
+
+case "$CHOICE" in
+*"Audio"*) ghostty --class=com.tui.centered -e pulsemixer ;;
+*"Network"*) ghostty --class=com.tui.centered -e wifitui ;;
+*"Bluetooth"*) ghostty --class=com.tui.centered -e bluetuith ;;
+*"System Monitor"*) ghostty --class=com.tui.centered -e btop ;;
+*"Files"*) ghostty --class=com.tui.centered -e yazi ;;
+*"Calendar"*) ghostty --class=com.tui.centered --font-size=18 -e ~/.config/waybar/scripts/calendar.sh ;;
+esac

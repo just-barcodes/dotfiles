@@ -1,0 +1,19 @@
+#!/bin/bash
+set -euo pipefail
+
+{{ if or (eq .chezmoi.osRelease.id "debian") (eq .chezmoi.osRelease.id "ubuntu") -}}
+if ! command -v zsh >/dev/null 2>&1; then
+	sudo apt-get update && sudo apt-get install -y zsh fonts-powerline
+fi
+
+# Arch installs starship via pacman (see packages.yaml). On Debian/Ubuntu it
+# isn't packaged in stable channels, so fall back to the upstream installer.
+if ! command -v starship >/dev/null 2>&1; then
+	if command -v curl >/dev/null 2>&1; then
+		curl -sS https://starship.rs/install.sh | sh -s -- -y
+	else
+		echo "ERROR: starship installer needs curl" >&2
+		exit 1
+	fi
+fi
+{{- end }}

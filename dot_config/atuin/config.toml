@@ -1,0 +1,22 @@
+## atuin config — see https://docs.atuin.sh/configuration/config/
+
+## Search UI
+search_mode = "fuzzy"
+filter_mode = "global"
+style = "compact"
+inline_height = 20
+show_preview = true
+show_help = true
+
+## Behaviour
+# Press Enter twice: first puts command on prompt, second executes.
+# Safer when you want to review before running something from history.
+enter_accept = false
+
+## Sync (opt-in — run `atuin register` / `atuin login` manually to enable)
+auto_sync = true
+sync_frequency = "10m"
+sync_address = "https://api.atuin.sh"
+
+## Stats / dupes
+update_check = false

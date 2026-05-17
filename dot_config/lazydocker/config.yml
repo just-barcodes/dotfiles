@@ -1,0 +1,82 @@
+gui:
+  border: "rounded"
+  containerStatusHealthStyle: "icon"
+  showAllContainers: true
+  expandFocusedSidePanel: true
+  scrollPastBottom: false
+  language: "auto"
+
+logs:
+  timestamps: false
+  since: "60m"
+  tail: ""
+
+commandTemplates:
+  # Use docker compose v2 plugin (not the legacy docker-compose binary)
+  dockerCompose: "docker compose"
+  # Fall back to sh if bash is not in the image (alpine, distroless, etc.)
+  bash: "docker exec -it {{ .Container.ID }} /bin/sh -c \"[ -e /bin/bash ] && exec /bin/bash || exec /bin/sh\""
+
+customCommands:
+  containers:
+    - name: "Shell as root"
+      command: "docker exec -it --user root {{ .Container.ID }} /bin/sh -c \"[ -e /bin/bash ] && exec /bin/bash || exec /bin/sh\""
+      attach: true
+    - name: "Tail last 100 lines"
+      command: "docker logs --tail 100 -f {{ .Container.ID }}"
+      attach: true
+    - name: "Inspect (pretty JSON)"
+      command: "docker inspect {{ .Container.ID }} | less"
+      attach: true
+    - name: "Stop and remove"
+      command: "docker rm -f {{ .Container.ID }}"
+      attach: false
+    - name: "Copy IP to clipboard"
+      command: "docker inspect -f '{{`{{range .NetworkSettings.Networks}}{{.IPAddress}} {{end}}`}}' {{ .Container.ID }} | tr -d ' \\n' | wl-copy"
+      attach: false
+  images:
+    - name: "Prune dangling images"
+      command: "docker image prune -f"
+      attach: false
+    - name: "Show history"
+      command: "docker history --no-trunc {{ .Image.ID }} | less"
+      attach: true
+    - name: "Scan with Trivy"
+      command: "trivy image --severity HIGH,CRITICAL {{ .Image.Name }} | less"
+      attach: true
+  volumes:
+    - name: "Prune unused volumes"
+      command: "docker volume prune -f"
+      attach: false
+    - name: "Inspect mountpoint contents"
+      command: "sudo ls -la $(docker volume inspect -f '{{`{{.Mountpoint}}`}}' {{ .Volume.Name }})"
+      attach: true
+  networks:
+    - name: "Prune unused networks"
+      command: "docker network prune -f"
+      attach: false
+  services:
+    - name: "Pull and recreate"
+      command: "docker compose pull {{ .Service.Name }} && docker compose up -d {{ .Service.Name }}"
+      attach: false
+      serviceNames: []
+
+stats:
+  maxDuration: "5m"
+  graphs:
+    - caption: "CPU (%)"
+      statPath: "DerivedStats.CPUPercentage"
+      color: "blue"
+      min: 0
+      max: 100
+    - caption: "Memory (%)"
+      statPath: "DerivedStats.MemoryPercentage"
+      color: "green"
+      min: 0
+      max: 100
+
+update:
+  method: "never"
+
+confirmOnQuit: false
+reportingOn: false

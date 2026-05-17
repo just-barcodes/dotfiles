@@ -1,0 +1,169 @@
+# If not running interactively, don't do anything
+case $- in
+*i*) ;;
+*) return ;;
+esac
+
+##############################################################################
+### history ###
+##############################################################################
+
+# don't put duplicate lines or lines starting with space in the history.
+# See bash(1) for more options
+HISTCONTROL=ignoreboth
+
+# append to the history file, don't overwrite it
+shopt -s histappend
+
+# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+HISTSIZE=4000
+HISTFILESIZE=8000
+
+##############################################################################
+### misc ###
+##############################################################################
+# check the window size after each command and, if necessary,
+# update the values of LINES and COLUMNS.
+shopt -s checkwinsize
+
+# make autocompletion case insensitive
+bind 'set completion-ignore-case on'
+
+set -o vi
+
+# do not exit shell with Ctrl-D
+set -o ignoreeof
+
+##############################################################################
+### aliases ###
+##############################################################################
+if [ -f "$HOME/.bashrc_private" ]; then
+    . "$HOME/.bashrc_private"
+fi
+
+# git autocomplete
+if [ -f ~/.git-completion.bash ]; then
+    . ~/.git-completion.bash
+
+    __git_complete g __git_main
+fi
+
+if [ -f /usr/share/git/completion/git-completion.bash ]; then
+    source /usr/share/git/completion/git-completion.bash
+fi
+
+# enable bash auto completion
+if [ -f "/etc/bash_completion" ]; then
+    source /etc/bash_completion
+fi
+
+##############################################################################
+### exports ###
+##############################################################################
+export EDITOR='vim'
+if [ -f "$HOME/.pythonrc.py" ]; then
+    export PYTHONSTARTUP=~/.pythonrc.py
+fi
+
+if [ -d "$HOME/workspace" ]; then
+    export PROJECT_HOME=$HOME/workspace
+fi
+
+##############################################################################
+### sources ###
+##############################################################################
+# liquidprompt
+if [ -f ~/dotfiles-deps/liquidprompt/liquidprompt ]; then
+    [[ $- = *i* ]] && source ~/dotfiles-deps/liquidprompt/liquidprompt
+elif [ -f /usr/local/bin/liquidprompt/liquidprompt ]; then
+    [[ $- = *i* ]] && source /usr/local/bin/liquidprompt/liquidprompt
+fi
+
+if [ -f ~/dotfiles-deps/complete-alias/complete_alias ]; then
+    . ~/dotfiles-deps/complete-alias/complete_alias
+    complete -F _complete_alias g
+    complete -F _complete_alias k
+elif [ -f ~/.bash_completion.d/complete_alias ]; then
+    source ~/.bash_completion.d/complete_alias
+    complete -F _complete_alias g
+    complete -F _complete_alias k
+fi
+
+# ls
+if command -v lsd 2>&1 >/dev/null; then
+    alias ls='lsd'
+else
+    alias ls='ls --color=auto -F'
+fi
+alias la='ls -hAlF'
+alias l='ls -lF'
+
+if command -v trash 2>&1 >/dev/null; then
+    alias rm=trash
+fi
+
+# python
+alias p3='python3'
+alias ip3='ipython3'
+
+# grep, ack
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+
+# git
+alias g='git'
+
+# tmux
+alias t='tmux'
+
+# emacs
+alias emacs='emacs26'
+
+# kubernetes
+alias k='kubectl'
+
+# terraform
+alias tf='terraform'
+
+# cd
+alias cd..='cd ..'
+alias cdd='cd ~/Desktop'
+alias cdw='cd ~/workspace'
+
+### other aliases ###
+alias gcc2='gcc -Wall -Werror -std=c99'
+alias xterm='xterm -fg black -bg white'
+
+# Add an "alert" alias for long running commands.  Use like so:
+#   sleep 10; alert
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/usr/local/bin/google-cloud-sdk/completion.bash.inc' ]; then
+    . '/usr/local/bin/google-cloud-sdk/completion.bash.inc'
+fi
+
+complete -C /usr/bin/terraform terraform
+
+################################################################################
+## shell nest level
+################################################################################
+
+function tmux_adjust_shlvl() {
+    if [ "$TMUX" ] && [ $SHLVL -gt 1 ] && [ ! "$SHLVL_ADJUSTED_FOR_TMUX" ]; then
+        SHLVL=$(($SHLVL - 1))
+        export SHLVL_ADJUSTED_FOR_TMUX=1
+    fi
+}
+
+tmux_adjust_shlvl
+
+################################################################################
+# Neovim setup
+################################################################################
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion

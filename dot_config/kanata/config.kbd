@@ -1,0 +1,88 @@
+;; The tap-hold action lets you activate different actions depending it a key is tapped or held.
+;; (tap-hold $tap-repress-timeout $hold-timeout $tap-action $hold-action)
+
+;; $tap-repress-timeout
+;; Number of milliseconds for the window that a tap into re-press with hold results in the $tap-action being held.
+
+;; $hold-timeout
+;; Number of milliseconds after which the $hold-action activates. Releasing the key before this elapses results in $tap-action activating.
+
+;; $tap-action
+;; Action to activate when the input is determined to be a "tap".
+
+;; $hold-action
+;; Action to activate when the input is determined to be a "hold".
+
+;; see also here for additional config: https://github.com/jtroo/kanata/blob/main/docs/config.adoc#tap-hold
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defcfg
+  process-unmapped-keys yes
+
+  ;; only match the built-in keyboard
+  linux-dev /dev/input/by-path/platform-i8042-serio-0-event-kbd
+)
+
+(defsrc
+  ;; need to define all keys to manage here
+  esc caps
+  a s d f g h j k l ;
+  < z x c v
+  spc 
+)
+
+(defvar
+  tap-time 90
+  hold-time 170
+)
+
+(defalias
+
+  ;; Home row mods
+  a (tap-hold $tap-time $hold-time a lmet)
+  s (tap-hold $tap-time $hold-time s lalt)
+  d (tap-hold $tap-time $hold-time d lctl)
+  f (tap-hold $tap-time $hold-time f lsft)
+
+  j (tap-hold $tap-time $hold-time j rsft)
+  k (tap-hold $tap-time $hold-time k rctl)
+  l (tap-hold $tap-time $hold-time l ralt)
+
+  ;; a (multi f24 (tap-hold $tap-time $hold-time a lmet))
+  ;; s (multi f24 (tap-hold $tap-time $hold-time s lalt))
+  ;; d (multi f24 (tap-hold $tap-time $hold-time d lctl))
+  ;; f (multi f24 (tap-hold $tap-time $hold-time f lsft))
+
+  ;; j (multi f24 (tap-hold $tap-time $hold-time j rsft))
+  ;; k (multi f24 (tap-hold $tap-time $hold-time k rctl))
+  ;; l (multi f24 (tap-hold $tap-time $hold-time l ralt))
+
+  ;; Match escape
+  g (chord gh g)
+  h (chord gh h)
+
+  ;; Space key: tap for space, hold for symbol layer
+  spc_sym (tap-hold 200 200 spc (layer-while-held symbols))
+)
+
+(defchords gh 100
+  (g h) esc
+  (g) g
+  (h) h
+)
+
+(deflayer base
+  caps esc
+  @a @s @d @f @g @h @j @k @l ;
+  _ _ _ _ _
+  @spc_sym 
+)
+
+(deflayer symbols
+  caps esc
+  S-6 = S-- S-4 S-8 _ lsft lctl lalt lmet
+  _ S-\ min S-. /
+  spc
+)
+

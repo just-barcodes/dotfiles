@@ -1,0 +1,26 @@
+set scrolloff=12
+
+" Don't use Ex mode, use Q for formatting.
+map Q gq
+
+
+""" searching """
+set hlsearch
+set incsearch
+set ignorecase
+
+
+let mapleader=" "
+vmap <Leader>y "+y
+nmap <Leader>p "+p
+nmap <Leader>P "+P
+vmap <Leader>p "+p
+vmap <Leader>P "+P
+
+nnoremap ZZ <nop>
+
+vnoremap < <gv
+vnoremap > >gv
+
+
+set ideajoin

@@ -1,0 +1,175 @@
+{
+  "cleanupPeriodDays": 90,
+  "includeGitInstructions": false,
+  "model": "opus",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [{ "type": "command", "command": "sm hook claude" }]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [{ "type": "command", "command": "sm hook claude" }]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [{ "type": "command", "command": "sm hook claude" }]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "bash {{ .chezmoi.homeDir }}/.claude/statusline-command.sh"
+  },
+  "enabledPlugins": {
+    "lua-lsp@claude-plugins-official": true,
+    "agentic-dev-team@bfinster": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "gopls-lsp@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "bfinster": {
+      "source": {
+        "source": "git",
+        "url": "https://github.com/bdfinst/agentic-dev-team.git"
+      }
+    }
+  },
+  "permissions": {
+    "allow": [
+      "Read",
+      "Grep",
+      "Glob",
+
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git branch:*)",
+      "Bash(git blame:*)",
+      "Bash(git stash list:*)",
+      "Bash(git remote -v)",
+
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(wc:*)",
+      "Bash(pwd)",
+      "Bash(which:*)",
+      "Bash(file:*)",
+      "Bash(rg:*)",
+      "Bash(fd:*)",
+      "Bash(jq:*)",
+      "Bash(stat:*)",
+      "Bash(realpath:*)",
+      "Bash(readlink:*)",
+      "Bash(basename:*)",
+      "Bash(dirname:*)",
+
+      "Bash(echo:*)",
+      "Bash(printf:*)",
+      "Bash(env)",
+      "Bash(uname:*)",
+      "Bash(hostname)",
+      "Bash(whoami)",
+      "Bash(id:*)",
+      "Bash(uptime)",
+      "Bash(groups)",
+      "Bash(date:*)",
+      "Bash(sort:*)",
+      "Bash(uniq:*)",
+      "Bash(tr:*)",
+      "Bash(cut:*)",
+      "Bash(test:*)",
+      "Bash(true)",
+      "Bash(false)",
+
+      "Bash(df:*)",
+      "Bash(du:*)",
+      "Bash(free:*)",
+      "Bash(ps:*)",
+      "Bash(ss:*)",
+
+      "Bash(dig:*)",
+      "Bash(host:*)",
+      "Bash(nslookup:*)",
+      "Bash(ping:*)",
+
+      "Bash(chezmoi diff:*)",
+      "Bash(chezmoi status:*)",
+      "Bash(chezmoi data:*)",
+      "Bash(chezmoi managed:*)",
+      "Bash(chezmoi execute-template:*)",
+
+      "Bash(pacman -Q:*)",
+      "Bash(pacman -Qi:*)",
+      "Bash(pacman -Qs:*)",
+      "Bash(pacman -Si:*)",
+      "Bash(pacman -Ss:*)",
+      "Bash(pacman -F:*)",
+      "Bash(paru -Q:*)",
+      "Bash(paru -Qi:*)",
+      "Bash(paru -Ss:*)",
+      "Bash(paru -Si:*)",
+
+      "Bash(mise ls:*)",
+      "Bash(mise current:*)",
+      "Bash(mise where:*)",
+      "Bash(mise env:*)",
+      "Bash(mise doctor)",
+
+      "Bash(podman ps:*)",
+      "Bash(podman images:*)",
+      "Bash(podman inspect:*)",
+      "Bash(podman logs:*)",
+      "Bash(docker ps:*)",
+      "Bash(docker images:*)",
+      "Bash(docker inspect:*)",
+      "Bash(docker logs:*)",
+
+      "Bash(gh pr view:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh issue view:*)",
+      "Bash(gh issue list:*)",
+      "Bash(gh repo view:*)",
+      "Bash(gh auth status)",
+
+      "Bash(tmux ls)",
+      "Bash(tmux list-sessions:*)",
+      "Bash(tmux list-windows:*)",
+      "Bash(tmux display-message:*)",
+      "Bash(sesh list:*)",
+      "Bash(atuin search:*)",
+      "Bash(atuin stats:*)",
+
+      "Bash(hyprctl clients)",
+      "Bash(hyprctl monitors)",
+      "Bash(hyprctl getoption:*)",
+      "Bash(systemctl status:*)",
+      "Bash(systemctl --user status:*)",
+      "Bash(journalctl:*)"
+    ],
+    "deny": [
+      "Bash(rm -rf /:*)",
+      "Bash(sudo rm -rf /:*)",
+      "Bash(dd:*)",
+      "Bash(mkfs:*)",
+      "Bash(mkfs.*:*)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(chezmoi purge:*)",
+      "Bash(pacman -Rsn:*)",
+      "Bash(sudo pacman -R:*)",
+      "Bash(paru -R:*)"
+    ]
+  },
+  "spinnerTipsEnabled": false,
+  "editorMode": "vim",
+  "preferredNotifChannel": "notifications_disabled",
+  "remoteControlAtStartup": true,
+  "agentPushNotifEnabled": false
+}

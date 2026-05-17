@@ -1,0 +1,32 @@
+#!/bin/bash
+# Rendered from .chezmoidata/packages.yaml. Edit the YAML, not this script.
+# Re-runs whenever the rendered output changes (i.e. when packages.yaml or the
+# host's entry in `machines:` changes).
+
+set -euo pipefail
+
+{{ if not (eq .chezmoi.osRelease.id "arch") -}}
+echo "Not running arch... exiting"
+exit 0
+{{ end -}}
+
+PACKAGES=(
+{{ range .packages.pacman.system    }}	{{ . }}
+{{ end -}}
+{{ range .packages.pacman.hyprland  }}	{{ . }}
+{{ end -}}
+{{ range .packages.pacman.developer }}	{{ . }}
+{{ end -}}
+{{ range .packages.pacman.fonts     }}	{{ . }}
+{{ end -}}
+{{ range .packages.pacman.apps      }}	{{ . }}
+{{ end -}}
+{{ range .packages.pacman.kde       }}	{{ . }}
+{{ end -}}
+{{- range (index .machines .chezmoi.hostname) -}}
+{{ range (index $.packages.pacman .) }}	{{ . }}
+{{ end -}}
+{{- end -}}
+)
+
+sudo pacman -Syu --needed --noconfirm "${PACKAGES[@]}"

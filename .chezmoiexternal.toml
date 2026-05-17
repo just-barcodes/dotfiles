@@ -1,0 +1,13 @@
+["dotfiles-deps/liquidprompt"]
+    type = "git-repo"
+    url = "https://github.com/liquidprompt/liquidprompt.git"
+    refreshPeriod = "168h"
+["dotfiles-deps/complete-alias"]
+    type = "git-repo"
+    url = "https://github.com/cykerway/complete-alias.git"
+    refreshPeriod = "840h"
+[".vim/bundle/Vundle.vim"]
+    type = "git-repo"
+    url = "https://github.com/VundleVim/Vundle.vim.git"
+    refreshPeriod = "840h"
+

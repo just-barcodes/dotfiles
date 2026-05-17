@@ -1,0 +1,207 @@
+export PATH=$HOME/.local/bin:$HOME/.npm-global/bin:$PATH
+export PATH="$HOME/.nimble/bin:$PATH"
+export PATH="$HOME/.local/share/mise/shims:$PATH"
+# Wrapper that injects --dotfiles-* flags on `devcontainer up`. Must come
+# after the mise shim line so it shadows the bare CLI.
+export PATH="$HOME/.local/share/devcontainer-wrapper/bin:$PATH"
+
+export EDITOR='vim'
+
+
+###############################################
+### History ###
+###############################################
+
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=50000
+SAVEHIST=10000
+setopt EXTENDED_HISTORY
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_SPACE
+setopt HIST_VERIFY
+setopt INC_APPEND_HISTORY
+# Do not share history between shells
+unsetopt SHARE_HISTORY
+
+
+###############################################
+### Completion ###
+###############################################
+
+autoload -Uz compinit
+compinit
+
+# Case-insensitive completion: typing `cd xxx<Tab>` matches `XxXasdf`
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+
+# Tool-generated completions (guarded so the rc stays portable)
+command -v kubectl >/dev/null && source <(kubectl completion zsh)
+command -v helm    >/dev/null && source <(helm completion zsh)
+command -v chezmoi >/dev/null && source <(chezmoi completion zsh)
+command -v npm     >/dev/null && source <(npm completion 2>/dev/null)
+command -v task    >/dev/null && source <(task --completion zsh)
+
+# AWS CLI completer (installed alongside awscli)
+command -v aws_completer >/dev/null && complete -C aws_completer aws
+
+
+###############################################
+### AWS profile helpers (replaces omz aws plugin) ###
+###############################################
+
+# Set current AWS profile; unset with `asp` and no args
+asp() {
+  if [[ -z "$1" ]]; then
+    unset AWS_PROFILE AWS_DEFAULT_PROFILE
+    return
+  fi
+  export AWS_PROFILE="$1"
+  export AWS_DEFAULT_PROFILE="$1"
+}
+
+# Echo current AWS profile
+agp() { echo "${AWS_PROFILE:-}" }
+
+
+###############################################
+### Key bindings ###
+###############################################
+
+# set -o vi
+bindkey -v
+
+# atuin — shell history with SQLite + fuzzy search on ^R
+# --disable-up-arrow keeps Up as default zsh history (avoids conflict with vi mode)
+if command -v atuin 2>&1 >/dev/null ; then
+    eval "$(atuin init zsh --disable-up-arrow)"
+fi
+
+# do not exit shell with Ctrl-D
+set -o ignoreeof
+
+
+###############################################
+### Aliases ###
+###############################################
+
+if command -v lsd 2>&1 >/dev/null ; then
+    alias ls='lsd'
+else
+    alias ls='ls --color=auto -F'
+fi
+alias la='ls -hAlF'
+alias l='ls -lF'
+
+alias y='yazi'
+
+if command -v nvim 2>&1 >/dev/null ; then
+    alias v='nvim'
+    alias vi='nvim'
+    alias vim='nvim'
+fi
+
+if command -v trash 2>&1 >/dev/null ; then
+    alias rm=trash
+fi
+
+# python
+alias p3='python3'
+alias p='python3'
+alias ip3='ipython3'
+
+# grep, ack
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+
+# git
+alias g='git'
+{{- range $key, $id := dig "git" "identities" dict . }}
+alias git-setup-{{ $key }}='git config user.name "{{ $id.name }}" && git config user.email "{{ $id.email }}"'
+{{- end }}
+
+# tmux
+alias t='tmux'
+
+# kubernetes
+alias k='kubectl'
+
+# terraform
+alias tf='terraform'
+
+# cd
+alias ..='cd ..'
+alias cd..='cd ..'
+alias cdd='cd ~/Desktop'
+alias cdw='cd ~/workspace'
+
+# pi (one-shot question to haiku)
+q() {
+    pi --print --no-session --no-tools --no-context-files --mode json --model claude-haiku-4-5 "$*" \
+        | jq -rs '
+            (map(select(.type == "agent_end")) | .[0].messages[-1]) as $m
+            | ($m.content | map(select(.type == "text"))[0].text) as $text
+            | $m.usage as $u
+            | "\($text)\n\n— \($m.model) | in:\($u.input) out:\($u.output) cache_r:\($u.cacheRead) | $\($u.cost.total)"
+        '
+}
+
+# kanata
+alias hm='sudo kanata --cfg .config/kanata/config.kbd'
+
+
+# sesh
+# Core picker — works anywhere
+function _sesh-pick() {
+  sesh list -t -c 2>/dev/null | \
+    fzf \
+      --height=80% \
+      --reverse \
+      --border \
+      --border-label=' sesh ' \
+      --prompt='⚡  ' \
+      --header='  ^a all  ^t tmux  ^g configs' \
+      --bind='tab:down,btab:up' \
+      --bind 'ctrl-a:reload(sesh list)' \
+      --bind='ctrl-t:reload(sesh list -t -c)' \
+      --bind='ctrl-g:reload(sesh list -c)' \
+      --preview-window='right:55%' \
+      --preview='sesh preview {}'
+}
+
+# ZLE widget — for keybinding
+function sesh-sessions() {
+  emulate -L zsh
+  local session
+  session="$(_sesh-pick < /dev/tty)"
+  [[ -z "$session" ]] && {
+    zle reset-prompt
+    return 0
+  }
+  BUFFER="sesh connect -- ${(q)session}"
+  zle accept-line
+}
+zle -N sesh-sessions
+bindkey -M emacs '^[^P' sesh-sessions
+bindkey -M vicmd '^[^P' sesh-sessions
+bindkey -M viins '^[^P' sesh-sessions
+
+
+###############################################
+### Secrets ###
+###############################################
+
+# GitHub PAT for Claude Code MCP server (stored in gnome-keyring via secret-tool)
+if command -v secret-tool >/dev/null 2>&1; then
+  export GITHUB_PAT="$(secret-tool lookup service github-mcp 2>/dev/null)"
+fi
+
+
+###############################################
+### Shell integrations ###
+###############################################
+
+command -v direnv   >/dev/null && eval "$(direnv hook zsh)"
+command -v zoxide   >/dev/null && eval "$(zoxide init zsh)"
+command -v starship >/dev/null && eval "$(starship init zsh)"
+

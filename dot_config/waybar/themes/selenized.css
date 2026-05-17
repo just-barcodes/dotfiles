@@ -1,0 +1,58 @@
+/* Selenized Dark — https://github.com/jan-warchol/selenized */
+
+/* Base colors */
+@define-color base   #103c48;
+@define-color mantle #0d3138;
+@define-color crust  #072530;
+
+/* Text colors */
+@define-color text     #adbcbc;
+@define-color subtext0 #72898f;
+@define-color subtext1 #cad8d9;
+
+/* Surface colors */
+@define-color surface0 #184956;
+@define-color surface1 #2d5b69;
+@define-color surface2 #3a6b7a;
+
+/* Overlay colors */
+@define-color overlay0 #72898f;
+@define-color overlay1 #8fa0a0;
+@define-color overlay2 #9babab;
+
+/* Accent colors */
+@define-color blue      #4695f7;
+@define-color lavender  #af88eb;
+@define-color sapphire  #41c7b9;
+@define-color sky       #41c7b9;
+@define-color teal      #41c7b9;
+@define-color green     #75b938;
+@define-color yellow    #dbb32d;
+@define-color peach     #ed8649;
+@define-color maroon    #fa5750;
+@define-color red       #fa5750;
+@define-color mauve     #af88eb;
+@define-color pink      #f275be;
+@define-color flamingo  #f275be;
+@define-color rosewater #cad8d9;
+
+/* Layout */
+@define-color background-primary   #103c48;
+@define-color background-secondary #184956;
+@define-color background-hover     #2d5b69;
+@define-color border-color         #2d5b69;
+
+/* Status colors */
+@define-color success @green;
+@define-color warning @yellow;
+@define-color error   @red;
+@define-color info    @blue;
+
+/* Module-specific */
+@define-color bg-workspaces #184956;
+@define-color bg-clock      #4695f7;
+@define-color bg-system     #2d5b69;
+@define-color bg-network    #2d5b69;
+@define-color bg-audio      #2d5b69;
+@define-color bg-launcher   #af88eb;
+@define-color bg-power      #fa5750;

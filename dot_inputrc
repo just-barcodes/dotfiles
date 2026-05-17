@@ -1,0 +1,40 @@
+# Readline config — affects bash, psql, python REPL, gdb, etc.
+
+# Use vi keymap if VI_MODE=1, else emacs (default)
+$if mode=emacs
+
+# Completion
+set completion-ignore-case on
+set completion-map-case on
+set show-all-if-ambiguous on
+set show-all-if-unmodified on
+set completion-prefix-display-length 3
+set menu-complete-display-prefix on
+set colored-completion-prefix on
+set colored-stats on
+set visible-stats on
+set mark-symlinked-directories on
+set skip-completed-text on
+
+# History
+set history-preserve-point on
+set revert-all-at-newline on
+
+# Display
+set bell-style none
+set echo-control-characters off
+set enable-bracketed-paste on
+
+# History search with up/down — type prefix then arrow
+"\e[A": history-search-backward
+"\e[B": history-search-forward
+
+# Word movement with ctrl+arrow
+"\e[1;5C": forward-word
+"\e[1;5D": backward-word
+
+# Tab cycles completions instead of just listing
+TAB: menu-complete
+"\e[Z": menu-complete-backward
+
+$endif

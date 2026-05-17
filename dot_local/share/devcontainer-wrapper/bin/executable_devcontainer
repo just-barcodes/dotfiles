@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# Wrapper around the mise-shimmed `devcontainer` CLI that injects --dotfiles-*
+# flags on `devcontainer up`, so every container we bring up automatically
+# clones our chezmoi-managed dotfiles and applies them.
+set -e
+
+REAL="$HOME/.local/share/mise/shims/devcontainer"
+
+DOTFILES_REPO="https://github.com/just-barcodes/dotfiles-chezmoi.git"
+# Clone straight into chezmoi's source dir so `chezmoi apply` finds it.
+# `~` is expanded inside the container by the dotfiles feature.
+DOTFILES_TARGET="~/.local/share/chezmoi"
+# Runs inside the container with CWD = DOTFILES_TARGET. Installs chezmoi via
+# the official one-liner if missing, then applies the just-cloned source.
+DOTFILES_INSTALL='set -e; command -v chezmoi >/dev/null 2>&1 || { sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"; export PATH="$HOME/.local/bin:$PATH"; }; chezmoi apply --source .'
+
+case "${1:-}" in
+  up)
+    shift
+    exec "$REAL" up \
+      --dotfiles-repository "$DOTFILES_REPO" \
+      --dotfiles-target-path "$DOTFILES_TARGET" \
+      --dotfiles-install-command "$DOTFILES_INSTALL" \
+      "$@"
+    ;;
+  *)
+    exec "$REAL" "$@"
+    ;;
+esac

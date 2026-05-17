@@ -1,0 +1,101 @@
+################################################################################
+# Window
+################################################################################
+[window.dimensions]
+columns = 90
+lines = 24
+
+################################################################################
+# Font
+################################################################################
+[font]
+size = 12.0
+
+[font.bold]
+family = "FiraCode Nerd Font"
+style = "Bold"
+
+[font.bold_italic]
+family = "FiraCode Nerd Font"
+style = "Bold Italic"
+
+[font.italic]
+family = "FiraCode Nerd Font"
+style = "Italic"
+
+[font.normal]
+family = "FiraCode Nerd Font"
+style = "Regular"
+
+################################################################################
+# Colors (Solarized Dark)
+################################################################################
+# Default colors
+# [colors.primary]
+# background = '#002b36'
+# foreground = '#839496'
+#
+# # Normal colors
+# [colors.normal]
+# black   = '#073642'
+# red     = '#dc322f'
+# green   = '#859900'
+# yellow  = '#b58900'
+# blue    = '#268bd2'
+# magenta = '#d33682'
+# cyan    = '#2aa198'
+# white   = '#eee8d5'
+#
+# # Bright colors
+# [colors.bright]
+# black   = '#002b36'
+# red     = '#cb4b16'
+# green   = '#586e75'
+# yellow  = '#657b83'
+# blue    = '#839496'
+# magenta = '#6c71c4'
+# cyan    = '#93a1a1'
+# white   = '#fdf6e3'
+
+################################################################################
+# Colors (Selenized dark)
+# from https://github.com/jan-warchol/selenized/tree/master/terminals/alacritty
+################################################################################
+
+# Default colors
+[colors.primary]
+background =  '0x103c48'
+foreground =  '0xadbcbc'
+
+# Normal colors
+[colors.normal]
+black =    '0x184956'
+red =      '0xfa5750'
+green =    '0x75b938'
+yellow =   '0xdbb32d'
+blue =     '0x4695f7'
+magenta =  '0xf275be'
+cyan =     '0x41c7b9'
+white =    '0x72898f'
+
+# Bright colors
+[colors.bright]
+black =    '0x2d5b69'
+red =      '0xff665c'
+green =    '0x84c747'
+yellow =   '0xebc13d'
+blue =     '0x58a3ff'
+magenta =  '0xff84cd'
+cyan =     '0x53d6c7'
+white =    '0xcad8d9'
+
+[[keyboard.bindings]]
+key = "Return"
+mods = "Shift"
+chars = "\u001B\r"
+
+# [[keyboard.bindings]]
+# key = "P"
+# mods = "Control|Alt|Shift"
+# chars = "\u001b[80;8u"
+
