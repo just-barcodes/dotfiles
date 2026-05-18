@@ -20,7 +20,7 @@ uv = "latest"
 rust = "latest"
 
 # Editors / fast-moving CLIs (kept current via mise instead of apt LTS)
-neovim = "stable"
+"aqua:neovim/neovim" = "latest"
 shellcheck = "latest"
 bat = "latest"
 yq = "latest"

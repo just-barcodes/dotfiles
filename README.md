@@ -73,6 +73,54 @@ glibc and breaks on Debian/Ubuntu LTS. Arch installs it from pacman
 (`tree-sitter-cli` in `packages.pacman.developer`); the apt extensive flow
 runs `cargo install tree-sitter-cli` so it links the local glibc.
 
+## Mise GitHub token — encrypted-at-rest setup
+
+Mise hits the GitHub releases API to resolve version aliases (`stable`, `latest`) and download binaries. Unauthenticated requests are throttled at 60/hr per IP — easy to exhaust during a fresh install or after a `mise upgrade`. With a token, the limit is 5000/hr.
+
+How the token is stored:
+
+- The PAT lives at `dot_config/secrets/encrypted_private_github.env` in this repo as an **age-encrypted** shell fragment. The ciphertext is safe to commit and push.
+- On `chezmoi apply`, it decrypts to `~/.config/secrets/github.env` with mode `0600` using the age key at `~/.config/sops/age/keys.txt`.
+- The first line of `~/.zshrc` sources that file, so `$GITHUB_TOKEN` is set before mise's shim path is wired up. Mise reads `GITHUB_TOKEN` from its process env at API-call time (not from its `[env]` table — that table only forwards env to child processes mise launches, not to mise itself).
+
+One-time, per-machine:
+
+1. Add age encryption to `~/.config/chezmoi/chezmoi.toml`:
+   ```toml
+   encryption = "age"
+
+   [age]
+   identity   = "~/.config/sops/age/keys.txt"
+   recipients = [
+     "age1eegxxwyv0lpdxyl9tlzkeh2l4d8vjq6gg3khzgudahf0x3qf0suqg6eexs",
+     "age1wm4vykzkwvajmmphgd38a8pyj070za75kvlpg8kqpela8gtfc4ms4cdst0",
+   ]
+   ```
+   Make sure `~/.config/sops/age/keys.txt` exists and contains a matching private key for at least one recipient.
+2. Apply the secrets dir and zshrc so the decrypted file lands at `~/.config/secrets/github.env`:
+   ```bash
+   chezmoi apply ~/.config/secrets ~/.zshrc
+   ```
+3. Open a new shell and verify:
+   ```bash
+   echo "${#GITHUB_TOKEN} chars"        # should print "93 chars" (or 40 for classic PAT)
+   mise ls-remote neovim | tail -3      # should print versions, no 403
+   ```
+
+To rotate the token (or set it up on a brand-new machine that has the age key but not the encrypted blob yet):
+
+```bash
+# In any shell with the age key present:
+read -rs T && printf 'export GITHUB_TOKEN=%q\nexport GITHUB_API_TOKEN="$GITHUB_TOKEN"\n' "$T" > /tmp/secrets.env && unset T
+chezmoi encrypt < /tmp/secrets.env > ~/.local/share/chezmoi/dot_config/secrets/encrypted_private_github.env
+shred -u /tmp/secrets.env
+chezmoi apply ~/.config/secrets
+```
+
+Generate the token at <https://github.com/settings/tokens> (classic, no scopes needed for public releases) or <https://github.com/settings/personal-access-tokens/new> (fine-grained, public repo read).
+
+**Gotcha — `vfox:` backend does not honour `$GITHUB_TOKEN`.** mise's vfox bridge (`crates/vfox/src/lua_mod/hooks.rs`) makes its own HTTP calls and never injects the auth header, so vfox-backed tools (notably the default `neovim` plugin) keep 403'ing even with a valid token. The aqua backend authenticates correctly. When a tool is available both ways, prefer `aqua:`. That is why `neovim` is pinned as `"aqua:neovim/neovim" = "latest"` rather than `neovim = "stable"`.
+
 ## Claude Code GitHub MCP — PAT setup
 
 The GitHub MCP server (`api.githubcopilot.com/mcp`) uses a Personal Access Token instead of OAuth. The token is stored in gnome-keyring via `secret-tool`; `~/.zshrc` exports it as `$GITHUB_PAT` at shell startup, and `.chezmoiscripts/run_onchange_claude_mcp_servers.sh` registers the server with a literal `${GITHUB_PAT}` placeholder that Claude Code expands at runtime. Nothing sensitive is written to `~/.claude.json` or the repo.
