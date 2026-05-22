@@ -38,17 +38,17 @@
   // Memory / CPU / Temp
   "memory": {
     "format": "{: >3}%",
-    "on-click": "hyprctl dispatch focusworkspaceoncurrentmonitor 99"
+    "on-click": "hyprctl dispatch 'hl.dsp.focus({workspace = 99, on_current_monitor = true})'"
   },
   "cpu": {
     "format": "󰘚 {usage: >2}%",
-    "on-click": "hyprctl dispatch focusworkspaceoncurrentmonitor 99"
+    "on-click": "hyprctl dispatch 'hl.dsp.focus({workspace = 99, on_current_monitor = true})'"
   },
   "temperature": {
     "hwmon-path": "/sys/class/hwmon/hwmon1/temp1_input",
     "critical-threshold": 80,
     "format": " {temperatureC}°C",
-    "on-click": "hyprctl dispatch focusworkspaceoncurrentmonitor 99"
+    "on-click": "hyprctl dispatch 'hl.dsp.focus({workspace = 99, on_current_monitor = true})'"
   },
   // Idle inhibitor
   "idle_inhibitor": {
