@@ -47,7 +47,7 @@ packages:
       # runtime/tool manager — installed from the mise apt repo (script adds it)
       - mise
 
-      # dev tools (neovim, gh, shellcheck, bat, yq live in mise — see above)
+      # dev tools (neovim, gh, shellcheck, bat, yq live in mise - see above)
       - git-lfs
       - tig
       - tldr
@@ -280,3 +280,4 @@ packages:
     - sesh-bin
     - bluetuith
     - wifitui
+    - proton-mail-bin
