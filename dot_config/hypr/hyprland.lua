@@ -73,11 +73,13 @@ hl.window_rule({
     no_focus = true,
 })
 
--- Red borders on the named special workspace
+-- Red border on the named special workspace, always visible — the no-gaps
+-- single-window rules in style.lua are scoped `s[false]` so they don't zero
+-- the border on special:magic. String form is "<active> <inactive>".
 hl.window_rule({
     name  = "special-magic-border",
     match = { workspace = "special:magic" },
-    border_color = { colors = { "rgba(ff4444ee)", "rgba(883333aa)" }, angle = 0 },
+    border_color = "rgba(fa5750ee) rgba(2d5b69aa)",
 })
 
 -- Firefox/Zen extension pop-out windows (e.g., Bitwarden) and Picture-in-Picture
