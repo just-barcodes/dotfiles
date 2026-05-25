@@ -201,10 +201,7 @@ hl.bind("SUPER + ALT + SHIFT + y", hl.dsp.window.move({ workspace = 95, follow =
 ----------------------------------------------------------------
 -- Teams (T / 91)
 ----------------------------------------------------------------
-hl.bind(
-	"SUPER + ALT + T",
-	focus_or_launch(91, "class:^chrome-teams\\.microsoft\\.com.*$", "gtk-launch teams")
-)
+hl.bind("SUPER + ALT + T", focus_or_launch(91, "class:^chrome-teams\\.microsoft\\.com.*$", "gtk-launch teams"))
 hl.window_rule({
 	name = "windowrule-teams",
 	match = { class = "^chrome-teams\\.microsoft\\.com.*$" },
@@ -213,13 +210,31 @@ hl.window_rule({
 hl.bind("SUPER + ALT + SHIFT + t", hl.dsp.window.move({ workspace = 91, follow = false }))
 
 ----------------------------------------------------------------
--- Email / Betterbird (U / 90)
+-- Email / Proton Mail + Prospect Mail (U / 90)
+-- tabbed group
 ----------------------------------------------------------------
-hl.bind("SUPER + ALT + U", focus_or_launch(90, "class:^eu\\.betterbird\\.Betterbird$", "betterbird"))
+hl.bind("SUPER + ALT + U", function()
+	hl.dispatch(hl.dsp.focus({ workspace = 90, on_current_monitor = true }))
+	if hl.get_window("class:^Proton Mail$") then
+		hl.dispatch(hl.dsp.focus({ window = "class:^Proton Mail$" }))
+	else
+		hl.exec_cmd("proton-mail")
+	end
+	if not hl.get_window("class:^Prospect Mail$") then
+		hl.exec_cmd("prospect-mail")
+	end
+end)
 hl.window_rule({
-	name = "windowrule-betterbird",
-	match = { class = "^(eu.betterbird.Betterbird)$" },
+	name = "windowrule-proton-mail",
+	match = { class = "^(Proton Mail)$" },
 	workspace = "90",
+	group = "set",
+})
+hl.window_rule({
+	name = "windowrule-prospect-mail",
+	match = { class = "^(Prospect Mail)$" },
+	workspace = "90",
+	group = "set",
 })
 hl.bind("SUPER + ALT + SHIFT + u", hl.dsp.window.move({ workspace = 90, follow = false }))
 
