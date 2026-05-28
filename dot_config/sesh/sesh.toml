@@ -7,9 +7,9 @@ path = "~/Downloads"
 startup_command = "yazi"
 
 [[session]]
-name = "chezmoi (configs)"
+name = "chezmoi (configs / dotfiles)"
 path = "~/.local/share/chezmoi"
-startup_command = 'bash ~/.config/sesh/scripts/chezmoi\ \(configs\).sh'
+startup_command = 'bash ~/.config/sesh/scripts/chezmoi_dotfiles.sh'
 
 [[session]]
 name = "homelab"
@@ -23,4 +23,3 @@ max_depth = 1
 [zoxide]
 enabled = true
 score_threshold = 20
-
