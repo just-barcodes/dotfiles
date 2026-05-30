@@ -46,4 +46,7 @@ vim.keymap.set("v", "<C-_>", "gc", { remap = true })
 
 -- save using ctrl s
 vim.keymap.set("n", "<C-s>", ":w<CR>", { noremap = true, silent = true })
+
+-- disable ZZ (write-and-quit) to avoid accidental quits
+vim.keymap.set("n", "ZZ", "<Nop>", { noremap = true })
 -- vim.keymap.set("i", "<C-s>", "<Esc>:w<CR>i", { noremap = true, silent = true })
