@@ -151,43 +151,8 @@ q() {
 # kanata
 alias hm='sudo kanata --cfg .config/kanata/config.kbd'
 
-
-# sesh
-# Core picker — works anywhere
-function _sesh-pick() {
-  sesh list -t -c 2>/dev/null | \
-    fzf \
-      --height=80% \
-      --reverse \
-      --border \
-      --border-label=' sesh ' \
-      --prompt='⚡  ' \
-      --header='  ^a all  ^t tmux  ^g configs' \
-      --bind='tab:down,btab:up' \
-      --bind 'ctrl-a:reload(sesh list)' \
-      --bind='ctrl-t:reload(sesh list -t -c)' \
-      --bind='ctrl-g:reload(sesh list -c)' \
-      --preview-window='right:55%' \
-      --preview='sesh preview {}'
-}
-
-# ZLE widget — for keybinding
-function sesh-sessions() {
-  emulate -L zsh
-  local session
-  session="$(_sesh-pick < /dev/tty)"
-  [[ -z "$session" ]] && {
-    zle reset-prompt
-    return 0
-  }
-  BUFFER="sesh connect -- ${(q)session}"
-  zle accept-line
-}
-zle -N sesh-sessions
-bindkey -M emacs '^[^P' sesh-sessions
-bindkey -M vicmd '^[^P' sesh-sessions
-bindkey -M viins '^[^P' sesh-sessions
-
+# hyprctl - restart hyprlock
+alias hyprctl_restart='hyprctl --instance 0 eval "hl.config({ misc = {allow_session_lock_restore = true } })" && hyprctl dispatch "hl.dsp.exec_cmd(\"hyprlock --immediate-render --no-fade-in\")" && export HYPRLAND_INSTANCE_SIGNATURE=$(basename "$(ls -td $XDG_RUNTIME_DIR/hypr/* | head -1)")'
 
 ###############################################
 ### Global aliases ###
