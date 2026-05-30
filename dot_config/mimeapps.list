@@ -10,8 +10,18 @@ text/html=firefox-developer-edition.desktop;
 x-scheme-handler/chrome=firefox-developer-edition.desktop;
 x-scheme-handler/http=firefox-developer-edition.desktop;
 x-scheme-handler/https=firefox-developer-edition.desktop;
+x-scheme-handler/mailto=proton-mail.desktop;
+text/plain=nvim.desktop;
+application/x-shellscript=nvim.desktop;
+text/markdown=nvim.desktop;
+application/json=nvim.desktop;
 
 [Default Applications]
+x-scheme-handler/mailto=proton-mail.desktop
+text/plain=nvim.desktop
+application/x-shellscript=nvim.desktop
+text/markdown=nvim.desktop
+application/json=nvim.desktop
 application/pdf=okular.desktop;
 application/x-extension-htm=firefox-developer-edition.desktop
 application/x-extension-html=firefox-developer-edition.desktop
