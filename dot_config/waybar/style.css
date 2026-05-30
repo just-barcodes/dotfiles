@@ -282,6 +282,10 @@ tooltip label {
 * Custom modules
 * -------------------------------------------------------------------------- */
 
+#custom-sm {
+	margin-right: 24px;
+}
+
 #custom-notification {
 	color: @peach;
 }

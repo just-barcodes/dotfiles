@@ -176,6 +176,16 @@
     },
     "interval": 1
   },
+  // Agentic session manager (sm)
+  "custom/sm": {
+    "return-type": "json",
+    "exec-if": "which sm",
+    "exec": "~/.config/waybar/scripts/sm-status.sh",
+    "interval": 3,
+    "on-click": "sm-switch.sh",
+    "tooltip": true,
+    "escape": false
+  },
   // Notifications (SwayNC)
   "custom/notification": {
     "tooltip": true,

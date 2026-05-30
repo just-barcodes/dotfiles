@@ -62,7 +62,7 @@ hl.window_rule({
 ----------------------------------------------------------------
 hl.bind("SUPER + SHIFT + F9", hl.dsp.exec_cmd('hyprctl --batch "dispatch dpms off; sleep 2; dispatch dpms on"'))
 
-hl.bind("CTRL + ALT + SHIFT + P", hl.dsp.exec_cmd("~/.local/bin/sesh-picker"))
+hl.bind("CTRL + ALT + SHIFT + P", hl.dsp.exec_cmd("~/.local/bin/sm-switch.sh"))
 hl.bind("CTRL + ALT + SHIFT + O", hl.dsp.exec_cmd("~/.local/bin/sesh-picker"))
 
 ----------------------------------------------------------------
