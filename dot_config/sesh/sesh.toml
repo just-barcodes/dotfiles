@@ -2,11 +2,6 @@
 startup_command = "nvim"
 
 [[session]]
-name = "Downloads 📥"
-path = "~/Downloads"
-startup_command = "yazi"
-
-[[session]]
 name = "chezmoi (configs / dotfiles)"
 path = "~/.local/share/chezmoi"
 startup_command = 'bash ~/.config/sesh/scripts/chezmoi_dotfiles.sh'
