@@ -19,7 +19,13 @@ sel=$(echo "$sessions" \
     | walker --dmenu)
 [ -z "$sel" ] && exit 0
 
-name=$(basename "$sel")
+# Path-based entries (zoxide/dir) are named by their directory basename;
+# named config sessions use the name verbatim. basename on the latter would
+# mangle names containing "/" (e.g. "chezmoi (configs / dotfiles)").
+case "$sel" in
+    /* | "~"*) name=$(basename "$sel") ;;
+    *) name=$sel ;;
+esac
 # Resolve absolute path for -c: zoxide entries' Name uses literal "~" which
 # won't expand inside quotes, so look up the absolute Path from the JSON.
 sel_path=$(echo "$sessions" | jq -r --arg n "$sel" 'first(.[] | select(.Name == $n) | .Path) // empty')
