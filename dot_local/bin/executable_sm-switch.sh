@@ -17,7 +17,7 @@ rows=$(sm status --json | jq -r '
   | @tsv
 ')
 
-[ -n "$rows" ] || exit 0
+# [ -n "$rows" ] || exit 0
 
 idx=$(printf '%s\n' "$rows" | cut -f2- |
     walker -d -i --width 960 -p "session...")
