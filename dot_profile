@@ -1,5 +1,5 @@
 
-. "$HOME/.local/bin/env"
+export PATH="$HOME/.local/bin:$PATH"
 
 
 # Added by Toolbox App

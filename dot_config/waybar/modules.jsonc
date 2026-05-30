@@ -178,6 +178,7 @@
   },
   // Agentic session manager (sm)
   "custom/sm": {
+    "format": "{}",
     "return-type": "json",
     "exec-if": "which sm",
     "exec": "~/.config/waybar/scripts/sm-status.sh",
