@@ -2,30 +2,33 @@
 # sm-switch: pick a live agent session in walker and jump to its window.
 set -eu
 
-# ID <TAB> "icon  agent  path  prompt"; dmenu renders one label per line, so
+# Map each session's CWD to its sesh/zoxide name
+sesh_json=$(sesh list -d --json 2>/dev/null || echo '[]')
+
+# ID <TAB> "icon  agent  name  prompt"; dmenu renders one label per line, so
 # the visible columns are space-padded to align
-rows=$(sm status --json | jq -r --arg home "$HOME" '
+rows=$(sm status --json | jq -r --argjson sesh "${sesh_json:-[]}" '
   def rank($s): {"waiting":0,"idle":1,"running":2}[$s] // 9;
   def icon($s): {"waiting":"🔴","idle":"🟡","running":"🟢"}[$s] // "⚪";
-  def shortpath($p): if ($p|startswith($home)) then "~"+$p[($home|length):] else $p end;
   def cap($n): if (length > $n) then "…" + .[(length - $n + 1):] else . end;
   def pad($w): . + (if ($w - length) > 0 then " " * ($w - length) else "" end);
-  [ .[] | select(.Status=="waiting" or .Status=="idle" or .Status=="running") ]
+  ( $sesh | map({ key: (.Path | rtrimstr("/")), value: .Name }) | from_entries ) as $names
+  | [ .[] | select(.Status=="waiting" or .Status=="idle" or .Status=="running") ]
   | sort_by(.LastEventAt) | reverse
   | sort_by(rank(.Status))
   | map({
       id: .ID,
       icon: icon(.Status),
       agent: .Agent,
-      path: (shortpath(.CWD) | cap(40)),
+      name: ( ($names[.CWD | rtrimstr("/")] // (.CWD | split("/") | last)) | cap(40) ),
       prompt: ( (.LastPrompt // "") | gsub("\\s+";" ") | .[0:100]
                 | if . == "" then "(no prompt yet)" else . end )
     })
   | (map(.agent | length) | max // 0) as $aw
-  | (map(.path  | length) | max // 0) as $pw
+  | (map(.name  | length) | max // 0) as $nw
   | .[]
   | [ .id,
-      ( .icon + "  " + (.agent | pad($aw)) + "  " + (.path | pad($pw)) + "  " + .prompt ) ]
+      ( .icon + "  " + (.agent | pad($aw)) + "  " + (.name | pad($nw)) + "  " + .prompt ) ]
   | @tsv
 ')
 
