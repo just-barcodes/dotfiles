@@ -7,8 +7,12 @@ export PATH="$HOME/.local/share/mise/shims:$PATH"
 # after the mise shim line so it shadows the bare CLI.
 export PATH="$HOME/.local/share/devcontainer-wrapper/bin:$PATH"
 
-export EDITOR='nvim'
-export VISUAL='nvim'
+if command -v nvim >/dev/null 2>&1; then
+  export EDITOR='nvim'
+else
+  export EDITOR='vi'
+fi
+export VISUAL="$EDITOR"
 
 
 ###############################################

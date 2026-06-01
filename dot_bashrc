@@ -60,8 +60,12 @@ fi
 ##############################################################################
 ### exports ###
 ##############################################################################
-export EDITOR='nvim'
-export VISUAL='nvim'
+if command -v nvim >/dev/null 2>&1; then
+  export EDITOR='nvim'
+else
+  export EDITOR='vi'
+fi
+export VISUAL="$EDITOR"
 if [ -f "$HOME/.pythonrc.py" ]; then
     export PYTHONSTARTUP=~/.pythonrc.py
 fi

@@ -13,7 +13,6 @@
 [branch]
     sort = -committerdate
 [core]
-    editor = vi
     excludesfile = ~/.gitignore_global
     autocrlf = false
 [color]
