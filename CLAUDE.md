@@ -48,7 +48,7 @@ chezmoi state delete-bucket --bucket=scriptState
 
 - `dot_config/` — XDG config dir (`~/.config/`), containing:
   - `nvim/` — Neovim config (lazy.nvim, selenized theme; plugin loading skipped when running inside VSCode via `vim.fn.exists("g:vscode")`)
-  - `hypr/` — Hyprland WM (Lua config since 0.55) split into focused files: `hyprland.lua` (entry, `require`s the others), `keybindings.lua`, `input.lua`, `style.lua`. `hypridle.conf` and `hyprlock.conf` are separate programs and stay in hyprlang format. `monitors.lua` is machine-local and not tracked by chezmoi.
+  - `hypr/` — Hyprland WM (Lua config since 0.55) split into focused files: `hyprland.lua` (entry, `require`s the others), `keybindings.lua`, `input.lua`, `style.lua`, and `workspaces.lua` (an intentionally empty placeholder kept via the source name `empty_workspaces.lua` so `require("workspaces")` resolves). `hypridle.conf` and `hyprlock.conf` are separate programs and stay in hyprlang format. `monitors.lua` is machine-local and not tracked by chezmoi.
   - `ghostty/config.ghostty` — primary terminal (replaced alacritty)
   - `waybar/`, `swaync/`, `walker/`, `kanata/` — supporting Wayland stack
   - `sesh/sesh.toml` — session manager config; `sesh/scripts/<session-name>.sh` — per-session startup scripts (see below)
@@ -58,6 +58,7 @@ chezmoi state delete-bucket --bucket=scriptState
   - `run_onchange_paru_installs.sh.tmpl` — AUR packages (paru), also rendered from `.chezmoidata/packages.yaml`
   - `run_onchange_apt_installs.sh.tmpl` — Debian/Ubuntu installer, rendered from `packages.apt.minimal` in `packages.yaml`. When `aptExtensive = true` is set under `[data]` in `~/.config/chezmoi/chezmoi.toml`, also adds the mise apt repo and installs `packages.apt.extensive` (which includes `mise`). No-op on non-Debian hosts.
   - `run_onchange_npm_global_installs.sh.tmpl` — npm globals from the `npm_global:` list; no-op if npm isn't installed
+  - `run_onchange_mise_installs.sh.tmpl` — runs `mise install` for the tools pinned in `dot_config/mise/config.toml` (re-triggers on that file's hash); no-op if mise isn't installed
 - `.chezmoidata/packages.yaml` — single source of truth for `pacman`, `paru`, `apt`, and `npm_global` package lists, plus the per-host `machines:` map. Edit this file (not the scripts) to add or remove packages.
 
 ## New machine bootstrap
