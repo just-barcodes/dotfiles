@@ -22,17 +22,6 @@ ensure_mcp() {
   fi
 }
 
-ensure_mcp_http() {
-  local name="$1"
-  local url="$2"
-  if grep -q "^${name}:" <<<"$existing"; then
-    echo "MCP '${name}' already registered"
-  else
-    echo "Adding MCP '${name}' (http)"
-    claude mcp add --transport http -s user "${name}" "${url}"
-  fi
-}
-
 # Always re-register so header/URL changes flow through on apply.
 ensure_mcp_http_with_header() {
   local name="$1"
