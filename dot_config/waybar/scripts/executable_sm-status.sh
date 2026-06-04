@@ -12,15 +12,15 @@ sm status --json 2>/dev/null | jq -c '
   def chip($hex; $n):
     "<span foreground=\"\($hex)\" size=\"140%\" rise=\"-9000\">●</span>"
     + "<span foreground=\"\($hex)\" rise=\"-7500\"> \($n)</span>";
-  "#fa5750" as $cred   |
-  "#75b938" as $cgreen |
-  "#dbb32d" as $cyellow|
-  ( [ .[] | select(.Status=="waiting") ] | length ) as $red    |
-  ( [ .[] | select(.Status=="running") ] | length ) as $green  |
-  ( [ .[] | select(.Status=="idle")    ] | length ) as $yellow |
+  "#fa5750" as $color_red    |
+  "#75b938" as $color_green  |
+  "#dbb32d" as $color_yellow |
+  ( [ .[] | select(.Status=="waiting") ] | length ) as $n_waiting |
+  ( [ .[] | select(.Status=="running") ] | length ) as $n_running |
+  ( [ .[] | select(.Status=="idle")    ] | length ) as $n_idle    |
   {
-    text: "\(chip($cred; $red))  \(chip($cgreen; $green))  \(chip($cyellow; $yellow))",
-    class: (if $red > 0 then "waiting" elif $green > 0 then "running" else "idle" end),
+    text: "\(chip($color_red; $n_waiting))  \(chip($color_green; $n_running))  \(chip($color_yellow; $n_idle))",
+    class: (if $n_waiting > 0 then "waiting" elif $n_running > 0 then "running" else "idle" end),
     tooltip: (
       [ .[]
         | select(.Status=="waiting" or .Status=="idle" or .Status=="running")
