@@ -27,6 +27,7 @@ packages:
       - vim
       - git
       - zsh
+      - fonts-powerline
       - curl
       - tmux
       - htop

@@ -2,9 +2,8 @@
 set -euo pipefail
 
 {{ if or (eq .chezmoi.osRelease.id "debian") (eq .chezmoi.osRelease.id "ubuntu") -}}
-if ! command -v zsh >/dev/null 2>&1; then
-	sudo apt-get update && sudo apt-get install -y zsh fonts-powerline
-fi
+# zsh and fonts-powerline are installed from the centralized manifest
+# (packages.apt.minimal via run_onchange_apt_installs.sh.tmpl).
 
 # Arch installs starship via pacman (see packages.yaml). On Debian/Ubuntu it
 # isn't packaged in stable channels, so fall back to the upstream installer.
