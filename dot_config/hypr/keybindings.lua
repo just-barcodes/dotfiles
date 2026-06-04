@@ -19,6 +19,14 @@ local function focus_or_launch(workspace, window_selector, launch_cmd)
 	end
 end
 
+-- Pin a single app to a workspace: SUPER+ALT+<key> focuses/launches it,
+-- SUPER+ALT+SHIFT+<key> moves the focused window there, and <rule> pins it.
+local function bind_app_workspace(key, workspace, selector, launch_cmd, rule)
+	hl.bind("SUPER + ALT + " .. key, focus_or_launch(workspace, selector, launch_cmd))
+	hl.window_rule(rule)
+	hl.bind("SUPER + ALT + SHIFT + " .. key:lower(), hl.dsp.window.move({ workspace = workspace, follow = false }))
+end
+
 ----------------------------------------------------------------
 -- Misc
 ----------------------------------------------------------------
@@ -157,57 +165,47 @@ hl.bind("SUPER + CTRL + j", hl.dsp.window.resize({ x = 0, y = 140, relative = tr
 ----------------------------------------------------------------
 -- Spotify (M / 96)
 ----------------------------------------------------------------
-hl.bind("SUPER + ALT + M", focus_or_launch(96, "class:^Spotify$", "spotify-launcher"))
-hl.window_rule({
+bind_app_workspace("M", 96, "class:^Spotify$", "spotify-launcher", {
 	name = "windowrule-spotify",
 	match = { class = "^(Spotify)$" },
 	workspace = "96",
 })
-hl.bind("SUPER + ALT + SHIFT + m", hl.dsp.window.move({ workspace = 96, follow = false }))
 
 ----------------------------------------------------------------
 -- Obsidian (O / 70)
 ----------------------------------------------------------------
-hl.bind("SUPER + ALT + O", focus_or_launch(70, "class:^(obsidian|Obsidian)$", "obsidian"))
-hl.window_rule({
+bind_app_workspace("O", 70, "class:^(obsidian|Obsidian)$", "obsidian", {
 	name = "windowrule-obsidian",
 	match = { class = "^(obsidian)$" },
 	workspace = "70",
 })
-hl.bind("SUPER + ALT + SHIFT + o", hl.dsp.window.move({ workspace = 70, follow = false }))
 
 ----------------------------------------------------------------
 -- ChatGPT (I / 80)
 ----------------------------------------------------------------
-hl.bind("SUPER + ALT + I", focus_or_launch(80, "class:^CHATGPT$", "gtk-launch chatgpt"))
-hl.window_rule({
+bind_app_workspace("I", 80, "class:^CHATGPT$", "gtk-launch chatgpt", {
 	name = "windowrule-chatgpt",
 	match = { class = "^(CHATGPT)$" },
 	workspace = "80",
 })
-hl.bind("SUPER + ALT + SHIFT + i", hl.dsp.window.move({ workspace = 80, follow = false }))
 
 ----------------------------------------------------------------
 -- YouTube (Y / 95)
 ----------------------------------------------------------------
-hl.bind("SUPER + ALT + Y", focus_or_launch(95, "class:^YOUTUBE$", "gtk-launch youtube"))
-hl.window_rule({
+bind_app_workspace("Y", 95, "class:^YOUTUBE$", "gtk-launch youtube", {
 	name = "windowrule-youtube",
 	match = { class = "^(YOUTUBE)$" },
 	workspace = "95",
 })
-hl.bind("SUPER + ALT + SHIFT + y", hl.dsp.window.move({ workspace = 95, follow = false }))
 
 ----------------------------------------------------------------
 -- Teams (T / 91)
 ----------------------------------------------------------------
-hl.bind("SUPER + ALT + T", focus_or_launch(91, "class:^chrome-teams\\.microsoft\\.com.*$", "gtk-launch teams"))
-hl.window_rule({
+bind_app_workspace("T", 91, "class:^chrome-teams\\.microsoft\\.com.*$", "gtk-launch teams", {
 	name = "windowrule-teams",
 	match = { class = "^chrome-teams\\.microsoft\\.com.*$" },
 	workspace = "91",
 })
-hl.bind("SUPER + ALT + SHIFT + t", hl.dsp.window.move({ workspace = 91, follow = false }))
 
 ----------------------------------------------------------------
 -- Email / Proton Mail + Prospect Mail (U / 90)
