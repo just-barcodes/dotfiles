@@ -21,26 +21,72 @@ data=$(printf '%s' "$input" | jq -r '
 $data
 EOF
 
+RST=$(printf '\033[0m')
+DIM=$(printf '\033[2m')
+CYAN=$(printf '\033[36m')
+MAGENTA=$(printf '\033[35m')
+SEP=" ${DIM}│${RST} "
+
+# green below 60%, yellow below 80%, bold red at 80%+
+pct_color() {
+  p=${1%.*}
+  if [ "$p" -ge 80 ]; then printf '\033[1;31m'
+  elif [ "$p" -ge 60 ]; then printf '\033[33m'
+  else printf '\033[32m'; fi
+}
+
+fmt_num() {
+  awk -v n="$1" 'BEGIN {
+    if (n >= 1000000) printf "%.1fM", n / 1000000
+    else if (n >= 1000) printf "%.1fk", n / 1000
+    else printf "%d", n
+  }'
+}
+
+bar() {
+  p=${1%.*}
+  filled=$(((p + 5) / 10))
+  [ "$filled" -gt 10 ] && filled=10
+  i=0
+  while [ "$i" -lt 10 ]; do
+    if [ "$i" -lt "$filled" ]; then printf '█'; else printf '░'; fi
+    i=$((i + 1))
+  done
+}
+
+out=""
+append() {
+  if [ -n "$out" ]; then out="${out}${SEP}$1"; else out="$1"; fi
+}
+
+if [ -n "$total_in" ]; then
+  append "$(printf '%s↑%s%s %s↓%s%s' \
+    "$CYAN" "$(fmt_num "$total_in")" "$RST" \
+    "$MAGENTA" "$(fmt_num "$total_out")" "$RST")"
+fi
+
 if [ -n "$used" ] && [ -n "$remaining" ]; then
-  printf "tokens: %d in / %d out | ctx: %.0f%% used / %.0f%% remaining" \
-    "$total_in" "$total_out" "$used" "$remaining"
-elif [ -n "$total_in" ]; then
-  printf "tokens: %d in / %d out" "$total_in" "$total_out"
+  c=$(pct_color "$used")
+  append "$(printf '%s%s %.0f%%%s %sctx%s' \
+    "$c" "$(bar "$used")" "$used" "$RST" "$DIM" "$RST")"
 fi
 
 if [ -n "$five_hour" ]; then
+  c=$(pct_color "$five_hour")
   reset_str=""
   if [ -n "$resets_at" ]; then
     now=$(date +%s)
     mins_left=$(((resets_at - now) / 60))
     reset_at_hhmm=$(date -d "@$resets_at" '+%H:%M')
     if [ "$mins_left" -gt 0 ]; then
-      hours_left=$((mins_left / 60))
-      mins_part=$((mins_left % 60))
-      reset_str=" (resets ${reset_at_hhmm}, in ${hours_left}h${mins_part}m)"
+      reset_str=$(printf ' %s⟳ %s in %dh%02dm%s' \
+        "$DIM" "$reset_at_hhmm" $((mins_left / 60)) $((mins_left % 60)) "$RST")
     else
-      reset_str=" (resets ${reset_at_hhmm})"
+      reset_str=$(printf ' %s⟳ %s%s' "$DIM" "$reset_at_hhmm" "$RST")
     fi
   fi
-  printf " | 5h: %.0f%% used%s" "$five_hour" "$reset_str"
+  append "$(printf '%s%.0f%%%s %s5h%s%s' \
+    "$c" "$five_hour" "$RST" "$DIM" "$RST" "$reset_str")"
 fi
+
+printf '%s' "$out"
