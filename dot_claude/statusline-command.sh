@@ -2,6 +2,8 @@
 input=$(cat)
 
 data=$(printf '%s' "$input" | jq -r '
+  .model.display_name                    // "",
+  .effort.level                          // "",
   .context_window.used_percentage        // "",
   .context_window.remaining_percentage   // "",
   .context_window.total_input_tokens     // "",
@@ -11,6 +13,8 @@ data=$(printf '%s' "$input" | jq -r '
 ')
 
 {
+  IFS= read -r model
+  IFS= read -r effort
   IFS= read -r used
   IFS= read -r remaining
   IFS= read -r total_in
@@ -58,6 +62,12 @@ out=""
 append() {
   if [ -n "$out" ]; then out="${out}${SEP}$1"; else out="$1"; fi
 }
+
+if [ -n "$model" ]; then
+  seg="$model"
+  [ -n "$effort" ] && seg="${seg} ${DIM}${effort}${RST}"
+  append "$seg"
+fi
 
 if [ -n "$total_in" ]; then
   append "$(printf '%s↑%s%s %s↓%s%s' \
