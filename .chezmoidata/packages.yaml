@@ -182,6 +182,8 @@ packages:
       - usage
       - television
       - tree-sitter-cli
+      - trivy
+      - gitleaks
 
     fonts:
       - ttf-fira-code
