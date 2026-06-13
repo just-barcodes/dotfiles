@@ -1,0 +1,37 @@
+name: Renovate
+
+on:
+  schedule:
+    # Weekly, Monday 06:00 UTC. Low-noise cadence for a personal dotfiles repo.
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: "Log level"
+        type: choice
+        default: info
+        options: [debug, info]
+      dryRun:
+        description: "Dry run (no branches/PRs created)"
+        type: boolean
+        default: false
+
+concurrency:
+  group: renovate
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  renovate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: renovatebot/github-action@v46.1.15
+        with:
+          token: ${{ secrets.RENOVATE_TOKEN }}
+        env:
+          LOG_LEVEL: ${{ inputs.logLevel || 'info' }}
+          RENOVATE_DRY_RUN: ${{ inputs.dryRun && 'full' || '' }}
+          RENOVATE_REPOSITORIES: ${{ github.repository }}
