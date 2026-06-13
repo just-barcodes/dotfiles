@@ -32,6 +32,7 @@ jobs:
         with:
           token: ${{ secrets.RENOVATE_TOKEN }}
         env:
+          RENOVATE_GIT_AUTHOR: "just-barcodes <4962974+just-barcodes@users.noreply.github.com>"
           LOG_LEVEL: ${{ inputs.logLevel || 'info' }}
           RENOVATE_DRY_RUN: ${{ inputs.dryRun && 'full' || '' }}
           RENOVATE_REPOSITORIES: ${{ github.repository }}

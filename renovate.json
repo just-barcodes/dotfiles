@@ -4,6 +4,7 @@
     "config:recommended",
     ":dependencyDashboard"
   ],
+  "assignees": ["just-barcodes"],
   "mise": {
     "managerFilePatterns": ["/(^|/)dot_config/mise/config\\.toml$/"]
   },
