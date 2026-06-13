@@ -23,7 +23,7 @@ rust = "1.96.0"
 "aqua:neovim/neovim" = "latest"
 shellcheck = "0.11.0"
 bat = "0.26.1"
-yq = "4.53.2"
+yq = "4.53.3"
 
 # Git / Docker TUIs
 gh = "2"
