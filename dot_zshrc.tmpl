@@ -154,7 +154,7 @@ q() {
 }
 
 # kanata
-alias hm='sudo kanata --cfg .config/kanata/config.kbd'
+alias hm='sudo kanata --cfg ~/.config/kanata/config.kbd'
 
 # hyprctl - restart hyprlock
 alias hyprctl_restart='export HYPRLAND_INSTANCE_SIGNATURE=$(basename "$(ls -td $XDG_RUNTIME_DIR/hypr/* | head -1)") && hyprctl --instance 0 eval "hl.config({ misc = {allow_session_lock_restore = true } })" && hyprctl dispatch "hl.dsp.exec_cmd(\"hyprlock --immediate-render --no-fade-in\")"'
