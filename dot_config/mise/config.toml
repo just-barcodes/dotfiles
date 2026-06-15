@@ -27,7 +27,7 @@ yq = "4.53.3"
 
 # Git / Docker TUIs
 gh = "2"
-lazygit = "0.61"
+lazygit = "0.62.2"
 lazydocker = "0.25"
 
 # Shell history sync
