@@ -10,7 +10,7 @@ kubectl = "1.36"
 helm = "4.2"
 argocd = "3.2"
 terraform = "1.15"
-cloudflared = "2026.5"
+cloudflared = "2026.6.0"
 
 # Dev tooling
 direnv = "2.37"
