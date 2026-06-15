@@ -13,4 +13,12 @@ fi
 # Re-trigger when the mise config changes by embedding its hash.
 # config hash: {{ include (joinPath .chezmoi.sourceDir "dot_config/mise/config.toml") | sha256sum }}
 
+# Install any newly-added or missing tools at their pinned versions.
 mise install
+
+# Move already-installed tools to the newest version matching their config
+# spec. `mise install` alone won't do this: an in-range version (e.g. node 22
+# satisfying "22") or a stale exact pin is treated as already satisfied. This
+# is what pulls Renovate's version bumps through. --bump is intentionally
+# omitted so the config stays owned by Renovate, not rewritten here.
+mise upgrade --yes
