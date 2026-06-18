@@ -153,6 +153,7 @@ packages:
       - chrony
       - wget
       - starship
+      - flatpak
 
     hyprland:
       - hyprland
