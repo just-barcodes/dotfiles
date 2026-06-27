@@ -8,6 +8,7 @@
     cam = commit -am
     co = checkout
     cob = checkout -b
+    dv = difftool -t vimdiff
 [init]
     defaultBranch = main
 [branch]
@@ -31,11 +32,13 @@
     tool = vimdiff
     conflictstyle = zdiff3
 [diff]
-    tool = vimdiff
+    tool = hunk
     algorithm = histogram
     colorMoved = plain
     mnemonicPrefix = true
     renames = true
+[difftool "hunk"]
+    cmd = hunk difftool "$LOCAL" "$REMOTE" "$MERGED"
 [push]
     default = simple
 [pull]

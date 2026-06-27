@@ -26,6 +26,13 @@ return {
 			desc = "[G]it lazy[G]it",
 		},
 		{
+			"<leader>gk",
+			function()
+				Snacks.terminal("hunk diff", { win = { style = "float" } })
+			end,
+			desc = "[G]it hun[K] diff",
+		},
+		{
 			"<leader>sh",
 			function()
 				Snacks.picker.help()
