@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Terminal=false
+Name=Outlook
+Comment=Outlook web app (Chromium)
+Exec=/usr/bin/chromium --app=https://outlook.office.com/mail/
+Icon=chromium
+StartupWMClass=chrome-outlook.office.com__mail_-Work
+Categories=Network;Email;

@@ -262,7 +262,6 @@ packages:
     - portmaster-bin
     - google-chrome
     - insync
-    - prospect-mail-bin
     - visual-studio-code-bin
     - jetbrains-toolbox
     - betterbird-bin

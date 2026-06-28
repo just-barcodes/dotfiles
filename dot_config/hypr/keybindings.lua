@@ -208,7 +208,7 @@ bind_app_workspace("T", 91, "class:^chrome-teams\\.microsoft\\.com.*$", "gtk-lau
 })
 
 ----------------------------------------------------------------
--- Email / Proton Mail + Prospect Mail (U / 90)
+-- Email / Proton Mail + Outlook (U / 90)
 -- tabbed group
 ----------------------------------------------------------------
 hl.bind("SUPER + ALT + U", function()
@@ -218,8 +218,8 @@ hl.bind("SUPER + ALT + U", function()
 	else
 		hl.exec_cmd("proton-mail")
 	end
-	if not hl.get_window("class:^Prospect Mail$") then
-		hl.exec_cmd("prospect-mail")
+	if not hl.get_window("class:^chrome-outlook\\.office\\.com.*$") then
+		hl.exec_cmd("gtk-launch outlook")
 	end
 end)
 hl.window_rule({
@@ -229,8 +229,8 @@ hl.window_rule({
 	group = "set",
 })
 hl.window_rule({
-	name = "windowrule-prospect-mail",
-	match = { class = "^(Prospect Mail)$" },
+	name = "windowrule-outlook",
+	match = { class = "^chrome-outlook\\.office\\.com.*$" },
 	workspace = "90",
 	group = "set",
 })
