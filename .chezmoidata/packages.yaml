@@ -188,6 +188,7 @@ packages:
       - tree-sitter-cli
       - trivy
       - gitleaks
+      - worktrunk
 
     fonts:
       - ttf-fira-code
