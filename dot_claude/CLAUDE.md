@@ -61,3 +61,13 @@ For multi-step tasks, state a brief plan:
 
 Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
 
+## 5. Never Touch the System
+
+**Isolate everything. Never modify the system-level environment.**
+
+- Never install packages system-wide. No `sudo pip install`, no `pip install` into the system interpreter, no global `npm install -g` unless explicitly asked.
+- Python packages go in a virtual environment (`venv`, `uv`, etc.) — always. Create one if none exists.
+- Prefer project-local, isolated installs for every language (local `node_modules`, per-project toolchains, etc.).
+- Don't alter global config, system files, or anything outside the project/virtualenv without explicit permission.
+- If a task seems to require a system-level change, stop and ask first.
+
