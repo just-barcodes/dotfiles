@@ -3,6 +3,10 @@
 
 set -euo pipefail
 
+{{ if (dig "coder" false .) -}}
+echo "Coder workspace: skipping package installs"; exit 0
+{{ end -}}
+
 {{ if not (or (eq .chezmoi.osRelease.id "debian") (eq .chezmoi.osRelease.id "ubuntu")) -}}
 echo "Not running debian/ubuntu... exiting"
 exit 0

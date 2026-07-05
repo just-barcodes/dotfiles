@@ -1,6 +1,10 @@
 #!/bin/bash
 set -euo pipefail
 
+{{ if (dig "coder" false .) -}}
+echo "Coder workspace: skipping starship install"; exit 0
+{{ end -}}
+
 {{ if or (eq .chezmoi.osRelease.id "debian") (eq .chezmoi.osRelease.id "ubuntu") -}}
 # zsh and fonts-powerline are installed from the centralized manifest
 # (packages.apt.minimal via run_onchange_apt_installs.sh.tmpl).

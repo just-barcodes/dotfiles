@@ -3,4 +3,27 @@ README.md
 install.sh
 renovate.json
 .config/nvim/lazy-lock.json
+{{ if (dig "coder" false .) }}
+.config/alacritty
+.config/ghostty
+.config/hypr
+.config/hyprshell
+.config/kanata
+.config/swaync
+.config/swayosd
+.config/walker
+.config/waybar
+.config/xdg-desktop-portal
+.config/gtk-3.0
+.config/gtk-4.0
+.config/fontconfig
+.config/bluetuith
+.config/breezerc
+.config/kdeglobals
+.config/kxkbrc
+.config/mimeapps.list
+.config/user-dirs.dirs
+.local/share/applications
+.local/share/icons
+{{ end }}
 

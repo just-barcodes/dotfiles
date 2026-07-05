@@ -3,6 +3,10 @@
 
 set -euo pipefail
 
+{{ if (dig "coder" false .) -}}
+echo "Coder workspace: skipping package installs"; exit 0
+{{ end -}}
+
 # npm comes from mise-managed node — chezmoi scripts run non-interactively so
 # shell-init activation of mise doesn't fire. Add the shim dir explicitly.
 export PATH="$HOME/.local/share/mise/shims:$PATH"

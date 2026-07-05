@@ -5,13 +5,15 @@
   still applies cleanly — templates that reference private data must guard
   against missing keys (see e.g. dot_zshrc.tmpl).
 */ -}}
+{{- $coder := ne (env "CODER_WORKSPACE_NAME") "" -}}
 {{- $privateDir := joinPath .chezmoi.homeDir ".config" "chezmoi-private" -}}
 {{- $repo := "git@github.com:just-barcodes/dotfiles-private.git" -}}
 {{- if stat $privateDir -}}
 {{-   output "sh" "-c" (printf "git -C %q pull --quiet --ff-only >/dev/null 2>&1 || true" $privateDir) -}}
 {{- else -}}
 {{-   output "sh" "-c" (printf "git clone --quiet %q %q >/dev/null 2>&1 || true" $repo $privateDir) -}}
-{{- end -}}
+{{- end }}
+data.coder = {{ $coder }}
 {{- $privateConfig := joinPath $privateDir "chezmoi.toml" -}}
 {{- if stat $privateConfig }}
 {{ include $privateConfig }}
