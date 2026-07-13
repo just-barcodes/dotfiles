@@ -17,7 +17,7 @@ direnv = "2.37"
 opencode = "1.15"
 devcontainer-cli = "latest"
 uv = "0.11.26"
-rust = "1.96.0"
+rust = "1.97.0"
 
 # Editors / fast-moving CLIs (kept current via mise instead of apt LTS)
 "aqua:neovim/neovim" = "latest"
