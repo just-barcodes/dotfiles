@@ -8,7 +8,7 @@ node = "22"
 # Kubernetes / cloud
 kubectl = "1.36"
 helm = "4.2"
-argocd = "3.4.4"
+argocd = "3.4.5"
 terraform = "1.15"
 cloudflared = "2026.6.1"
 
