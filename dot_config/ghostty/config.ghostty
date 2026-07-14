@@ -1,5 +1,9 @@
 theme = Selenized Dark
 
+# Scrollback is a per-surface byte cap (default ~10MB). Byte-capped, so no
+# runaway-output risk; 100MB is generous on a modern machine.
+scrollback-limit = 100000000
+
 font-size = 12
 font-family = "FiraCode Nerd Font"
 font-family-bold = "FiraCode Nerd Font"
