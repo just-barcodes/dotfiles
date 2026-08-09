@@ -174,9 +174,9 @@ bind_app_workspace("M", 96, "class:^Spotify$", "spotify-launcher", {
 ----------------------------------------------------------------
 -- Obsidian (O / 70)
 ----------------------------------------------------------------
-bind_app_workspace("O", 70, "class:^(obsidian|Obsidian)$", "obsidian", {
+bind_app_workspace("O", 70, "class:^(md\\.Obsidian|obsidian|Obsidian)$", "obsidian", {
 	name = "windowrule-obsidian",
-	match = { class = "^(obsidian)$" },
+	match = { class = "^(md\\.Obsidian|obsidian)$" },
 	workspace = "70",
 })
 
