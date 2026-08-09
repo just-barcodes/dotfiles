@@ -81,13 +81,38 @@ hl.bind("SUPER + SHIFT + equal", hl.dsp.layout("swapsplit"))
 
 ----------------------------------------------------------------
 -- Window groups (tabbed stack with groupbar)
--- SUPER + G toggles the focused window's tile into/out of a group.
--- Hyprland 0.55.1 does not expose `moveintogroup` to Lua, so existing
--- tiles cannot be merged programmatically — drag a tab onto the groupbar
--- to add another window, or rely on auto_group when spawning new ones.
+-- SUPER + G: if the focused window is ungrouped, group it and absorb
+-- every other tiled window on the workspace (0.56 exposes group:add()
+-- to Lua, so merging existing tiles works now); if it is grouped,
+-- toggle dissolves the whole group back into tiles.
 -- Alt+Tab is a no-op outside a group, so it only acts when grouped.
 ----------------------------------------------------------------
-hl.bind("SUPER + G", hl.dsp.group.toggle())
+local function toggle_group_workspace()
+	local w = hl.get_active_window()
+	if not w then
+		return
+	end
+	if w.group then
+		hl.dispatch(hl.dsp.group.toggle())
+		return
+	end
+	hl.dispatch(hl.dsp.group.toggle())
+	w = hl.get_active_window()
+	local g = w and w.group
+	local ws = w and w.workspace
+	if not (g and ws) then
+		return
+	end
+	for _, win in ipairs(ws:get_windows()) do
+		if not win.floating and not win.group then
+			g:add(win)
+		end
+	end
+	-- group:add() drops keyboard focus entirely (active window becomes nil)
+	hl.dispatch(hl.dsp.focus({ window = "address:" .. w.address }))
+end
+
+hl.bind("SUPER + G", toggle_group_workspace)
 hl.bind("ALT + Tab", hl.dsp.group.next())
 hl.bind("ALT + SHIFT + Tab", hl.dsp.group.prev())
 
