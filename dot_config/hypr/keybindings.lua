@@ -7,13 +7,15 @@ local fileManager = "dolphin"
 -- faster way to start walker via its socket; cannot run terminal commands
 local menu = "nc -U /run/user/1000/walker/walker.sock"
 
--- Switch to a workspace, focus the app window if it exists, else launch it.
+-- Switch to a workspace, launching the app if it has no window yet.
+-- Deliberately no `focus({window = selector})` afterwards: the workspace
+-- switch already restores that workspace's last-focused window, and a
+-- `class:` selector resolves to one fixed match, so re-focusing would snap
+-- to the same window every time when several share the class.
 local function focus_or_launch(workspace, window_selector, launch_cmd)
 	return function()
 		hl.dispatch(hl.dsp.focus({ workspace = workspace, on_current_monitor = true }))
-		if hl.get_window(window_selector) then
-			hl.dispatch(hl.dsp.focus({ window = window_selector }))
-		else
+		if not hl.get_window(window_selector) then
 			hl.exec_cmd(launch_cmd)
 		end
 	end
@@ -238,9 +240,7 @@ bind_app_workspace("T", 91, "class:^chrome-teams\\.microsoft\\.com.*$", "gtk-lau
 ----------------------------------------------------------------
 hl.bind("SUPER + ALT + U", function()
 	hl.dispatch(hl.dsp.focus({ workspace = 90, on_current_monitor = true }))
-	if hl.get_window("class:^Proton Mail$") then
-		hl.dispatch(hl.dsp.focus({ window = "class:^Proton Mail$" }))
-	else
+	if not hl.get_window("class:^Proton Mail$") then
 		hl.exec_cmd("proton-mail")
 	end
 	if not hl.get_window("class:^chrome-outlook\\.office\\.com.*$") then
