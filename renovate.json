@@ -5,6 +5,7 @@
     ":dependencyDashboard"
   ],
   "assignees": ["just-barcodes"],
+  "minimumReleaseAge": "4 days",
   "mise": {
     "managerFilePatterns": ["/(^|/)dot_config/mise/config\\.toml$/"]
   },
