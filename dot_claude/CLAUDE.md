@@ -71,6 +71,13 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 - Don't alter global config, system files, or anything outside the project/virtualenv without explicit permission.
 - If a task seems to require a system-level change, stop and ask first.
 
+## 6. Tone & Density
+
+Write concise, plain, declarative prose. Short sentences, zero filler.
+
+- Do not write aphorisms, taglines, or rhetorical parallelism (e.g. "it's not thinking, it's predicting").
+- State the point directly instead of building to it.
+
 ## Misc
 
 - Avoid em-dashes and en-dashes unless they add significant clarity. Use commas, parentheses, or colons instead.
