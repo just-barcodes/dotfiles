@@ -116,7 +116,7 @@
   },
   // Audio
   "pulseaudio": {
-    "scroll-step": 1, // ignored, controlled by swayosd config
+    "scroll-step": 1, // ignored, the OSD applies its own step
     "format": "{icon} {volume: >3}% {format_source}",
     "format-bluetooth": "{icon} {volume: >3}% {format_source}",
     "format-muted": " muted{format_source}",
@@ -135,10 +135,10 @@
       ]
     },
     "on-click": "ghostty --class=com.tui.centered -e pulsemixer",
-    "on-click-middle": "swayosd-client --output-volume mute-toggle",
-    "on-click-right": "swayosd-client --input-volume mute-toggle",
-    "on-scroll-up": "swayosd-client --output-volume raise",
-    "on-scroll-down": "swayosd-client --output-volume lower",
+    "on-click-middle": "qs ipc call osd volumeMute",
+    "on-click-right": "qs ipc call osd micMute",
+    "on-scroll-up": "qs ipc call osd volumeUp",
+    "on-scroll-down": "qs ipc call osd volumeDown",
     "tooltip-format": "{desc}\nVolume: {volume}%"
   },
   // Network

@@ -1,5 +1,6 @@
 CLAUDE.md
 README.md
+QUICKSHELL-MIGRATION.md
 install.sh
 renovate.json
 .config/nvim/lazy-lock.json
@@ -9,8 +10,8 @@ renovate.json
 .config/hypr
 .config/hyprshell
 .config/kanata
+.config/quickshell
 .config/swaync
-.config/swayosd
 .config/walker
 .config/waybar
 .config/xdg-desktop-portal

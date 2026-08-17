@@ -9,6 +9,10 @@ ShellRoot {
         id: controlCenter
     }
 
+    Osd {
+        id: osd
+    }
+
     // Driven from hyprland keybindings and the waybar module.
     //   qs ipc call notifs toggle
     IpcHandler {
@@ -45,6 +49,36 @@ ShellRoot {
                 class: alt,
                 tooltip: `${count} notification${count === 1 ? "" : "s"}${Notifications.dnd ? " (do not disturb)" : ""}`
             });
+        }
+    }
+
+    // Multimedia keys and the waybar audio module, replacing swayosd-client.
+    //   qs ipc call osd volumeUp
+    IpcHandler {
+        target: "osd"
+
+        function volumeUp(): void {
+            osd.volumeStep(1);
+        }
+
+        function volumeDown(): void {
+            osd.volumeStep(-1);
+        }
+
+        function volumeMute(): void {
+            osd.toggleMute();
+        }
+
+        function micMute(): void {
+            osd.toggleMicMute();
+        }
+
+        function brightnessUp(): void {
+            osd.brightnessStep(1);
+        }
+
+        function brightnessDown(): void {
+            osd.brightnessStep(-1);
         }
     }
 }

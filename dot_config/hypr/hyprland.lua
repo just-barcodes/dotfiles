@@ -18,7 +18,7 @@ require("workspaces")
 hl.on("hyprland.start", function()
     hl.exec_cmd("nm-applet")
     hl.exec_cmd("waybar")               -- status bar
-    hl.exec_cmd("qs -d")                -- quickshell: notifications + control center
+    hl.exec_cmd("qs -d")                -- quickshell: notifications, control center, OSD
     hl.exec_cmd("elephant")             -- backend for walker
     hl.exec_cmd("walker --gapplication-service")  -- improve walker start-up time
     hl.exec_cmd("ghostty -e btop", { workspace = "99" })
