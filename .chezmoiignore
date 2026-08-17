@@ -8,7 +8,6 @@ renovate.json
 .config/alacritty
 .config/ghostty
 .config/hypr
-.config/hyprshell
 .config/kanata
 .config/quickshell
 .config/swaync
