@@ -156,8 +156,16 @@ q() {
 # kanata
 alias hm='sudo kanata --cfg ~/.config/kanata/config.kbd'
 
-# hyprctl - restart hyprlock
-alias hyprctl_restart='export HYPRLAND_INSTANCE_SIGNATURE=$(basename "$(ls -td $XDG_RUNTIME_DIR/hypr/* | head -1)") && hyprctl --instance 0 eval "hl.config({ misc = {allow_session_lock_restore = true } })" && hyprctl dispatch "hl.dsp.exec_cmd(\"hyprlock --immediate-render --no-fade-in\")"'
+# hyprctl - restore the lock screen from a TTY after quickshell dies while
+# locked. ext-session-lock fails closed, so the compositor keeps the session
+# locked with no client to type into until a new one takes the lock over.
+hyprctl_restart() {
+    export HYPRLAND_INSTANCE_SIGNATURE=$(basename "$(ls -td $XDG_RUNTIME_DIR/hypr/* | head -1)")
+    hyprctl --instance 0 eval "hl.config({ misc = {allow_session_lock_restore = true } })" || return
+    pgrep -x qs >/dev/null || hyprctl dispatch "hl.dsp.exec_cmd(\"qs -d\")"
+    sleep 1
+    qs ipc call lock lock
+}
 
 ###############################################
 ### Global aliases ###
