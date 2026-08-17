@@ -202,11 +202,13 @@
       "dnd-inhibited-none": "<span foreground='#72898f'>󰂛</span>"
     },
     "return-type": "json",
-    "exec-if": "which swaync-client",
-    "exec": "swaync-client -swb",
-    "on-click": "swaync-client -t -sw",
-    "on-click-right": "swaync-client -d -sw",
-    // "on-click-middle": "swaync-client -C",
+    "exec-if": "which qs",
+    // quickshell pushes updates with `pkill -RTMIN+8 waybar` instead of streaming.
+    "exec": "qs ipc call notifs status",
+    "interval": "once",
+    "signal": 8,
+    "on-click": "qs ipc call notifs toggle",
+    "on-click-right": "qs ipc call notifs toggleDnd",
     "escape": true
   },
   // Tray

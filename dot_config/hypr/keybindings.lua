@@ -44,7 +44,7 @@ hl.bind("SUPER + F11", hl.dsp.window.fullscreen({ mode = "fullscreen", action = 
 hl.bind("SUPER + F9", hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }))
 
 -- toggle notifications
-hl.bind("SUPER + n", hl.dsp.exec_cmd("swaync-client -t -sw"))
+hl.bind("SUPER + n", hl.dsp.exec_cmd("qs ipc call notifs toggle"))
 
 ----------------------------------------------------------------
 -- TUI launcher
