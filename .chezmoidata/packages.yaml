@@ -167,7 +167,7 @@ packages:
       - hyprlock
       - hypridle
       - nwg-displays
-      - swaync
+      - quickshell
       - hyprpolkitagent
       - xdg-desktop-portal-hyprland
       - xdg-desktop-portal-gtk
