@@ -52,6 +52,16 @@ PanelWindow {
         }
     }
 
+    // Separates the panel from the desktop behind it.
+    Rectangle {
+        anchors.left: parent.left
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        width: 2
+        color: Theme.bgEdge
+        z: 1
+    }
+
     Item {
         anchors.fill: parent
         focus: true

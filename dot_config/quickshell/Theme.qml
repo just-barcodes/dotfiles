@@ -12,6 +12,7 @@ Singleton {
     readonly property color control: Qt.rgba(45 / 255, 91 / 255, 105 / 255, 0.5)
     readonly property color trough: Qt.rgba(45 / 255, 91 / 255, 105 / 255, 0.6)
     readonly property color border: Qt.rgba(70 / 255, 149 / 255, 247 / 255, 0.3)
+    readonly property color bgEdge: "#2d5b69"
 
     readonly property color accent: "#4695f7"
     readonly property color red: "#fa5750"
