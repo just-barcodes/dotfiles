@@ -1,0 +1,31 @@
+#!/bin/bash
+# Fingerprint PAM stack for the quickshell lock screen (Lock.qml).
+#
+# The password path uses /etc/pam.d/login directly — the same stack that
+# /etc/pam.d/hyprlock included — so only the fingerprint file is new. hyprlock
+# did not use PAM for fingerprints at all: it drove fprintd over DBus itself,
+# and quickshell has no DBus binding in QML, so this file is what replaces it.
+
+set -euo pipefail
+
+{{ if (dig "coder" false .) -}}
+echo "Coder workspace: skipping quickshell fingerprint PAM setup"; exit 0
+{{ end -}}
+
+if [ ! -e /usr/lib/security/pam_fprintd.so ]; then
+	echo "pam_fprintd not installed; skipping quickshell fingerprint PAM setup"
+	exit 0
+fi
+
+CONFIG='#%PAM-1.0
+# Fingerprint-only stack for the quickshell lock screen. Managed by chezmoi:
+# .chezmoiscripts/run_onchange_install_pam_quickshell_fprint.sh.tmpl
+auth     required  pam_fprintd.so
+account  include   login'
+
+if [ "$(cat /etc/pam.d/quickshell-fprint 2>/dev/null)" = "$CONFIG" ]; then
+	exit 0
+fi
+
+printf '%s\n' "$CONFIG" | sudo tee /etc/pam.d/quickshell-fprint >/dev/null
+echo "installed /etc/pam.d/quickshell-fprint"

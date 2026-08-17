@@ -25,7 +25,6 @@ hl.on("hyprland.start", function()
     hl.dispatch(hl.dsp.focus({ workspace = 4, on_current_monitor = true }))
     hl.exec_cmd("systemctl --user start hyprpolkitagent")  -- authentication daemon
     hl.exec_cmd("hypridle")
-    hl.exec_cmd("swayosd-server")
     hl.exec_cmd("tailscale systray")
 end)
 

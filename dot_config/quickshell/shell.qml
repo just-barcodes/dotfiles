@@ -13,6 +13,10 @@ ShellRoot {
         id: osd
     }
 
+    Lock {
+        id: sessionLock
+    }
+
     // Driven from hyprland keybindings and the waybar module.
     //   qs ipc call notifs toggle
     IpcHandler {
@@ -79,6 +83,18 @@ ShellRoot {
 
         function brightnessDown(): void {
             osd.brightnessStep(-1);
+        }
+    }
+
+    // hypridle's lock_cmd and before_sleep_cmd, and the CTRL+ALT+DELETE bind,
+    // replacing hyprlock. Locking is idempotent, so the old
+    // `pidof hyprlock || hyprlock` guard is no longer needed.
+    //   qs ipc call lock lock
+    IpcHandler {
+        target: "lock"
+
+        function lock(): void {
+            sessionLock.lock();
         }
     }
 }

@@ -39,7 +39,7 @@ hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind("SUPER + SHIFT + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind("SUPER + SHIFT + V", hl.dsp.window.pin())
 hl.bind("ALT + space", hl.dsp.exec_cmd(menu))
-hl.bind("CTRL + ALT + DELETE", hl.dsp.exec_cmd("hyprlock"))
+hl.bind("CTRL + ALT + DELETE", hl.dsp.exec_cmd("qs ipc call lock lock"))
 hl.bind("SUPER + F11", hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }))
 hl.bind("SUPER + F9", hl.dsp.window.fullscreen({ mode = "fullscreen", action = "toggle" }))
 
