@@ -13,8 +13,8 @@ ShellRoot {
         id: osd
     }
 
-    WifiPanel {
-        id: wifiPanel
+    NetworkPanel {
+        id: networkPanel
     }
 
     Lock {
@@ -91,20 +91,20 @@ ShellRoot {
     }
 
     // Waybar's network module, replacing the click-out to wifitui.
-    //   qs ipc call wifi toggle
+    //   qs ipc call network toggle
     IpcHandler {
-        target: "wifi"
+        target: "network"
 
         function toggle(): void {
-            wifiPanel.toggle();
+            networkPanel.toggle();
         }
 
         function open(): void {
-            wifiPanel.shown = true;
+            networkPanel.shown = true;
         }
 
         function close(): void {
-            wifiPanel.shown = false;
+            networkPanel.shown = false;
         }
     }
 

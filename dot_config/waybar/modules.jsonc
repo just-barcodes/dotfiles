@@ -154,7 +154,7 @@
     "max-length": 50,
     // Right-click keeps wifitui for what the panel doesn't do: enterprise
     // networks, hidden SSIDs, VPNs.
-    "on-click": "qs ipc call wifi toggle",
+    "on-click": "qs ipc call network toggle",
     "on-click-right": "ghostty --class=com.tui.centered -e wifitui"
   },
   // Clock
