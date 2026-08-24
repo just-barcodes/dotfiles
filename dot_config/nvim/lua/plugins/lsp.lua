@@ -146,6 +146,8 @@ return {
 				jsonls = "json-lsp",
 				yamlls = "yaml-language-server",
 				lua_ls = "lua-language-server",
+				-- Shipped with the qt6-declarative system package; mason has no such package.
+				qmlls = false,
 			}
 
 			local servers = {
@@ -159,6 +161,7 @@ return {
 				yamlls = {},
 				jsonls = {},
 				marksman = {},
+				qmlls = { cmd = { "qmlls6" } },
 				lua_ls = {
 					settings = {
 						Lua = {
@@ -176,7 +179,10 @@ return {
 
 			local ensure_installed = {}
 			for name in pairs(servers) do
-				table.insert(ensure_installed, mason_name[name] or name)
+				local pkg = mason_name[name]
+				if pkg ~= false then
+					table.insert(ensure_installed, pkg or name)
+				end
 			end
 			vim.list_extend(ensure_installed, { "stylua", "prettierd", "shfmt" })
 			require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
