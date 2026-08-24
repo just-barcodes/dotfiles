@@ -223,6 +223,7 @@ packages:
       - tmux
       - htop
       - proton-vpn-gtk-app
+      - proton-vpn-cli
       - luarocks
       - cmake
       - libreoffice-fresh

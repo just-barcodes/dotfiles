@@ -4,6 +4,7 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Bluetooth
 import Quickshell.Hyprland
+import Quickshell.Io
 import Quickshell.Networking
 import qs
 import qs.components
@@ -196,6 +197,33 @@ PanelWindow {
             root.runBt(row.address, d => d.pair());
     }
 
+    // Proton VPN over its CLI. NetworkManager carries the tunnel as a device
+    // type Quickshell.Networking does not model, so the CLI is the only status
+    // source, and `protonvpn status` costs about a second, so it polls on its
+    // own slower timer rather than riding the 2s wifi and bluetooth rebuild.
+    readonly property string vpnCountry: "CH"
+    property bool vpnConnected: false
+    property string vpnServer: ""
+    property string vpnAction: ""  // "connect" | "disconnect" | ""
+
+    function parseVpnStatus(text) {
+        root.vpnConnected = /^Status:\s*Connected/m.test(text);
+
+        // "Server: CH#470 in Zurich, Switzerland" reads better as
+        // "CH#470 - Zurich, Switzerland" than wrapped whole into a 380px row.
+        const server = text.match(/^Server:\s*(\S+)(?:\s+in\s+(.*))?$/m);
+        root.vpnServer = root.vpnConnected && server ? (server[2] ? `${server[1]} · ${server[2].trim()}` : server[1]) : "";
+    }
+
+    function toggleVpn() {
+        if (root.vpnAction !== "")
+            return;
+
+        root.vpnAction = root.vpnConnected ? "disconnect" : "connect";
+        vpnProc.command = root.vpnConnected ? ["protonvpn", "disconnect"] : ["protonvpn", "connect", "--country", root.vpnCountry];
+        vpnProc.running = true;
+    }
+
     screen: Quickshell.screens.find(s => s.name === Hyprland.focusedMonitor?.name) ?? Quickshell.screens[0]
     visible: shown
 
@@ -326,6 +354,60 @@ PanelWindow {
         // A device that bonds without connecting settles on this instead.
         function onPairingChanged() {
             pendingBt.settle();
+        }
+    }
+
+    // Cleared by a read that actually returned, so a spawn that produced nothing
+    // (missing binary, crash) cannot leave a stale reading on screen. Stale
+    // resolves to disconnected rather than connected: claiming a tunnel that is
+    // not up is the harmful direction to be wrong in.
+    property bool vpnStatusStale: true
+
+    Process {
+        id: vpnStatusProc
+        command: ["protonvpn", "status"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                root.vpnStatusStale = false;
+                root.parseVpnStatus(text);
+            }
+        }
+    }
+
+    Timer {
+        running: root.shown && root.vpnAction === ""
+        interval: 5000
+        repeat: true
+        triggeredOnStart: true
+        onTriggered: {
+            if (root.vpnStatusStale)
+                root.parseVpnStatus("");
+
+            root.vpnStatusStale = true;
+
+            if (!vpnStatusProc.running)
+                vpnStatusProc.running = true;
+        }
+    }
+
+    Process {
+        id: vpnProc
+        onExited: {
+            root.vpnAction = "";
+            root.vpnStatusStale = true;
+            if (!vpnStatusProc.running)
+                vpnStatusProc.running = true;
+        }
+    }
+
+    // The CLI can sit on a dead network for a long time, and a hung connect
+    // would strand the row on "Connecting..." with no way to retry.
+    Timer {
+        interval: 120000
+        running: root.vpnAction !== ""
+        onTriggered: {
+            vpnProc.signal(15);
+            root.vpnAction = "";
         }
     }
 
@@ -818,6 +900,59 @@ PanelWindow {
                             }
                         }
                     }
+                }
+            }
+
+            Rectangle {
+                Layout.fillWidth: true
+                implicitHeight: 1
+                color: Theme.border
+            }
+
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: Theme.padding
+
+                Text {
+                    text: root.vpnConnected ? "󰦝" : "󰦞"
+                    color: root.vpnConnected ? Theme.green : Theme.fgFaint
+                    font.family: Theme.fontFamily
+                    font.pixelSize: Theme.fontSizeIcon
+                }
+
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 0
+
+                    Text {
+                        Layout.fillWidth: true
+                        text: "Proton VPN"
+                        color: Theme.fg
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontSizeLarge
+                        font.weight: Font.Bold
+                    }
+
+                    Text {
+                        Layout.fillWidth: true
+                        text: {
+                            if (root.vpnAction === "connect")
+                                return `Connecting to ${root.vpnCountry}…`;
+                            if (root.vpnAction === "disconnect")
+                                return "Disconnecting…";
+                            return root.vpnConnected ? root.vpnServer : "Disconnected";
+                        }
+                        color: root.vpnConnected ? Theme.green : Theme.fgFaint
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontSizeSmall
+                        elide: Text.ElideRight
+                    }
+                }
+
+                Toggle {
+                    checked: root.vpnConnected
+                    interactive: root.vpnAction === ""
+                    onToggled: root.toggleVpn()
                 }
             }
         }

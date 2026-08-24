@@ -9,6 +9,7 @@ renovate.json
 .config/ghostty
 .config/hypr
 .config/kanata
+.config/Proton
 .config/quickshell
 .config/swaync
 .config/walker
