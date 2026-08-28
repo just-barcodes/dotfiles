@@ -9,6 +9,6 @@ case "$CHOICE" in
 *"Bluetooth"*) ghostty --class=com.tui.centered -e bluetuith ;;
 *"System Monitor"*) ghostty --class=com.tui.centered -e btop ;;
 *"Files"*) ghostty --class=com.tui.centered -e yazi ;;
-*"Calendar"*) ghostty --class=com.tui.centered --font-size=18 -e ~/.config/waybar/scripts/calendar.sh ;;
+*"Calendar"*) ghostty --class=com.tui.centered --font-size=18 -e calendar.sh ;;
 *"Screenshot"*) grim -g "$(slurp)" - | swappy -f - ;;
 esac

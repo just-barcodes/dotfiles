@@ -2,7 +2,7 @@
 # Pretty multi-month calendar: 1 previous + current + 3 following.
 # Monday as first day of week. Current month gets a slight background.
 # Bottom-right shows the current day big.
-# Used by waybar clock on-click and tui-launcher.
+# Used by the quickshell bar clock on-click and tui-launcher.
 
 set -u
 

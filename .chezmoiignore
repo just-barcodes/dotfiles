@@ -13,7 +13,6 @@ renovate.json
 .config/quickshell
 .config/swaync
 .config/walker
-.config/waybar
 .config/xdg-desktop-portal
 .config/gtk-3.0
 .config/gtk-4.0

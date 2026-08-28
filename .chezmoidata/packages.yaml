@@ -163,7 +163,6 @@ packages:
       - meson
       - cpio
       - glaze
-      - waybar
       - hyprlock
       - hypridle
       - nwg-displays

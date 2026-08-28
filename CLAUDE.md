@@ -50,8 +50,8 @@ chezmoi state delete-bucket --bucket=scriptState
   - `nvim/` — Neovim config (lazy.nvim, selenized theme; plugin loading skipped when running inside VSCode via `vim.fn.exists("g:vscode")`)
   - `hypr/` — Hyprland WM (Lua config since 0.55) split into focused files: `hyprland.lua` (entry, `require`s the others), `keybindings.lua`, `input.lua`, `style.lua`, and `workspaces.lua` (an intentionally empty placeholder kept via the source name `empty_workspaces.lua` so `require("workspaces")` resolves). `hypridle.conf` and `hyprlock.conf` are separate programs and stay in hyprlang format. `monitors.lua` is machine-local and not tracked by chezmoi.
   - `ghostty/config.ghostty` — primary terminal (replaced alacritty)
-  - `quickshell/` — QML shell (QtQuick): notification daemon, popups, and control center (replaced swaync). `shell.qml` is the entry point; `Theme.qml` and `Notifications.qml` are singletons; widgets live in `components/`. Driven by `qs ipc call notifs <toggle|toggleDnd|clear|status>`; pushes waybar updates with `pkill -RTMIN+8 waybar`
-  - `waybar/`, `walker/`, `kanata/` — supporting Wayland stack
+  - `quickshell/` — QML shell (QtQuick): the top bar, notification daemon, popups, control center, OSD and session lock (replaced swaync, swayosd, hyprlock and waybar). `shell.qml` is the entry point; `Theme.qml`, `Notifications.qml`, `Backlight.qml` and `SystemStats.qml` are singletons; `Bar.qml` plus `bar/` are the bar and its modules, other widgets live in `components/`. Driven by `qs ipc call <notifs|osd|network|lock> ...`
+  - `walker/`, `kanata/` — supporting Wayland stack
   - `sesh/sesh.toml` — session manager config; `sesh/scripts/<session-name>.sh` — per-session startup scripts (see below)
 - `dot_local/` — `~/.local/` (user binaries, systemd user units, etc.)
 - `.chezmoiscripts/` — all `run_once_*` and `run_onchange_*` scripts live here. This is a chezmoi special directory: scripts run as normal, but the directory itself does not create a matching `~/.chezmoiscripts/` in the target. Notable contents:

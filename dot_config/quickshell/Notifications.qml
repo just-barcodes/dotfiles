@@ -1,6 +1,5 @@
 pragma Singleton
 
-import QtQuick
 import Quickshell
 import Quickshell.Services.Notifications
 
@@ -49,22 +48,6 @@ Singleton {
         if (root.dnd)
             root.popups = [];
         return root.dnd;
-    }
-
-    // Waybar's custom/notification module re-runs its script on RTMIN+8.
-    function signalWaybar() {
-        Quickshell.execDetached(["pkill", "-RTMIN+8", "waybar"]);
-    }
-
-    onCountChanged: root.signalWaybar()
-    onDndChanged: root.signalWaybar()
-
-    // waybar's module runs once and waits for signals, so prime it at startup
-    // in case waybar came up first.
-    Timer {
-        running: true
-        interval: 100
-        onTriggered: root.signalWaybar()
     }
 
     NotificationServer {

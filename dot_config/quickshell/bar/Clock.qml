@@ -9,7 +9,7 @@ BarChip {
     text: Qt.formatDateTime(clock.date, "HH:mm")
     textColor: Theme.accent
 
-    onLeftClicked: Quickshell.execDetached(["ghostty", "--class=com.tui.centered", "--font-size=18", "-e", Quickshell.env("HOME") + "/.config/waybar/scripts/calendar.sh"])
+    onLeftClicked: Quickshell.execDetached(["ghostty", "--class=com.tui.centered", "--font-size=18", "-e", "calendar.sh"])
 
     SystemClock {
         id: clock
