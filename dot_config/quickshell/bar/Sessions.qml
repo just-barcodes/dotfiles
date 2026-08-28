@@ -14,9 +14,6 @@ Rectangle {
     property int running: 0
     property int idle: 0
 
-    readonly property bool present: root.waiting + root.running + root.idle > 0
-
-    visible: root.present
     color: Theme.chipBg
     implicitWidth: row.implicitWidth + Theme.barChipPadding * 2
     implicitHeight: Theme.barChipHeight
