@@ -5,7 +5,7 @@ set -eu
 # Map each session's CWD to its sesh/zoxide name
 sesh_json=$(sesh list -d --json 2>/dev/null || echo '[]')
 
-# ID <TAB> "icon  agent  name  prompt"; dmenu renders one label per line, so
+# ID <TAB> "icon  agent  name  title"; dmenu renders one label per line, so
 # the visible columns are space-padded to align
 rows=$(sm status --json | jq -r --argjson sesh "${sesh_json:-[]}" '
   def rank($s): {"waiting":0,"idle":1,"running":2}[$s] // 9;
@@ -21,14 +21,14 @@ rows=$(sm status --json | jq -r --argjson sesh "${sesh_json:-[]}" '
       icon: icon(.Status),
       agent: .Agent,
       name: ( ($names[.CWD | rtrimstr("/")] // (.CWD | split("/") | last)) | cap(40) ),
-      prompt: ( (.LastPrompt // "") | gsub("\\s+";" ") | .[0:100]
-                | if . == "" then "(no prompt yet)" else . end )
+      title: ( ((.Title // .LastPrompt) // "") | gsub("\\s+";" ") | .[0:100]
+               | if . == "" then "(no title yet)" else . end )
     })
   | (map(.agent | length) | max // 0) as $aw
   | (map(.name  | length) | max // 0) as $nw
   | .[]
   | [ .id,
-      ( .icon + "  " + (.agent | pad($aw)) + "  " + (.name | pad($nw)) + "  " + .prompt ) ]
+      ( .icon + "  " + (.agent | pad($aw)) + "  " + (.name | pad($nw)) + "  " + .title ) ]
   | @tsv
 ')
 
