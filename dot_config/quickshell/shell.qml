@@ -21,6 +21,12 @@ ShellRoot {
         id: sessionLock
     }
 
+    Bar {
+        osd: osd
+        controlCenter: controlCenter
+        networkPanel: networkPanel
+    }
+
     // Driven from hyprland keybindings and the waybar module.
     //   qs ipc call notifs toggle
     IpcHandler {
