@@ -3,9 +3,8 @@ import Quickshell
 import qs
 import qs.bar
 
-// The top bar, one window per monitor. Runs alongside waybar for now: this
-// covers the modules with a quickshell service behind them, and waybar keeps
-// cpu, memory, temperature, keyboard-state and idle_inhibitor.
+// The top bar, one window per monitor. Covers every waybar module except
+// keyboard-state, which needs an evdev read Wayland does not offer.
 Scope {
     id: root
 
@@ -57,9 +56,20 @@ Scope {
             Row {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenter: parent.verticalCenter
-                spacing: 24
 
                 Sessions {}
+
+                // `#custom-sm { margin-right: 24px }`
+                Item {
+                    implicitWidth: 24
+                    implicitHeight: 1
+                }
+
+                Memory {}
+
+                Cpu {}
+
+                Temperature {}
 
                 PowerProfileToggle {}
             }
@@ -68,6 +78,16 @@ Scope {
                 anchors.right: parent.right
                 anchors.rightMargin: 3
                 anchors.verticalCenter: parent.verticalCenter
+
+                // `#idle_inhibitor { margin: 3px 6px }`
+                IdleInhibitor {
+                    barWindow: win
+                }
+
+                Item {
+                    implicitWidth: 6
+                    implicitHeight: 1
+                }
 
                 Battery {}
 
