@@ -14,7 +14,7 @@ Rectangle {
     property int running: 0
     property int idle: 0
 
-    color: Theme.chipBg
+    color: "transparent"
     implicitWidth: row.implicitWidth + Theme.barChipPadding * 2
     implicitHeight: Theme.barChipHeight
     opacity: mouse.containsMouse ? 0.85 : 1
