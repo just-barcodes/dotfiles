@@ -19,11 +19,11 @@ return {
 			desc = "Toggle file tree",
 		},
 		{
-			"<leader>gg",
+			"<leader>gl",
 			function()
 				Snacks.lazygit()
 			end,
-			desc = "[G]it lazy[G]it",
+			desc = "[G]it [L]azygit",
 		},
 		{
 			"<leader>gk",
