@@ -37,6 +37,49 @@ return {
 		-- and is unused in the status buffer.
 		vim.api.nvim_set_hl(0, "NeogitUnmergedCommit", { link = "Statement" })
 
+		-- Neogit paints a staged change exactly like an unstaged one and leaves
+		-- untracked files uncoloured entirely. Recolour every file entry so the
+		-- hue says what git did to the file and the weight says which section it
+		-- is in: untracked and unstaged blend towards the background, staged uses
+		-- the bright variant in bold.
+		local palette = _G.selenized.colors
+
+		local function muted(hex)
+			local fg, bg = tonumber(hex:sub(2), 16), tonumber(palette.bg_0:sub(2), 16)
+			local function channel(shift)
+				local f, b = math.floor(fg / shift) % 256, math.floor(bg / shift) % 256
+				return math.floor(f * 0.6 + b * 0.4 + 0.5)
+			end
+			return ("#%02x%02x%02x"):format(channel(65536), channel(256), channel(1))
+		end
+
+		-- Keyed by the git status letter neogit builds the group name from
+		-- ("?" becomes "Untracked"); the two-letter codes are the unmerged states.
+		local modes = {
+			Untracked = "green",
+			N = "green",
+			A = "green",
+			M = "blue",
+			D = "red",
+			R = "violet",
+			C = "cyan",
+			U = "orange",
+			T = "orange",
+		}
+		for _, mode in ipairs({ "DD", "UU", "AA", "DU", "UD", "AU", "UA" }) do
+			modes[mode] = "yellow"
+		end
+
+		for _, section in ipairs({ "untracked", "unstaged", "staged" }) do
+			local staged = section == "staged"
+			for mode, color in pairs(modes) do
+				vim.api.nvim_set_hl(0, ("NeogitChange%s%s"):format(mode, section), {
+					fg = staged and palette["br_" .. color] or muted(palette[color]),
+					bold = staged,
+				})
+			end
+		end
+
 		-- Tint the commits that are not yet on the upstream/push remote. Neogit
 		-- renders every commit the same way, so the highlight has to be applied
 		-- after each render, keyed off the oids in the repo state.
