@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Tasks
 Exec=/usr/bin/zen-browser --no-remote https://tasks.srsrhome.com --profile {{ .chezmoi.homeDir }}/.zen/tasks --name "TASKS"
-Icon=korg-todo
+Icon={{ .chezmoi.homeDir }}/.local/share/icons/tasks.svg
 Type=Application
 StartupNotify=true
 Categories=Network;WebBrowser;

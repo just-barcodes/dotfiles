@@ -235,6 +235,15 @@ bind_app_workspace("T", 91, "class:^chrome-teams\\.microsoft\\.com.*$", "gtk-lau
 })
 
 ----------------------------------------------------------------
+-- Tasks (P / 40)
+----------------------------------------------------------------
+bind_app_workspace("P", 40, "class:^TASKS$", "gtk-launch tasks", {
+	name = "windowrule-tasks",
+	match = { class = "^(TASKS)$" },
+	workspace = "40",
+})
+
+----------------------------------------------------------------
 -- Email / Proton Mail + Outlook (U / 90)
 -- tabbed group
 ----------------------------------------------------------------
