@@ -17,10 +17,59 @@ return {
 		stash = { kind = "auto" },
 		refs_view = { kind = "auto" },
 		popup = { kind = "split", show_title = true },
-		sections = { recent = { folded = false } },
+		status = { recent_commit_count = 30 },
+		-- Neogit hides "Recent Commits" whenever an unmerged section is on
+		-- screen, so having unpushed work costs you the whole history. Hide the
+		-- unmerged sections instead: "Recent Commits" then lists everything and
+		-- the unpushed commits get tinted below.
+		sections = {
+			recent = { folded = false },
+			unmerged_upstream = { hidden = true },
+			unmerged_pushRemote = { hidden = true },
+		},
 	},
 	config = function(_, opts)
 		require("neogit").setup(opts)
+
+		-- NeogitGraphOrange resolves to the same violet as the author margin
+		-- and the neogit palette has no colour that is not already used by the
+		-- hash, branch, remote or tag. Statement is the theme's yellow accent
+		-- and is unused in the status buffer.
+		vim.api.nvim_set_hl(0, "NeogitUnmergedCommit", { link = "Statement" })
+
+		-- Tint the commits that are not yet on the upstream/push remote. Neogit
+		-- renders every commit the same way, so the highlight has to be applied
+		-- after each render, keyed off the oids in the repo state.
+		local unmerged_ns = vim.api.nvim_create_namespace("neogit-unmerged-commits")
+
+		local function highlight_unmerged()
+			local instance = require("neogit.buffers.status").instance()
+			if not (instance and instance.buffer and instance.buffer.ui) then
+				return
+			end
+
+			local handle = instance.buffer.handle
+			vim.api.nvim_buf_clear_namespace(handle, unmerged_ns, 0, -1)
+
+			local ui = instance.buffer.ui
+			local repo = require("neogit.lib.git").repo.state
+			for _, source in ipairs({ repo.upstream.unmerged.items, repo.pushRemote.unmerged.items }) do
+				for _, commit in ipairs(source) do
+					local item = ui:find_component_by_oid(commit.oid)
+					if item and item.first then
+						vim.api.nvim_buf_set_extmark(handle, unmerged_ns, item.first - 1, 0, {
+							line_hl_group = "NeogitUnmergedCommit",
+						})
+					end
+				end
+			end
+		end
+
+		vim.api.nvim_create_autocmd("User", {
+			pattern = "NeogitStatusRefreshed",
+			group = vim.api.nvim_create_augroup("neogit-unmerged-commits", { clear = true }),
+			callback = vim.schedule_wrap(highlight_unmerged),
+		})
 
 		-- Neogit has no live preview pane: its "PeekFile" mapping is listed in
 		-- the defaults but never wired up in the status buffer, and diffs are
