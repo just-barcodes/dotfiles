@@ -1,0 +1,112 @@
+#!/bin/bash
+# theme-switch: repaint the desktop from a palette in ~/.config/theme/palettes.
+#
+#   theme-switch                 toggle to the palette's `pair`
+#   theme-switch selenized-light switch to a named palette
+#   theme-switch apply           re-assert the saved theme (hyprland autostart)
+#   theme-switch list            names of the installed palettes
+#
+# Deliberately no `set -e`: this is a fan-out, and one unreachable consumer
+# must not abort the ones after it and leave the desktop half-themed.
+#
+# SC2154: polarity is set by the sourced palette.
+# shellcheck disable=SC2154
+set -u
+
+THEMES="$HOME/.config/theme/palettes"
+GEN="$HOME/.config/theme/generated"
+STATE="${XDG_STATE_HOME:-$HOME/.local/state}/theme"
+DEFAULT=selenized-dark
+
+current() { cat "$STATE" 2>/dev/null || echo "$DEFAULT"; }
+
+case "${1:-toggle}" in
+    list)
+        basename -s .env "$THEMES"/*.env
+        exit 0
+        ;;
+    apply)  name=$(current) ;;
+    toggle) name=$(sed -n 's/^pair=//p' "$THEMES/$(current).env" 2>/dev/null) ;;
+    -h|--help)
+        sed -n '2,8p' "$0" | cut -c3-
+        exit 0
+        ;;
+    *)      name=$1 ;;
+esac
+
+if [ -z "$name" ] || [ ! -f "$THEMES/$name.env" ]; then
+    echo "theme-switch: no such theme: ${name:-<unset>}" >&2
+    echo "available: $(basename -s .env "$THEMES"/*.env | tr '\n' ' ')" >&2
+    exit 1
+fi
+
+# shellcheck source=/dev/null
+. "$THEMES/$name.env"
+
+# Two handles on the same choice. The symlink is for consumers that take a
+# path (tmux's source-file); the state file is for the ones that watch, because
+# FileView's inotify watch sits on the *resolved* path and a symlink flip would
+# never fire it. The state file is rewritten in place, which does.
+ln -sfn "$GEN/$name" "$HOME/.config/theme/current"
+mkdir -p "$(dirname "$STATE")"
+printf '%s\n' "$name" >"$STATE"
+
+# GTK, Qt, ghostty, Zen and Electron all read this via the XDG portal:
+# xdg-desktop-portal-gtk republishes it as org.freedesktop.appearance
+# color-scheme, so no D-Bus work of our own is needed.
+#
+#
+# Deliberately NOT setting `gtk-theme` as well. Measured with an Electron
+# nativeTheme probe: setting it fires a GTK settings-changed that Chromium uses
+# to recompute dark mode from the toolkit, overriding the portal value it just
+# accepted. Each switch showed shouldUseDarkColors flip to the right value and
+# then immediately back.
+#
+# It also buys nothing here. kde-gtk-config generates ~/.config/gtk-3.0/
+# colors.css from kdeglobals and gtk.css imports it unconditionally, so GTK3
+# resolves the same #202326 under both Breeze and Breeze-Dark. The GTK theme
+# name cannot change GTK's colours while that import stands.
+gsettings set org.gnome.desktop.interface color-scheme "prefer-$polarity"
+
+# Every running nvim, including ones inside tmux. Sockets are created without
+# --listen since 0.12, so there is nothing to configure on the nvim side.
+#
+# A stale socket hangs on connect, and checking the pid in the socket name does
+# not catch it: an `nvim --embed` whose embedder died stays alive and listening
+# but never answers. So the two guards are the timeout and the parallel fan-out.
+# A healthy nvim replies in ~6ms, so 0.3s is ~50x headroom, and backgrounding
+# means several wedged servers cost one timeout between them rather than one
+# each.
+for sock in "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"/nvim.*; do
+    [ -S "$sock" ] || continue
+    timeout 0.3 nvim --server "$sock" --remote-expr \
+        "execute('set background=$polarity | colorscheme selenized')" \
+        >/dev/null 2>&1 &
+done
+wait
+
+# tmux re-reads the whole colour block; every option in it is `set -g`, so one
+# source-file repaints all sessions on the server.
+if tmux has-session 2>/dev/null; then
+    tmux source-file "$HOME/.config/theme/current/tmux.conf" 2>/dev/null
+fi
+
+# Ghostty reads its palette from the included ../theme/current/ghostty.conf and
+# reloads on SIGUSR2. The portal already moves it between light and dark, but
+# the include is what lets a *third* theme exist, and that needs the signal.
+pkill -USR2 -x ghostty 2>/dev/null
+
+# GTK reads CSS once at startup, so walker has to come back. setsid detaches it
+# from this script, which is about to exit. It is a launcher daemon; restarting
+# it is invisible unless it happens to be open.
+if pkill -x walker 2>/dev/null; then
+    setsid walker --gapplication-service >/dev/null 2>&1 &
+fi
+
+# hypr/palette.lua reads the state file, but `hyprctl reload` alone re-reads a
+# *cached* parse, so the Lua never re-runs and the colours never change.
+# Touching the entry point invalidates that cache; the reload then applies it
+# without waiting on Hyprland's own file watcher. Touch changes mtime only, so
+# it causes no chezmoi drift.
+touch "$HOME/.config/hypr/hyprland.lua" 2>/dev/null
+hyprctl reload >/dev/null 2>&1

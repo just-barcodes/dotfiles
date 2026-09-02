@@ -1,6 +1,9 @@
 CLAUDE.md
 README.md
 QUICKSHELL-MIGRATION.md
+THEME-SWITCHING.md
+.config/theme/generated
+.config/theme/current
 install.sh
 renovate.json
 .config/nvim/lazy-lock.json

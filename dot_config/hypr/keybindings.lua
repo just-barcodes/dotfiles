@@ -74,6 +74,7 @@ hl.bind("SUPER + SHIFT + F9", hl.dsp.exec_cmd('hyprctl --batch "dispatch dpms of
 
 hl.bind("CTRL + ALT + SHIFT + P", hl.dsp.exec_cmd("~/.local/bin/sm-switch.sh"))
 hl.bind("CTRL + ALT + SHIFT + O", hl.dsp.exec_cmd("~/.local/bin/sesh-picker"))
+hl.bind("CTRL + ALT + SHIFT + T", hl.dsp.exec_cmd("~/.local/bin/theme-switch"))
 
 ----------------------------------------------------------------
 -- Window splits

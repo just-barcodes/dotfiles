@@ -1,0 +1,62 @@
+#!/bin/bash
+# Render per-theme config fragments for the apps that cannot read palette.env
+# themselves. tmux (and later walker, btop) have config formats we cannot teach
+# to parse key=value, so their colours are generated instead.
+#
+# One template per app shared by every theme, one .env per theme: adding a theme
+# is a new palette file and nothing else. See THEME-SWITCHING.md.
+#
+# `after_` because this reads the palettes and templates from their deployed
+# locations, so they must be written first.
+set -euo pipefail
+
+{{ if (dig "coder" false .) -}}
+echo "Coder workspace: skipping theme render"; exit 0
+{{ end -}}
+
+# Re-trigger when any palette or template changes by embedding their hashes.
+{{ range (glob (joinPath .chezmoi.sourceDir "dot_config/theme/palettes/*.env")) -}}
+# {{ base . }}: {{ include . | sha256sum }}
+{{ end -}}
+{{ range (glob (joinPath .chezmoi.sourceDir "dot_config/theme/templates/*")) -}}
+# tmpl {{ base . }}: {{ include . | sha256sum }}
+{{ end }}
+THEMES="$HOME/.config/theme/palettes"
+TEMPLATES="$HOME/.config/theme/templates"
+GEN="$HOME/.config/theme/generated"
+STATE="${XDG_STATE_HOME:-$HOME/.local/state}/theme"
+
+if ! command -v envsubst >/dev/null 2>&1; then
+	echo "envsubst (gettext) not installed; skipping theme render"
+	exit 0
+fi
+
+rm -rf "$GEN"
+for palette in "$THEMES"/*.env; do
+	name=$(basename "$palette" .env)
+	mkdir -p "$GEN/$name"
+
+	# Restrict substitution to this palette's own keys. Without the explicit
+	# list envsubst would also try to expand things like the `$3` awk fields
+	# inside tmux's status-format.
+	vars=$(sed -n 's/^\([A-Za-z_][A-Za-z0-9_]*\)=.*/${\1}/p' "$palette" | tr '\n' ' ')
+
+	for template in "$TEMPLATES"/*; do
+		[ -f "$template" ] || continue
+		# shellcheck source=/dev/null
+		(set -a; . "$palette"; set +a; envsubst "$vars" <"$template") \
+			>"$GEN/$name/$(basename "$template")"
+	done
+	echo "rendered theme: $name"
+done
+
+# Make sure ~/.config/theme/current resolves before the first theme-switch run,
+# so tmux has something to source on a fresh machine. An existing valid symlink
+# is left alone -- theme-switch owns it.
+current="$HOME/.config/theme/current"
+if [ ! -d "$current" ]; then
+	name=$(cat "$STATE" 2>/dev/null || echo selenized-dark)
+	[ -d "$GEN/$name" ] || name=selenized-dark
+	ln -sfn "$GEN/$name" "$current"
+	echo "theme/current -> $name"
+fi

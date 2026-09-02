@@ -111,6 +111,7 @@ packages:
   pacman:
     system:
       - vim
+      - gettext  # envsubst, for .chezmoiscripts/run_onchange_after_render_themes.sh
       - git
       - openssh
       - zsh
