@@ -34,19 +34,33 @@ $time\
 [ ](fg:color_bg1)\
 $line_break$character"""
 
-palette = 'gruvbox_dark'
+# Rendered per theme from the palette .env. See THEME-SWITCHING.md.
+# Do not edit the generated copy.
+#
+# starship re-reads its config on every prompt, and STARSHIP_CONFIG (set in
+# dot_zshrc.tmpl) points through ~/.config/theme/current -- so a switch lands on
+# the next prompt in every shell, with no signal from theme-switch.
+#
+# `${count}` and friends below are starship's own variables, not palette keys.
+# The render script passes envsubst an explicit list, so they survive.
+palette = 'selenized'
 
-[palettes.gruvbox_dark]
-color_fg0 = '#fbf1c7'
-color_bg1 = '#3c3836'
-color_bg3 = '#665c54'
-color_blue = '#458588'
-color_aqua = '#689d6a'
-color_green = '#98971a'
-color_orange = '#d65d0e'
-color_purple = '#b16286'
-color_red = '#cc241d'
-color_yellow = '#d79921'
+[palettes.selenized]
+# Text on the bright accent segments. bg_0 is the maximum-contrast counterpart
+# to the accents in both polarities: dark text on bright chips in the dark
+# theme, light text on saturated chips in the light one.
+color_fg0 = '${bg_0}'
+# Text on the neutral bg1/bg3 segments, where bg_0 would be invisible.
+color_fg_dim = '${fg_1}'
+color_bg1 = '${bg_1}'
+color_bg3 = '${bg_2}'
+color_blue = '${blue}'
+color_aqua = '${cyan}'
+color_green = '${green}'
+color_orange = '${orange}'
+color_purple = '${violet}'
+color_red = '${red}'
+color_yellow = '${yellow}'
 
 [aws]
 format = '[$symbol($profile )(\($region\) )(\[$duration\])]($style)'
@@ -116,11 +130,11 @@ commit_hash_length = 8
 style = "bold white"
 
 [git_state]
-style = "fg:#CC241D bg:color_aqua"
+style = "fg:color_red bg:color_aqua"
 format = '[--\($state( $progress_current of $progress_total)\)--]($style)'
 
 [git_status]
-style = "fg:#CC241D bg:color_aqua"
+style = "fg:color_red bg:color_aqua"
 format = '([$all_status$ahead_behind]($style))'
 
 conflicted = "✗ "
@@ -182,7 +196,7 @@ format = '[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)'
 [docker_context]
 symbol = ""
 style = "bg:color_bg3"
-format = '[[ $symbol( $context) ](fg:#83a598 bg:color_bg3)]($style)'
+format = '[[ $symbol( $context) ](fg:color_fg_dim bg:color_bg3)]($style)'
 
 [helm]
 format = '[⎈ $version](bold white) '
@@ -193,13 +207,13 @@ disabled = false
 
 [conda]
 style = "bg:color_bg3"
-format = '[[ $symbol( $environment) ](fg:#83a598 bg:color_bg3)]($style)'
+format = '[[ $symbol( $environment) ](fg:color_fg_dim bg:color_bg3)]($style)'
 
 [time]
 disabled = true
 time_format = "%R"
 style = "bg:color_bg1"
-format = '[[  $time ](fg:color_fg0 bg:color_bg1)]($style)'
+format = '[[  $time ](fg:color_fg_dim bg:color_bg1)]($style)'
 
 [line_break]
 disabled = false

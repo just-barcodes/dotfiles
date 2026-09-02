@@ -1,0 +1,16 @@
+/* walker palette, rendered per theme from the palette .env.
+   See THEME-SWITCHING.md. Do not edit the generated copy.
+
+   Imported by walker/themes/minimal/style.css, which owns the layout and the
+   rules that consume these names. */
+
+@define-color window_bg_color alpha(${bg_1}, 0.97);   /* raised vs the bg_0 desktop */
+@define-color panel_border    alpha(${cyan}, 0.35);
+@define-color input_bg        alpha(${bg_0}, 0.95);   /* sunken inside the panel */
+@define-color accent          ${cyan};
+@define-color accent_soft     alpha(${cyan}, 0.18);
+@define-color accent_alt      ${yellow};
+@define-color bg_base         ${bg_0};
+@define-color theme_fg_color  ${fg_1};
+@define-color theme_fg_dim    ${fg_0};
+@define-color theme_fg_muted  ${dim_0};

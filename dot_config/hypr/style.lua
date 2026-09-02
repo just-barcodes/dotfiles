@@ -1,6 +1,8 @@
 -- Look and feel
 -- https://wiki.hypr.land/Configuring/Basics/Variables/
 
+local p = require("palette")
+
 hl.config({
     general = {
         gaps_in  = 2,
@@ -9,8 +11,8 @@ hl.config({
         border_size = 3,
 
         col = {
-            active_border   = "rgba(33ccffee)",
-            inactive_border = "rgba(595959aa)",
+            active_border   = p.rgba("cyan", "ee"),
+            inactive_border = p.rgba("bg_2", "aa"),
         },
 
         resize_on_border = true,
@@ -52,18 +54,15 @@ hl.config({
         disable_splash_rendering = true,
     },
 
-    -- Selenized Dark palette:
-    --   base #103c48  surface0 #184956  surface1 #2d5b69
-    --   text #adbcbc  dim #72898f       blue #4695f7  yellow #dbb32d
     group = {
         -- Keep one group per workspace: new and moved-in windows auto-join.
         auto_group               = true,
         group_on_movetoworkspace = true,
         col = {
-            border_active          = "rgba(41c7b9ee)",
-            border_inactive        = "rgba(2d5b69aa)",
-            border_locked_active   = "rgba(dbb32dee)",
-            border_locked_inactive = "rgba(2d5b69aa)",
+            border_active          = p.rgba("cyan", "ee"),
+            border_inactive        = p.rgba("bg_2", "aa"),
+            border_locked_active   = p.rgba("yellow", "ee"),
+            border_locked_inactive = p.rgba("bg_2", "aa"),
         },
         groupbar = {
             enabled                    = true,
@@ -84,17 +83,17 @@ hl.config({
             text_offset                = 0,
             indicator_height           = 0,
             indicator_gap              = 0,
-            text_color                 = "rgb(103c48)",
-            text_color_inactive        = "rgb(adbcbc)",
-            text_color_locked_active   = "rgb(103c48)",
-            text_color_locked_inactive = "rgb(adbcbc)",
+            text_color                 = p.rgb("bg_0"),
+            text_color_inactive        = p.rgb("fg_0"),
+            text_color_locked_active   = p.rgb("bg_0"),
+            text_color_locked_inactive = p.rgb("fg_0"),
             font_weight_active         = "bold",
             font_weight_inactive       = "bold",
             col = {
-                active          = "rgba(41c7b9ff)",
-                inactive        = "rgba(2d5b69ff)",
-                locked_active   = "rgba(dbb32dff)",
-                locked_inactive = "rgba(2d5b69ff)",
+                active          = p.rgba("cyan", "ff"),
+                inactive        = p.rgba("bg_2", "ff"),
+                locked_active   = p.rgba("yellow", "ff"),
+                locked_inactive = p.rgba("bg_2", "ff"),
             },
         },
     },

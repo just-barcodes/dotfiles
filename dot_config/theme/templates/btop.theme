@@ -1,0 +1,54 @@
+# Selenized, rendered per theme from the palette .env.
+# See THEME-SWITCHING.md. Do not edit the generated copy.
+#
+# Gradients run bg_2 -> hue so they read correctly in both polarities: in dark
+# that is a dark-to-bright ramp, in light a pale-to-saturated one. Only the
+# three-stop ramps (temp, cpu, download, upload) use a distinct mid colour.
+
+theme[main_bg]="${bg_0}"
+theme[main_fg]="${fg_0}"
+theme[title]="${fg_1}"
+theme[hi_fg]="${yellow}"
+theme[selected_bg]="${bg_2}"
+theme[selected_fg]="${yellow}"
+# dim_0 rather than a background tone: bg_2 is invisible on a light bg_0.
+theme[inactive_fg]="${dim_0}"
+theme[proc_misc]="${green}"
+
+theme[cpu_box]="${bg_2}"
+theme[mem_box]="${bg_2}"
+theme[net_box]="${bg_2}"
+theme[proc_box]="${bg_2}"
+theme[div_line]="${bg_2}"
+
+theme[temp_start]="${blue}"
+theme[temp_mid]="${violet}"
+theme[temp_end]="${red}"
+
+theme[cpu_start]="${green}"
+theme[cpu_mid]="${yellow}"
+theme[cpu_end]="${red}"
+
+theme[free_start]="${bg_2}"
+theme[free_mid]=""
+theme[free_end]="${green}"
+
+theme[cached_start]="${bg_2}"
+theme[cached_mid]=""
+theme[cached_end]="${blue}"
+
+theme[available_start]="${bg_2}"
+theme[available_mid]=""
+theme[available_end]="${yellow}"
+
+theme[used_start]="${bg_2}"
+theme[used_mid]=""
+theme[used_end]="${red}"
+
+theme[download_start]="${bg_2}"
+theme[download_mid]="${blue}"
+theme[download_end]="${cyan}"
+
+theme[upload_start]="${bg_2}"
+theme[upload_mid]="${magenta}"
+theme[upload_end]="${violet}"

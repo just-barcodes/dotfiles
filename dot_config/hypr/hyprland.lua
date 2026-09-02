@@ -1,6 +1,8 @@
 -- Hyprland config entry point
 -- https://wiki.hypr.land/Configuring/Start/
 
+local p = require("palette")
+
 ------------------
 ---- INCLUDES ----
 ------------------
@@ -16,6 +18,7 @@ require("workspaces")
 ---- AUTOSTART ----
 -------------------
 hl.on("hyprland.start", function()
+    hl.exec_cmd("~/.local/bin/theme-switch apply")  -- gsettings lives in dconf, which chezmoi cannot manage; the state file is the source of truth
     hl.exec_cmd("nm-applet")
     hl.exec_cmd("qs -d")                -- quickshell: bar, notifications, control center, OSD, lock
     hl.exec_cmd("elephant")             -- backend for walker
@@ -76,7 +79,7 @@ hl.window_rule({
 hl.window_rule({
     name  = "special-magic-border",
     match = { workspace = "special:magic" },
-    border_color = "rgba(fa5750ee) rgba(2d5b69aa)",
+    border_color = p.rgba("red", "ee") .. " " .. p.rgba("bg_2", "aa"),
 })
 
 -- Firefox/Zen extension pop-out windows (e.g., Bitwarden) and Picture-in-Picture
