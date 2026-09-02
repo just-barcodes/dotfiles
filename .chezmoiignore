@@ -8,13 +8,11 @@ install.sh
 renovate.json
 .config/nvim/lazy-lock.json
 {{ if (dig "coder" false .) }}
-.config/alacritty
 .config/ghostty
 .config/hypr
 .config/kanata
 .config/Proton
 .config/quickshell
-.config/swaync
 .config/walker
 .config/xdg-desktop-portal
 .config/gtk-3.0

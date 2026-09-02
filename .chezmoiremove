@@ -1,0 +1,6 @@
+# Replaced by ghostty (alacritty) and the quickshell config (swaync, hyprlock).
+# Source files are gone, but chezmoi only removes a target if it is listed here,
+# so this is what clears them from machines that still have them deployed.
+.config/alacritty
+.config/swaync
+.config/hypr/hyprlock.conf
