@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Simple walker script to select and launch a TUI
-CHOICE=$(printf "🔊 Audio (pulsemixer)\n🌐 Network (wifitui)\n Bluetooth (bluetuith)\n💻 System Monitor (btop)\n📁 Files (yazi)\n📅 Calendar (cal)\n📸 Screenshot (grim+swappy)" | walker --dmenu)
+CHOICE=$(printf "🔊 Audio (pulsemixer)\n🌐 Network (wifitui)\n Bluetooth (bluetuith)\n💻 System Monitor (btop)\n📁 Files (yazi)\n📅 Calendar (cal)\n📸 Screenshot (grim+swappy)\n🎨 Theme" | walker --dmenu)
 
 case "$CHOICE" in
 *"Audio"*) ghostty --class=com.tui.centered -e pulsemixer ;;
@@ -11,4 +11,8 @@ case "$CHOICE" in
 *"Files"*) ghostty --class=com.tui.centered -e yazi ;;
 *"Calendar"*) ghostty --class=com.tui.centered --font-size=18 -e calendar.sh ;;
 *"Screenshot"*) grim -g "$(slurp)" - | swappy -f - ;;
+*"Theme"*)
+	THEME=$(~/.local/bin/theme-switch list | walker --dmenu -p "Theme")
+	[ -n "$THEME" ] && ~/.local/bin/theme-switch "$THEME"
+	;;
 esac

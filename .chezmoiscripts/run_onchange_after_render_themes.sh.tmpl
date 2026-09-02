@@ -31,22 +31,54 @@ if ! command -v envsubst >/dev/null 2>&1; then
 	exit 0
 fi
 
+# Derived keys for consumers that want channels rather than hex. For every
+# `key=#rrggbb` this prints `key_rgb="r, g, b"` and `key_h`/`key_s`/`key_l`
+# (hue in degrees, saturation and lightness in %), which is how Obsidian and
+# the Minimal theme build their colours. Hex to decimal is done in bash so the
+# awk stays POSIX (Ubuntu's mawk has no strtonum).
+derived() {
+	sed -n 's/^\([A-Za-z_][A-Za-z0-9_]*\)=#\([0-9a-fA-F]\{6\}\)$/\1 \2/p' "$1" |
+		while read -r key hex; do
+			r=$((16#${hex:0:2})) g=$((16#${hex:2:2})) b=$((16#${hex:4:2}))
+			echo "${key}_rgb=\"$r, $g, $b\""
+			awk -v k="$key" -v r="$r" -v g="$g" -v b="$b" 'BEGIN {
+				r /= 255; g /= 255; b /= 255
+				max = r; if (g > max) max = g; if (b > max) max = b
+				min = r; if (g < min) min = g; if (b < min) min = b
+				l = (max + min) / 2; d = max - min; h = 0; s = 0
+				if (d > 0) {
+					s = (l > 0.5) ? d / (2 - max - min) : d / (max + min)
+					if (max == r) h = (g - b) / d + (g < b ? 6 : 0)
+					else if (max == g) h = (b - r) / d + 2
+					else h = (r - g) / d + 4
+					h *= 60
+				}
+				printf "%s_h=%d\n%s_s=%d%%\n%s_l=%d%%\n", k, h + 0.5, k, s * 100 + 0.5, k, l * 100 + 0.5
+			}'
+		done
+}
+
 rm -rf "$GEN"
 for palette in "$THEMES"/*.env; do
 	name=$(basename "$palette" .env)
 	mkdir -p "$GEN/$name"
 
+	# The palette plus its derived channel keys, in one sourceable file.
+	full=$(mktemp)
+	{ cat "$palette"; derived "$palette"; } >"$full"
+
 	# Restrict substitution to this palette's own keys. Without the explicit
 	# list envsubst would also try to expand things like the `$3` awk fields
 	# inside tmux's status-format.
-	vars=$(sed -n 's/^\([A-Za-z_][A-Za-z0-9_]*\)=.*/${\1}/p' "$palette" | tr '\n' ' ')
+	vars=$(sed -n 's/^\([A-Za-z_][A-Za-z0-9_]*\)=.*/${\1}/p' "$full" | tr '\n' ' ')
 
 	for template in "$TEMPLATES"/*; do
 		[ -f "$template" ] || continue
 		# shellcheck source=/dev/null
-		(set -a; . "$palette"; set +a; envsubst "$vars" <"$template") \
+		(set -a; . "$full"; set +a; envsubst "$vars" <"$template") \
 			>"$GEN/$name/$(basename "$template")"
 	done
+	rm -f "$full"
 	echo "rendered theme: $name"
 done
 

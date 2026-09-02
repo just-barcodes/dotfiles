@@ -1,0 +1,51 @@
+/* Obsidian (Minimal theme) palette, rendered per theme from the palette .env.
+   Themes live in ~/.config/theme/palettes. Do not edit the generated copy.
+
+   theme-switch copies this into every vault's .obsidian/snippets/theme.css;
+   Obsidian reloads an enabled snippet when the file changes. Light/dark is
+   not decided here: appearance.json's `"theme": "system"` follows the portal.
+
+   Variable names are Minimal's (--bg1, --tx1, --ui1 ...) plus Obsidian's own
+   --color-*. The doubled class outranks Minimal's scheme blocks, which are
+   `.theme-dark.minimal-<scheme>-dark` (0,2,0): equal specificity, and a
+   snippet is loaded after the theme, so this wins. */
+
+.theme-dark.theme-dark,
+.theme-light.theme-light {
+  --base-h: ${bg_0_h};
+  --base-s: ${bg_0_s};
+  --base-l: ${bg_0_l};
+  --accent-h: ${blue_h};
+  --accent-s: ${blue_s};
+  --accent-l: ${blue_l};
+
+  --bg1: ${bg_0};                                        /* editor */
+  --bg2: ${bg_1};                                        /* sidebars */
+  --bg3: rgba(${fg_0_rgb}, 0.08);                        /* hover overlay */
+  --ui1: ${bg_2};                                        /* borders */
+  --ui2: color-mix(in srgb, ${bg_2} 70%, ${dim_0});      /* hover borders */
+  --ui3: color-mix(in srgb, ${bg_2} 40%, ${dim_0});      /* active borders */
+  --tx1: ${fg_0};                                        /* text */
+  --tx2: ${dim_0};                                       /* muted */
+  --tx3: color-mix(in srgb, ${bg_2} 40%, ${dim_0});      /* faint */
+  --tx4: ${dim_0};
+  --hl1: rgba(${blue_rgb}, 0.25);                        /* selection */
+  --hl2: rgba(${yellow_rgb}, 0.35);                      /* search hit */
+
+  --color-red: ${red};
+  --color-orange: ${orange};
+  --color-yellow: ${yellow};
+  --color-green: ${green};
+  --color-cyan: ${cyan};
+  --color-blue: ${blue};
+  --color-purple: ${violet};
+  --color-pink: ${magenta};
+  --color-red-rgb: ${red_rgb};
+  --color-orange-rgb: ${orange_rgb};
+  --color-yellow-rgb: ${yellow_rgb};
+  --color-green-rgb: ${green_rgb};
+  --color-cyan-rgb: ${cyan_rgb};
+  --color-blue-rgb: ${blue_rgb};
+  --color-purple-rgb: ${violet_rgb};
+  --color-pink-rgb: ${magenta_rgb};
+}

@@ -9,7 +9,7 @@
 # Deliberately no `set -e`: this is a fan-out, and one unreachable consumer
 # must not abort the ones after it and leave the desktop half-themed.
 #
-# SC2154: polarity is set by the sourced palette.
+# SC2154: polarity and nvim_colorscheme are set by the sourced palette.
 # shellcheck disable=SC2154
 set -u
 
@@ -80,7 +80,7 @@ gsettings set org.gnome.desktop.interface color-scheme "prefer-$polarity"
 for sock in "${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"/nvim.*; do
     [ -S "$sock" ] || continue
     timeout 0.3 nvim --server "$sock" --remote-expr \
-        "execute('set background=$polarity | colorscheme selenized')" \
+        "execute('set background=$polarity | colorscheme ${nvim_colorscheme:-selenized}')" \
         >/dev/null 2>&1 &
 done
 wait
@@ -95,6 +95,18 @@ fi
 # reloads on SIGUSR2. The portal already moves it between light and dark, but
 # the include is what lets a *third* theme exist, and that needs the signal.
 pkill -USR2 -x ghostty 2>/dev/null
+
+# Obsidian reloads an enabled CSS snippet when its file changes, so the
+# rendered one is copied, not linked, into every vault Obsidian knows about.
+# Light/dark itself follows the portal via appearance.json's "system" theme.
+if [ -r "$HOME/.config/obsidian/obsidian.json" ] && command -v jq >/dev/null 2>&1; then
+    jq -r '.vaults[].path' "$HOME/.config/obsidian/obsidian.json" 2>/dev/null |
+        while IFS= read -r vault; do
+            [ -d "$vault/.obsidian" ] || continue
+            mkdir -p "$vault/.obsidian/snippets"
+            cp "$HOME/.config/theme/current/obsidian.css" "$vault/.obsidian/snippets/theme.css"
+        done
+fi
 
 # GTK reads CSS once at startup, so walker has to come back. setsid detaches it
 # from this script, which is about to exit. It is a launcher daemon; restarting
