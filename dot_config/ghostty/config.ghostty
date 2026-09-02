@@ -1,7 +1,7 @@
 # The active theme. Path is relative to this file, and the leading `?` makes a
 # missing file non-fatal on a machine where the theme has not rendered yet.
 # An included file overrides the config that names it, so this wins over any
-# `theme` set above. See THEME-SWITCHING.md.
+# `theme` set above.
 config-file = ?../theme/current/ghostty.conf
 
 # Scrollback is a per-surface byte cap (default ~10MB). Byte-capped, so no

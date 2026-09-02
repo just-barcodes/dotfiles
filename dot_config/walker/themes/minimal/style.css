@@ -1,5 +1,5 @@
-/* Colours come from the active theme; see THEME-SWITCHING.md. The path is
-   relative to this file: ~/.config/walker/themes/minimal -> ~/.config/theme. */
+/* Colours come from the active theme. The path is relative to this file:
+   ~/.config/walker/themes/minimal -> ~/.config/theme. */
 @import url("../../../theme/current/walker.css");
 
 * {

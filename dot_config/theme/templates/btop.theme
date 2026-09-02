@@ -1,5 +1,5 @@
 # Selenized, rendered per theme from the palette .env.
-# See THEME-SWITCHING.md. Do not edit the generated copy.
+# Themes live in ~/.config/theme/palettes. Do not edit the generated copy.
 #
 # Gradients run bg_2 -> hue so they read correctly in both polarities: in dark
 # that is a dark-to-bright ramp, in light a pale-to-saturated one. Only the

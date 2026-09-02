@@ -6,7 +6,6 @@ import Quickshell.Io
 
 // Palette is read from ~/.config/theme/palettes/<name>.env, selected by the
 // theme name in ~/.local/state/theme. Both files are written by `theme-switch`.
-// See THEME-SWITCHING.md.
 //
 // The *state file* is watched, not the palette: FileView's inotify watch sits
 // on the resolved path, so repointing a symlink would never fire it.

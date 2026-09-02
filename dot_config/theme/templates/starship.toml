@@ -34,7 +34,7 @@ $time\
 [ ](fg:color_bg1)\
 $line_break$character"""
 
-# Rendered per theme from the palette .env. See THEME-SWITCHING.md.
+# Rendered per theme from the palette .env. Themes live in ~/.config/theme/palettes.
 # Do not edit the generated copy.
 #
 # starship re-reads its config on every prompt, and STARSHIP_CONFIG (set in

@@ -1,7 +1,6 @@
 -- Colours for the current theme, read from ~/.config/theme/palettes/<name>.env.
 -- The name comes from ~/.local/state/theme, both written by `theme-switch`.
 -- A switch takes effect via `hyprctl reload`, which re-executes this config.
--- See THEME-SWITCHING.md.
 
 local home = os.getenv("HOME")
 

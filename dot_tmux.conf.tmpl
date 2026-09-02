@@ -85,7 +85,7 @@ set -g window-active-style ''
 # Line 0 (bottom) — windows + cwd
 set -g status-left ""
 
-# Colours live in the active theme; see THEME-SWITCHING.md. `theme-switch`
+# Colours come from the active theme in ~/.config/theme/current. `theme-switch`
 # re-sources this file, so a switch repaints tmux without restarting it.
 if-shell "test -r ~/.config/theme/current/tmux.conf" \
     "source-file ~/.config/theme/current/tmux.conf"

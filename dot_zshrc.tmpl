@@ -194,7 +194,7 @@ command -v zoxide   >/dev/null && eval "$(zoxide init zsh)"
 # starship re-reads its config on every prompt, so pointing it through the
 # theme symlink makes a `theme-switch` land on the next prompt in every shell,
 # including ones already open. The guard keeps the built-in default on a
-# machine where the theme has not been rendered yet. See THEME-SWITCHING.md.
+# machine where the theme has not been rendered yet.
 [ -r "$HOME/.config/theme/current/starship.toml" ] &&
 	export STARSHIP_CONFIG="$HOME/.config/theme/current/starship.toml"
 command -v starship >/dev/null && eval "$(starship init zsh)"
