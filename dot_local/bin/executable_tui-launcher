@@ -7,7 +7,7 @@ case "$CHOICE" in
 *"Audio"*) ghostty --class=com.tui.centered -e pulsemixer ;;
 *"Network"*) ghostty --class=com.tui.centered -e wifitui ;;
 *"Bluetooth"*) ghostty --class=com.tui.centered -e bluetuith ;;
-*"System Monitor"*) ghostty --class=com.tui.centered -e btop ;;
+*"System Monitor"*) ghostty --class=com.tui.centered --font-size=14 -e btop ;;
 *"Files"*) ghostty --class=com.tui.centered -e yazi ;;
 *"Calendar"*) ghostty --class=com.tui.centered --font-size=18 -e calendar.sh ;;
 *"Screenshot"*) grim -g "$(slurp)" - | swappy -f - ;;

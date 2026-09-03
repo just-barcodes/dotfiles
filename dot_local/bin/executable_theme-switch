@@ -96,6 +96,11 @@ fi
 # the include is what lets a *third* theme exist, and that needs the signal.
 pkill -USR2 -x ghostty 2>/dev/null
 
+# btop hot-reloads its config and theme on SIGUSR2. Its color_theme is
+# ~/.config/btop/themes/current.theme, a symlink into theme/current, which
+# btop re-reads through the flipped link on reload.
+pkill -USR2 -x btop 2>/dev/null
+
 # Obsidian reloads an enabled CSS snippet when its file changes, so the
 # rendered one is copied, not linked, into every vault Obsidian knows about.
 # Light/dark itself follows the portal via appearance.json's "system" theme.

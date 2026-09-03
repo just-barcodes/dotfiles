@@ -23,7 +23,7 @@ hl.on("hyprland.start", function()
     hl.exec_cmd("qs -d")                -- quickshell: bar, notifications, control center, OSD, lock
     hl.exec_cmd("elephant")             -- backend for walker
     hl.exec_cmd("walker --gapplication-service")  -- improve walker start-up time
-    hl.exec_cmd("ghostty -e btop", { workspace = "99" })
+    hl.exec_cmd("ghostty --font-size=14 -e btop", { workspace = "99" })
     hl.dispatch(hl.dsp.focus({ workspace = 4, on_current_monitor = true }))
     hl.exec_cmd("systemctl --user start hyprpolkitagent")  -- authentication daemon
     hl.exec_cmd("hypridle")

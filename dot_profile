@@ -1,6 +1,10 @@
 
 export PATH="$HOME/.local/bin:$PATH"
 
+# Terminal for Terminal=true desktop entries launched from walker (elephant
+# falls back to whatever emulator it finds first, which was foot).
+export TERMINAL=ghostty
+
 
 # Added by Toolbox App
 export PATH="$PATH:$HOME/.local/share/JetBrains/Toolbox/scripts"
