@@ -50,4 +50,6 @@ return {
 	{ "ellisonleao/gruvbox.nvim", lazy = true },
 	{ "catppuccin/nvim", name = "catppuccin", lazy = true },
 	{ "rose-pine/neovim", name = "rose-pine", lazy = true },
+	{ "folke/tokyonight.nvim", lazy = true },
+	{ "kepano/flexoki-neovim", name = "flexoki", lazy = true },
 }
