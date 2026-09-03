@@ -66,8 +66,11 @@ Rectangle {
                         // Right click, and left click on a menu-only item, both
                         // want the DBus menu rather than Activate.
                         if (event.button === Qt.RightButton || entry.modelData.onlyMenu) {
-                            if (entry.modelData.hasMenu)
-                                entry.modelData.display(root.barWindow, entry.width / 2, root.height);
+                            if (entry.modelData.hasMenu) {
+                                // display() wants window coordinates.
+                                const pos = entry.mapToItem(null, entry.width / 2, entry.height);
+                                entry.modelData.display(root.barWindow, pos.x, pos.y);
+                            }
                             return;
                         }
                         entry.modelData.activate();
