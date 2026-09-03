@@ -111,7 +111,7 @@ packages:
   pacman:
     system:
       - vim
-      - gettext  # envsubst, for .chezmoiscripts/run_onchange_after_render_themes.sh
+      - gettext # envsubst, for .chezmoiscripts/run_onchange_after_render_themes.sh
       - git
       - openssh
       - zsh
@@ -262,10 +262,7 @@ packages:
     - google-chrome
     - insync
     - visual-studio-code-bin
-    - jetbrains-toolbox
-    - betterbird-bin
     - x11docker
-    - bruno-bin
     - appimagelauncher
     - kanata
     - walker
@@ -280,12 +277,20 @@ packages:
     - elephant-clipboard
     - elephant-files
     - elephant-bitwarden
-    - podman-tui-bin
-    - choosenim
     - headlamp-bin # kubernetes manage gui
     - sesh-bin
     - bluetuith
     - wifitui
     - proton-mail-bin
     - semgrep-bin
+
+  # Optional AUR packages. Not installed by any script; install by hand with
+  # `paru -S <pkg>` when needed.
+  paru_optional:
+    - betterbird-bin
+    - bruno-bin
+    - choosenim
     - coder
+    - jetbrains-toolbox
+    - openshot
+    - podman-tui-bin
