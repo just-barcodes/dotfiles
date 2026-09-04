@@ -150,8 +150,28 @@ Scope {
             color: "black"
 
             Item {
+                id: content
+
                 anchors.fill: parent
                 focus: true
+
+                // WlSessionLock recreates its surfaces whenever the screen set
+                // changes, which hypridle guarantees right after every lock:
+                // dpms off at 7min, suspend at 10min. Declarative `focus` alone
+                // does not survive that. The new content item renders (clock,
+                // field and placeholder are static bindings) but never takes
+                // active focus, so Keys.onPressed below never fires and the
+                // lock screen ignores every keystroke. Assert focus explicitly,
+                // as NetworkPanel.qml and WifiPanel.qml already do.
+                Component.onCompleted: forceActiveFocus()
+
+                Connections {
+                    target: surface
+                    function onVisibleChanged() {
+                        if (surface.visible)
+                            content.forceActiveFocus();
+                    }
+                }
 
                 Keys.onPressed: event => {
                     event.accepted = true;

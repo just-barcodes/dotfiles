@@ -52,6 +52,14 @@ hl.config({
         force_default_wallpaper  = 0,
         disable_hyprland_logo    = true,
         disable_splash_rendering = true,
+
+        -- Break-glass for the quickshell lock screen (Lock.qml). If the lock
+        -- client dies while the session is locked, the default (false) makes
+        -- Hyprland refuse the lock to any new client: the session stays locked
+        -- forever with nothing to authenticate against, and the only way out is
+        -- killing Hyprland and losing the session. With this on, `qs -d` from a
+        -- TTY takes the lock back over.
+        allow_session_lock_restore = true,
     },
 
     group = {
