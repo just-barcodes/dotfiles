@@ -91,6 +91,14 @@ if tmux has-session 2>/dev/null; then
     tmux source-file "$HOME/.config/theme/current/tmux.conf" 2>/dev/null
 fi
 
+# herdr's config.toml is a symlink into theme/current; reload-config re-reads
+# it through the flipped link. The binary is a mise shim, which is not on PATH
+# when this runs from a Hyprland keybind.
+herdr=$(command -v herdr || echo "$HOME/.local/share/mise/shims/herdr")
+if [ -S "$HOME/.config/herdr/herdr.sock" ]; then
+    "$herdr" server reload-config >/dev/null 2>&1
+fi
+
 # Ghostty reads its palette from the included ../theme/current/ghostty.conf and
 # reloads on SIGUSR2. The portal already moves it between light and dark, but
 # the include is what lets a *third* theme exist, and that needs the signal.

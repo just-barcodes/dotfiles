@@ -39,3 +39,7 @@ yazi = "26"
 # Secrets / encryption
 age = "1.3"
 sops = "3.13"
+
+# Agent workspace manager (tmux-like; config is rendered per theme, see
+# dot_config/theme/templates/herdr.toml)
+herdr = "latest"

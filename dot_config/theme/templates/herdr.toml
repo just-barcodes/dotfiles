@@ -1,0 +1,75 @@
+# herdr config, rendered per theme by
+# .chezmoiscripts/run_onchange_after_render_themes.sh.tmpl into
+# ~/.config/theme/generated/<name>/herdr.toml. ~/.config/herdr/config.toml is
+# a symlink through ~/.config/theme/current, and theme-switch runs
+# `herdr server reload-config` so a switch repaints a running herdr.
+#
+# herdr has no include, so the whole config lives here: the keybindings are
+# theme-independent but rendered into every theme along with the colours.
+# `${key}` names a key in the palette .env; nothing else uses `$`.
+
+##### Keys: mirror ~/.tmux.conf ###############################################
+[keys]
+# tmux: `set -g prefix F12`. tmux's prefix2 (C-Space) has no counterpart:
+# herdr takes exactly one prefix key.
+prefix = "f12"
+
+# tmux defaults that herdr binds differently.
+detach = "prefix+d"
+rename_tab = "prefix+comma"
+
+# tmux: `bind -n M-n next-window` / `M-p previous-window`. Tabs are windows.
+next_tab = ["prefix+n", "alt+n"]
+previous_tab = ["prefix+p", "alt+p"]
+
+# tmux: `|` side by side, `-` stacked.
+split_vertical = "prefix+|"
+split_horizontal = "prefix+minus"
+
+# tmux: `bind -n C-h/j/k/l select-pane`. Unlike tmux's is_vim guard, herdr
+# cannot pass these through to an nvim running in the pane; drop the ctrl+
+# entries if that bites.
+focus_pane_left = ["prefix+h", "ctrl+h"]
+focus_pane_down = ["prefix+j", "ctrl+j"]
+focus_pane_up = ["prefix+k", "ctrl+k"]
+focus_pane_right = ["prefix+l", "ctrl+l"]
+
+# tmux: `bind -n M-h/j/k/l resize-pane`.
+resize_pane_left = "alt+h"
+resize_pane_down = "alt+j"
+resize_pane_up = "alt+k"
+resize_pane_right = "alt+l"
+
+[ui]
+# tmux's prefix+c opens a window immediately; herdr would prompt for a name.
+prompt_new_tab_name = false
+
+##### Colours: from the palette ###############################################
+[theme]
+name = "${herdr_theme}"
+
+# Token names are Catppuccin's (surface0, overlay0, subtext0, peach, mauve).
+# Every palette key the built-in theme would otherwise decide is overridden,
+# so a palette without a matching built-in (selenized, flexoki) still renders
+# in its own colours.
+[theme.custom]
+panel_bg = "${bg_0}"
+sidebar_bg = "${bg_dim}"
+active_row_bg = "${bg_0}"
+selection_bg = "${bg_1}"
+surface_dim = "${bg_dim}"
+surface0 = "${bg_1}"
+surface1 = "${bg_2}"
+overlay0 = "${dim_0}"
+overlay1 = "${dim_0}"
+subtext0 = "${fg_0}"
+text = "${fg_1}"
+# cyan, as tmux's active pane border and walker's accent.
+accent = "${cyan}"
+blue = "${blue}"
+green = "${green}"
+yellow = "${yellow}"
+red = "${red}"
+peach = "${orange}"
+mauve = "${violet}"
+teal = "${cyan}"
