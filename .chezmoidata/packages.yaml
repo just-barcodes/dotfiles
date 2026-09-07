@@ -42,7 +42,7 @@ packages:
       - ca-certificates
       - gnupg
       - lsb-release
-      - software-properties-common
+      - software-properties-common # add-apt-repository
       - apt-transport-https
 
       # runtime/tool manager — installed from the mise apt repo (script adds it)
@@ -50,29 +50,29 @@ packages:
 
       # dev tools (neovim, gh, shellcheck, bat, yq live in mise - see above)
       - git-lfs
-      - tig
+      - tig # ncurses git log/diff browser
       - tldr
       - tree
-      - httpie
-      - ncdu
-      - entr
-      - moreutils
-      - pv
+      - httpie # friendlier curl (http/https commands)
+      - ncdu # ncurses disk usage browser
+      - entr # run a command when files change
+      - moreutils # sponge, ts, vidir, chronic, ...
+      - pv # progress meter for pipes
       - rsync
       - file
-      - universal-ctags
-      - pipx
+      - universal-ctags # symbol index for editors
+      - pipx # isolated installs of python CLI apps
 
       # network / diagnostics
       - iputils-ping
       - iproute2
       - dnsutils
       - whois
-      - mtr-tiny
+      - mtr-tiny # ping + traceroute in one
       - traceroute
-      - lsof
-      - strace
-      - net-tools
+      - lsof # list open files/ports
+      - strace # syscall tracer
+      - net-tools # legacy ifconfig/netstat
 
       # archives
       - unzip
@@ -116,77 +116,68 @@ packages:
       - openssh
       - zsh
       - gcc
-      - wl-clipboard
-      - grim
-      - slurp
-      - swappy
+      - wl-clipboard # wl-copy / wl-paste
+      - grim # Wayland screenshots
+      - slurp # region selector for grim
+      - swappy # screenshot annotation editor
       - base-devel
       - less
       - man-db
       - tldr
-      - alsa-utils
+      - alsa-utils # alsamixer, aplay
       - fzf
-      - usbutils
-      - network-manager-applet
+      - usbutils # lsusb
+      - network-manager-applet # nm-applet / nm-connection-editor
       - fd
       - cups
-      - cups-pdf
-      - qemu-full
-      - ntp
-      - fwupd
-      - dosfstools
-      - ntfsprogs
-      - brightnessctl
-      - pamixer
-      - pavucontrol
+      - cups-pdf # print-to-PDF backend
+      - qemu-full # VM emulator with all targets
+      - fwupd # firmware updates via LVFS
+      - dosfstools # mkfs.fat / fsck.fat
+      - ntfsprogs # NTFS filesystem tools
+      - brightnessctl # backlight control CLI
+      - pavucontrol # pipewire/pulse GUI mixer
       - btop
-      - figlet
-      - pulsemixer
-      - openbsd-netcat
+      - figlet # ASCII banner text
+      - pulsemixer # pipewire/pulse TUI mixer
+      - openbsd-netcat # nc
       - bluez
-      - bluez-utils
+      - bluez-utils # bluetoothctl
       - pipewire
       - pipewire-alsa
       - pipewire-pulse
-      - pipewire-jack
-      - pipewire-zeroconf
-      - wireplumber
-      - chrony
+      - pipewire-jack # JACK API compatibility
+      - pipewire-zeroconf # mDNS audio device discovery
+      - wireplumber # pipewire session manager
       - wget
-      - starship
+      - starship # shell prompt
       - flatpak
 
     hyprland:
       - hyprland
-      - greetd
-      - greetd-tuigreet
-      - uwsm
-      - meson
-      - cpio
-      - glaze
-      - hypridle
-      - nwg-displays
-      - quickshell
-      - hyprpolkitagent
-      - xdg-desktop-portal-hyprland
-      - xdg-desktop-portal-gtk
-      - gnome-keyring
-      - libsecret
+      - uwsm # universal wayland session manager, runs hyprland under systemd
+      - hypridle # idle daemon (lock/dpms timers)
+      - nwg-displays # GUI monitor layout editor
+      - quickshell # QML shell: bar, notifications, OSD, lock
+      - hyprpolkitagent # polkit auth prompts
+      - xdg-desktop-portal-hyprland # screen sharing portal
+      - xdg-desktop-portal-gtk # file picker portal
+      - gnome-keyring # secret storage for apps
+      - libsecret # client lib for gnome-keyring
 
     developer:
-      - webkit2gtk-4.1
       - jq
       - postgresql
-      - apache
+      - apache # httpd
       - ansible
       - dnsutils
       - mise
-      - usage
-      - television
-      - tree-sitter-cli
-      - trivy
-      - gitleaks
-      - worktrunk
+      - usage # CLI spec tool, mise completions
+      - television # fuzzy finder TUI (tv)
+      - tree-sitter-cli # parser generator, nvim-treesitter
+      - trivy # container/IaC vulnerability scanner
+      - gitleaks # git secret scanner
+      - worktrunk # git worktree manager for parallel agents
 
     fonts:
       - ttf-fira-code
@@ -198,8 +189,8 @@ packages:
       - ttf-bitstream-vera
       - ttf-input-nerd
       - ttf-firacode-nerd
-      - ttf-nerd-fonts-symbols
-      - nerd-fonts
+      - ttf-nerd-fonts-symbols # symbols-only nerd font fallback
+      - nerd-fonts # meta package, all nerd fonts
       - noto-fonts-emoji
 
     apps:
@@ -214,83 +205,82 @@ packages:
       - chezmoi
       - obsidian
       - chromium
-      - tailscale
+      - tailscale # mesh VPN
       - zip
       - unzip
-      - trash-cli
+      - trash-cli # trash-put etc., rm alternative
       - tmux
       - htop
       - proton-vpn-gtk-app
       - proton-vpn-cli
-      - luarocks
+      - luarocks # lua package manager
       - cmake
       - libreoffice-fresh
-      - spotify-launcher
+      - spotify-launcher # downloads/updates the spotify client
       - obs-studio
 
     kde:
-      - ark
-      - isoimagewriter
-      - kcalc
-      - dolphin
+      - ark # archive manager
+      - isoimagewriter # USB image writer
+      - kcalc # calculator
+      - dolphin # file manager
       - dolphin-plugins
-      - archlinux-xdg-menu
-      - okular
-      - bluedevil
-      - system-config-printer
+      - archlinux-xdg-menu # app menus for dolphin open-with
+      - okular # PDF/document viewer
+      - system-config-printer # printer setup GUI
       # konsole
       # kwalletmanager
 
     laptop:
-      - sof-firmware
-      - iio-sensor-proxy
-      - fprintd
-      - power-profiles-daemon
+      - sof-firmware # Intel Sound Open Firmware audio
+      - iio-sensor-proxy # accelerometer/ambient light sensors
+      - fprintd # fingerprint reader
+      - power-profiles-daemon # power profile switching
 
     pc:
       - steam
 
   npm_global:
     - "@anthropic-ai/claude-code"
-    - "@earendil-works/pi-coding-agent"
+    - "@earendil-works/pi-coding-agent" # pi coding agent CLI
     - pnpm
     - yarn
-    - hunkdiff
+    - hunkdiff # terminal diff viewer for agent changesets
 
   paru:
-    - portmaster-bin
+    - portmaster-bin # application firewall
     - google-chrome
-    - insync
+    - insync # google drive sync client
     - visual-studio-code-bin
-    - x11docker
-    - appimagelauncher
-    - kanata
-    - walker
+    - x11docker # run GUI apps in docker
+    - appimagelauncher # AppImage desktop integration
+    - kanata # keyboard remapper
+    - walker # app launcher
     - zen-browser-bin
-    - elephant
+    - elephant # provider backend for walker
     - elephant-desktopapplications
     - elephant-windows
     - elephant-calc
     - elephant-symbols
-    - elephant-providerlist
+    - elephant-providerlist # provider picker for walker
     - elephant-bluetooth
     - elephant-clipboard
     - elephant-files
     - elephant-bitwarden
     - headlamp-bin # kubernetes manage gui
-    - sesh-bin
-    - bluetuith
-    - wifitui
+    - sesh-bin # tmux session manager
+    - bluetuith # bluetooth TUI
+    - wifitui # wifi TUI
     - proton-mail-bin
-    - semgrep-bin
+    - semgrep-bin # static analysis
 
   # Optional AUR packages. Not installed by any script; install by hand with
   # `paru -S <pkg>` when needed.
   paru_optional:
-    - betterbird-bin
-    - bruno-bin
-    - choosenim
-    - coder
+    - betterbird-bin # thunderbird fork
+    - bruno-bin # API client (postman alternative)
+    - choosenim # nim toolchain installer
+    - coder # coder.com remote dev env CLI
     - jetbrains-toolbox
-    - openshot
-    - podman-tui-bin
+    - openshot # video editor
+    - podman-tui-bin # podman TUI
