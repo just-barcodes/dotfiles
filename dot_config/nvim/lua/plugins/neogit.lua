@@ -182,15 +182,28 @@ return {
 			local item = instance.buffer.ui:get_item_under_cursor()
 			-- Section headers and commit entries have no diff; keep whatever
 			-- was last shown rather than flickering the split empty.
-			if not (item and item.diff and #item.diff.lines > 0) then
+			if not (item and item.absolute_path) then
 				return
 			end
 			if item.name == preview.last and preview.win and vim.api.nvim_win_is_valid(preview.win) then
 				return
 			end
 
+			-- Reading item.diff runs Neogit's lazy loader, which caches the
+			-- result on the item. Neogit takes a cached diff to mean the file is
+			-- expanded inline and reads hunk buffer positions off it, so put the
+			-- item back the way it was or <CR> on the file errors out.
+			local expanded = rawget(item, "diff") ~= nil
+			local diff = item.diff
+			if not expanded then
+				rawset(item, "diff", nil)
+			end
+			if not (diff and #diff.lines > 0) then
+				return
+			end
+
 			preview.last = item.name
-			show(item.diff.lines, item.name)
+			show(diff.lines, item.name)
 		end
 
 		vim.api.nvim_create_autocmd("FileType", {
