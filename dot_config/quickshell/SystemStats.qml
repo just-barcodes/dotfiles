@@ -86,11 +86,16 @@ Singleton {
     // waybar `hwmon-path` pointed at hwmon1, which is acpi_fan on this boot and
     // has no temperature attribute at all; waybar had been silently falling
     // back to the thermal zone, which is also the fallback here.
+    //
+    // The embedded controller sensor (thinkpad) is preferred over coretemp:
+    // coretemp is the instantaneous package reading and jumps to 90-100 for a
+    // moment on any short burst of load, so a 5s poll shows random spikes. The
+    // EC value is smoothed and is what the old thermal-zone fallback showed.
     property string temperaturePath: ""
 
     Process {
         running: true
-        command: ["sh", "-c", "for f in /sys/class/hwmon/*/name; do case \"$(cat \"$f\")\" in coretemp|k10temp) d=${f%/name}; [ -r \"$d/temp1_input\" ] && { echo \"$d/temp1_input\"; exit; };; esac; done; echo /sys/class/thermal/thermal_zone0/temp"]
+        command: ["sh", "-c", "for name in thinkpad coretemp k10temp; do for f in /sys/class/hwmon/*/name; do [ \"$(cat \"$f\")\" = \"$name\" ] || continue; d=${f%/name}; [ -r \"$d/temp1_input\" ] && { echo \"$d/temp1_input\"; exit; }; done; done; echo /sys/class/thermal/thermal_zone0/temp"]
 
         stdout: StdioCollector {
             onStreamFinished: root.temperaturePath = this.text.trim()
