@@ -151,9 +151,31 @@ return {
 			vim.wo[preview.win].winbar = title or ""
 		end
 
+		-- The commit/log/... views open as a vsplit next to the status window,
+		-- which would leave three panes side by side. The preview is dropped when
+		-- one of them opens and stays closed while any of them is still visible.
+		local views = {
+			"NeogitCommitView",
+			"NeogitCommitSelectView",
+			"NeogitDiffView",
+			"NeogitLogView",
+			"NeogitReflogView",
+			"NeogitRefsView",
+			"NeogitStashView",
+		}
+
+		local function view_open()
+			for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+				if vim.tbl_contains(views, vim.bo[vim.api.nvim_win_get_buf(win)].filetype) then
+					return true
+				end
+			end
+			return false
+		end
+
 		local function update()
 			local instance = require("neogit.buffers.status").instance()
-			if not (instance and instance.buffer and instance.buffer.ui) then
+			if not (instance and instance.buffer and instance.buffer.ui) or view_open() then
 				return
 			end
 
@@ -184,6 +206,12 @@ return {
 					callback = close,
 				})
 			end,
+		})
+
+		vim.api.nvim_create_autocmd("FileType", {
+			pattern = views,
+			group = vim.api.nvim_create_augroup("neogit-diff-preview-close", { clear = true }),
+			callback = close,
 		})
 	end,
 	keys = {
