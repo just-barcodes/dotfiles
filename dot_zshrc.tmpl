@@ -156,14 +156,22 @@ q() {
 # kanata
 alias hm='sudo kanata --cfg ~/.config/kanata/config.kbd'
 
-# hyprctl - restore the lock screen from a TTY after quickshell dies while
-# locked. ext-session-lock fails closed, so the compositor keeps the session
-# locked with no client to type into until a new one takes the lock over.
+# hyprctl - restore the lock screen from a TTY. Two cases, same fix:
+#  - quickshell died while locked: ext-session-lock fails closed, so the
+#    compositor keeps the session locked with no client to type into.
+#  - tty1 shows a stale frame after a VT switch (NVIDIA rejects the atomic
+#    restore; Sep 2026 freezes): Hyprland re-modesets fine, but the old lock
+#    surface never produces a frame again. A DPMS bounce does not help, a
+#    fresh lock client does.
+# Restarts quickshell unconditionally and has it take the lock over. The qs
+# calls need the compositor's Wayland socket, which a TTY shell lacks.
 hyprctl_restart() {
     export HYPRLAND_INSTANCE_SIGNATURE=$(basename "$(ls -td $XDG_RUNTIME_DIR/hypr/* | head -1)")
+    export WAYLAND_DISPLAY=$(hyprctl -j instances | jq -r --arg s "$HYPRLAND_INSTANCE_SIGNATURE" '.[] | select(.instance == $s) | .wl_socket')
     hyprctl --instance 0 eval "hl.config({ misc = {allow_session_lock_restore = true } })" || return
-    pgrep -x qs >/dev/null || hyprctl dispatch "hl.dsp.exec_cmd(\"qs -d\")"
-    sleep 1
+    pgrep -x qs >/dev/null && { qs kill; sleep 1; }
+    hyprctl dispatch "hl.dsp.exec_cmd(\"qs -d\")"
+    sleep 3
     qs ipc call lock lock
 }
 
