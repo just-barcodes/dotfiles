@@ -55,17 +55,20 @@ chezmoi state delete-bucket --bucket=scriptState
   - `sesh/sesh.toml` — session manager config; `sesh/scripts/<session-name>.sh` — per-session startup scripts (see below)
 - `dot_local/` — `~/.local/` (user binaries, systemd user units, etc.)
 - `.chezmoiscripts/` — all `run_once_*` and `run_onchange_*` scripts live here. This is a chezmoi special directory: scripts run as normal, but the directory itself does not create a matching `~/.chezmoiscripts/` in the target. Notable contents:
-  - `run_onchange_pacman_installs.sh.tmpl` — renders the pacman install list from `.chezmoidata/packages.yaml`; per-host extras (laptop/pc) are picked via the `machines:` map keyed by `.chezmoi.hostname`
-  - `run_onchange_paru_installs.sh.tmpl` — AUR packages (paru), also rendered from `.chezmoidata/packages.yaml`
-  - `run_onchange_apt_installs.sh.tmpl` — Debian/Ubuntu installer, rendered from `packages.apt.minimal` in `packages.yaml`. When `aptExtensive = true` is set under `[data]` in `~/.config/chezmoi/chezmoi.toml`, also adds the mise apt repo and installs `packages.apt.extensive` (which includes `mise`). No-op on non-Debian hosts.
+  - `run_onchange_pacman_installs.sh.tmpl` — installs `packages.core.pacman` from `.chezmoidata/packages.yaml` with `pacman -S --needed --noconfirm` (no `-Syu`; upgrades are a separate path). Groups named in the `machines:` map are host-specific and only installed on the matching `.chezmoi.hostname`.
+  - `run_onchange_paru_installs.sh.tmpl` — installs `packages.core.paru` (AUR) the same way.
+  - `run_onchange_apt_installs.sh.tmpl` — Debian/Ubuntu installer, rendered from `apt.minimal` in `.chezmoidata/apt.yaml`. When `aptExtensive = true` is set under `[data]` in `~/.config/chezmoi/chezmoi.toml`, also adds the mise apt repo and installs `apt.extensive` (which includes `mise`). No-op on non-Debian hosts.
   - `run_onchange_npm_global_installs.sh.tmpl` — npm globals from the `npm_global:` list; no-op if npm isn't installed
   - `run_onchange_mise_installs.sh.tmpl` — runs `mise install` for the tools pinned in `dot_config/mise/config.toml` (re-triggers on that file's hash); no-op if mise isn't installed
-- `.chezmoidata/packages.yaml` — single source of truth for `pacman`, `paru`, `apt`, and `npm_global` package lists, plus the per-host `machines:` map. Edit this file (not the scripts) to add or remove packages.
+- `.chezmoidata/packages.yaml` — source of truth for Arch packages and `npm_global`, plus the per-host `machines:` map. `packages.core.{pacman,paru}` is installed on every apply; `packages.optional.{pacman,paru}` is never installed automatically and is managed interactively with `dot_local/bin/executable_pkgpick` (fzf: install, guarded remove, `--drift` to find explicit packages missing from both lists). Edit the YAML (not the scripts) to add or remove packages; new non-essential packages go under `optional`.
+- `.chezmoidata/apt.yaml` — Debian/Ubuntu package lists (`apt.minimal`, `apt.extensive`). Top-level keys must stay distinct from `packages.yaml` because chezmoi merges all `.chezmoidata/` files into one context.
 
 ## New machine bootstrap
 
 ```bash
 sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply git@github.com:just-barcodes/dotfiles.git
+# reboot into Hyprland, then pick optional packages:
+pkgpick
 ```
 
-Or use `install.sh` if the repo is already cloned locally.
+Or use `install.sh` if the repo is already cloned locally. The first apply only installs `packages.core`; everything under `packages.optional` is installed on demand with `pkgpick`.

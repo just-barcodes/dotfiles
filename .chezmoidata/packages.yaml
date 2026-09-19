@@ -1,244 +1,198 @@
-# Package manifest consumed by .chezmoiscripts/run_onchange_*_installs.sh.tmpl.
-# chezmoi auto-loads everything under .chezmoidata/ into the template context as
-# top-level keys (here: `.packages.pacman.*`, `.packages.paru`, `.machines`).
+# Package manifest for Arch. chezmoi auto-loads everything under .chezmoidata/
+# into the template context as top-level keys (`.packages`, `.machines`,
+# `.apt` from apt.yaml).
+#
+#   packages.core     installed by .chezmoiscripts/run_onchange_{pacman,paru}_installs.sh.tmpl
+#                     on every apply. Keep this to what the Hyprland session and
+#                     chezmoi's own scripts need.
+#   packages.optional never installed automatically. Pick from them with
+#                     `pkgpick` (dot_local/bin/executable_pkgpick), which also
+#                     handles removal and drift detection (`pkgpick --drift`).
+#
+# Group names under core/optional are free-form; optional groups are shown in
+# the picker. Machine-specific core groups are selected via `machines:` keyed
+# by `.chezmoi.hostname`.
 #
 # Notes:
-#   - Fast-moving CLIs are managed by mise (see dot_config/mise/config.toml),
-#     not apt/pacman, so they stay current on LTS distros: node, npm, terraform,
-#     helm, kubectl, argocd, direnv, opencode, age, sops, uv, gh, neovim,
-#     shellcheck, bat, yq, atuin.
+#   - Fast-moving CLIs are managed by mise (see dot_config/mise/config.toml):
+#     node, npm, terraform, helm, kubectl, argocd, direnv, opencode, age, sops,
+#     uv, gh, neovim (Debian only), shellcheck, bat, yq, atuin.
 #   - `tree-sitter-cli` is intentionally NOT in mise — the prebuilt binary
-#     requires a recent glibc and breaks on older LTS distros. Pacman ships
-#     `tree-sitter-cli`; on apt extensive we `cargo install` it from source
-#     so it links the local glibc.
-#   - Per-machine extras are selected via `machines:` below, keyed by
-#     `.chezmoi.hostname`. Each entry lists which `packages.pacman.*` groups
-#     to merge in addition to the always-on sets.
+#     requires a recent glibc. Pacman ships it; apt extensive builds it with cargo.
 
 machines:
   samPC: [pc]
   samTPLinux: [laptop]
 
 packages:
-  # Debian/Ubuntu packages. `minimal` always installs; `extensive` only when
-  # `aptExtensive = true` is set in ~/.config/chezmoi/chezmoi.toml [data].
-  apt:
-    minimal:
-      - vim
-      - git
-      - zsh
-      - fonts-powerline
-      - curl
-      - tmux
-      - htop
-      - fzf
-      - fd-find # binary is `fdfind`; alias in .zshrc if desired
-      - ripgrep
-      - jq
-      - build-essential
+  core:
+    pacman:
+      base:
+        - vim
+        - neovim
+        - gettext # envsubst, for .chezmoiscripts/run_onchange_after_render_themes.sh
+        - git
+        - openssh
+        - zsh
+        - gcc
+        - base-devel
+        - less
+        - man-db
+        - wget
+        - fzf
+        - fd
+        - jq
+        - starship # shell prompt
+        - chezmoi
+        - tmux
+        - mise
+        - usage # CLI spec tool, mise completions
+        - pacman-contrib # pactree, for pkgpick removal checks
+        - zip
+        - unzip
+        - wl-clipboard # wl-copy / wl-paste
+        - usbutils # lsusb
+        - dosfstools # mkfs.fat / fsck.fat
+        - fwupd # firmware updates via LVFS
+        - btop # autostarted on workspace 99
+      hyprland:
+        - hyprland
+        - uwsm # universal wayland session manager, runs hyprland under systemd
+        - hypridle # idle daemon (lock/dpms timers)
+        - quickshell # QML shell: bar, notifications, OSD, lock
+        - hyprpolkitagent # polkit auth prompts
+        - xdg-desktop-portal-hyprland # screen sharing portal
+        - xdg-desktop-portal-gtk # file picker portal
+        - gnome-keyring # secret storage for apps
+        - libsecret # client lib for gnome-keyring
+        - ghostty
+        - grim # Wayland screenshots
+        - slurp # region selector for grim
+        - swappy # screenshot annotation editor
+        - brightnessctl # backlight control CLI
+        - network-manager-applet # nm-applet / nm-connection-editor
+        - nwg-displays # GUI monitor layout editor
+      audio:
+        - pipewire
+        - pipewire-alsa
+        - pipewire-pulse
+        - pipewire-jack # JACK API compatibility
+        - pipewire-zeroconf # mDNS audio device discovery
+        - wireplumber # pipewire session manager
+        - alsa-utils # alsamixer, aplay
+        - pavucontrol # pipewire/pulse GUI mixer
+        - pulsemixer # pipewire/pulse TUI mixer (tui-launcher)
+        - bluez
+        - bluez-utils # bluetoothctl
+      fonts:
+        - ttf-jetbrains-mono-nerd
+        - ttf-nerd-fonts-symbols # symbols-only nerd font fallback
+        - ttf-dejavu
+        - noto-fonts-emoji
+      laptop:
+        - sof-firmware # Intel Sound Open Firmware audio
+        - iio-sensor-proxy # accelerometer/ambient light sensors
+        - fprintd # fingerprint reader
+        - power-profiles-daemon # power profile switching
+      pc:
+        - steam
+    paru:
+      desktop:
+        - walker # app launcher
+        - elephant # provider backend for walker
+        - elephant-desktopapplications
+        - elephant-windows
+        - elephant-calc
+        - elephant-symbols
+        - elephant-providerlist # provider picker for walker
+        - elephant-bluetooth
+        - elephant-clipboard
+        - elephant-files
+        - elephant-bitwarden
+        - kanata # keyboard remapper
+        - sesh-bin # tmux session manager
+        - bluetuith # bluetooth TUI (tui-launcher)
+        - wifitui # wifi TUI (tui-launcher)
+        - pacsea-bin # package browser TUI (tui-launcher)
 
-    extensive:
-      # repo / install foundations (also used by the mise repo setup step)
-      - ca-certificates
-      - gnupg
-      - lsb-release
-      - software-properties-common # add-apt-repository
-      - apt-transport-https
-
-      # runtime/tool manager — installed from the mise apt repo (script adds it)
-      - mise
-
-      # dev tools (neovim, gh, shellcheck, bat, yq live in mise - see above)
-      - git-lfs
-      - tig # ncurses git log/diff browser
-      - tldr
-      - tree
-      - httpie # friendlier curl (http/https commands)
-      - ncdu # ncurses disk usage browser
-      - entr # run a command when files change
-      - moreutils # sponge, ts, vidir, chronic, ...
-      - pv # progress meter for pipes
-      - rsync
-      - file
-      - universal-ctags # symbol index for editors
-      - pipx # isolated installs of python CLI apps
-
-      # network / diagnostics
-      - iputils-ping
-      - iproute2
-      - dnsutils
-      - whois
-      - mtr-tiny # ping + traceroute in one
-      - traceroute
-      - lsof # list open files/ports
-      - strace # syscall tracer
-      - net-tools # legacy ifconfig/netstat
-
-      # archives
-      - unzip
-      - zip
-      - xz-utils
-
-      # build toolchain (build-essential is in minimal)
-      - cmake
-      - pkg-config
-      - autoconf
-      - automake
-      - libtool
-
-      # python
-      - python3-pip
-      - python3-venv
-      - python3-dev
-
-      # common build deps for language toolchains (pyenv / ruby-build / node-from-source)
-      - libssl-dev
-      - libffi-dev
-      - zlib1g-dev
-      - libbz2-dev
-      - libreadline-dev
-      - libsqlite3-dev
-
-      # libclang is required to build tree-sitter-cli (rquickjs-sys uses bindgen)
-      - libclang-dev
-
-      # database clients
-      - postgresql-client
-      - default-mysql-client
-      - sqlite3
-      - redis-tools
-
-  pacman:
-    system:
-      - vim
-      - gettext # envsubst, for .chezmoiscripts/run_onchange_after_render_themes.sh
-      - git
-      - openssh
-      - zsh
-      - gcc
-      - wl-clipboard # wl-copy / wl-paste
-      - grim # Wayland screenshots
-      - slurp # region selector for grim
-      - swappy # screenshot annotation editor
-      - base-devel
-      - less
-      - man-db
-      - tldr
-      - alsa-utils # alsamixer, aplay
-      - fzf
-      - usbutils # lsusb
-      - network-manager-applet # nm-applet / nm-connection-editor
-      - fd
-      - cups
-      - cups-pdf # print-to-PDF backend
-      - qemu-full # VM emulator with all targets
-      - fwupd # firmware updates via LVFS
-      - dosfstools # mkfs.fat / fsck.fat
-      - ntfsprogs # NTFS filesystem tools
-      - brightnessctl # backlight control CLI
-      - pavucontrol # pipewire/pulse GUI mixer
-      - btop
-      - figlet # ASCII banner text
-      - pulsemixer # pipewire/pulse TUI mixer
-      - openbsd-netcat # nc
-      - bluez
-      - bluez-utils # bluetoothctl
-      - pipewire
-      - pipewire-alsa
-      - pipewire-pulse
-      - pipewire-jack # JACK API compatibility
-      - pipewire-zeroconf # mDNS audio device discovery
-      - wireplumber # pipewire session manager
-      - wget
-      - starship # shell prompt
-      - flatpak
-
-    hyprland:
-      - hyprland
-      - uwsm # universal wayland session manager, runs hyprland under systemd
-      - hypridle # idle daemon (lock/dpms timers)
-      - nwg-displays # GUI monitor layout editor
-      - quickshell # QML shell: bar, notifications, OSD, lock
-      - hyprpolkitagent # polkit auth prompts
-      - xdg-desktop-portal-hyprland # screen sharing portal
-      - xdg-desktop-portal-gtk # file picker portal
-      - gnome-keyring # secret storage for apps
-      - libsecret # client lib for gnome-keyring
-
-    developer:
-      - jq
-      - postgresql
-      - apache # httpd
-      - ansible
-      - dnsutils
-      - mise
-      - usage # CLI spec tool, mise completions
-      - television # fuzzy finder TUI (tv)
-      - tree-sitter-cli # parser generator, nvim-treesitter
-      - trivy # container/IaC vulnerability scanner
-      - gitleaks # git secret scanner
-      - worktrunk # git worktree manager for parallel agents
-
-    fonts:
-      - ttf-fira-code
-      - ttf-fira-mono
-      - ttf-jetbrains-mono
-      - ttf-jetbrains-mono-nerd
-      - ttf-roboto-mono
-      - ttf-dejavu
-      - ttf-bitstream-vera
-      - ttf-input-nerd
-      - ttf-firacode-nerd
-      - ttf-nerd-fonts-symbols # symbols-only nerd font fallback
-      - nerd-fonts # meta package, all nerd fonts
-      - noto-fonts-emoji
-
-    apps:
-      - firefox-developer-edition
-      - ghostty
-      - neovim
-      - podman
-      - podman-desktop
-      - docker
-      - docker-compose
-      - docker-buildx
-      - chezmoi
-      - obsidian
-      - chromium
-      - tailscale # mesh VPN
-      - zip
-      - unzip
-      - trash-cli # trash-put etc., rm alternative
-      - tmux
-      - htop
-      - proton-vpn-gtk-app
-      - proton-vpn-cli
-      - luarocks # lua package manager
-      - cmake
-      - libreoffice-fresh
-      - spotify-launcher # downloads/updates the spotify client
-      - obs-studio
-
-    kde:
-      - ark # archive manager
-      - isoimagewriter # USB image writer
-      - kcalc # calculator
-      - dolphin # file manager
-      - dolphin-plugins
-      - archlinux-xdg-menu # app menus for dolphin open-with
-      - okular # PDF/document viewer
-      - system-config-printer # printer setup GUI
-      # konsole
-      # kwalletmanager
-
-    laptop:
-      - sof-firmware # Intel Sound Open Firmware audio
-      - iio-sensor-proxy # accelerometer/ambient light sensors
-      - fprintd # fingerprint reader
-      - power-profiles-daemon # power profile switching
-
-    pc:
-      - steam
+  optional:
+    pacman:
+      developer:
+        - postgresql
+        - apache # httpd
+        - ansible
+        - dnsutils
+        - television # fuzzy finder TUI (tv)
+        - tree-sitter-cli # parser generator, nvim-treesitter
+        - trivy # container/IaC vulnerability scanner
+        - gitleaks # git secret scanner
+        - worktrunk # git worktree manager for parallel agents
+        - luarocks # lua package manager
+        - cmake
+        - podman
+        - podman-desktop
+        - docker
+        - docker-compose
+        - docker-buildx
+        - qemu-full # VM emulator with all targets
+      apps:
+        - firefox-developer-edition
+        - chromium
+        - obsidian
+        - libreoffice-fresh
+        - spotify-launcher # downloads/updates the spotify client
+        - obs-studio
+        - tailscale # mesh VPN
+        - proton-vpn-gtk-app
+        - proton-vpn-cli
+        - flatpak
+      tools:
+        - htop
+        - tldr
+        - trash-cli # trash-put etc., rm alternative
+        - figlet # ASCII banner text
+        - openbsd-netcat # nc
+        - cups
+        - cups-pdf # print-to-PDF backend
+        - ntfsprogs # NTFS filesystem tools
+      fonts:
+        - ttf-fira-code
+        - ttf-fira-mono
+        - ttf-jetbrains-mono
+        - ttf-roboto-mono
+        - ttf-bitstream-vera
+        - ttf-input-nerd
+        - ttf-firacode-nerd
+        - nerd-fonts # meta package, all nerd fonts
+      kde:
+        - ark # archive manager
+        - isoimagewriter # USB image writer
+        - kcalc # calculator
+        - dolphin # file manager
+        - dolphin-plugins
+        - archlinux-xdg-menu # app menus for dolphin open-with
+        - okular # PDF/document viewer
+        - system-config-printer # printer setup GUI
+    paru:
+      apps:
+        - google-chrome
+        - zen-browser-bin
+        - insync # google drive sync client
+        - visual-studio-code-bin
+        - appimagelauncher # AppImage desktop integration
+        - proton-mail-bin
+        - portmaster-bin # application firewall
+        - betterbird-bin # thunderbird fork
+        - jetbrains-toolbox
+        - openshot # video editor
+      developer:
+        - x11docker # run GUI apps in docker
+        - headlamp-bin # kubernetes manage gui
+        - semgrep-bin # static analysis
+        - bruno-bin # API client (postman alternative)
+        - choosenim # nim toolchain installer
+        - coder # coder.com remote dev env CLI
+        - podman-tui-bin # podman TUI
 
   npm_global:
     - "@anthropic-ai/claude-code"
@@ -246,41 +200,3 @@ packages:
     - pnpm
     - yarn
     - hunkdiff # terminal diff viewer for agent changesets
-
-  paru:
-    - portmaster-bin # application firewall
-    - google-chrome
-    - insync # google drive sync client
-    - visual-studio-code-bin
-    - x11docker # run GUI apps in docker
-    - appimagelauncher # AppImage desktop integration
-    - kanata # keyboard remapper
-    - walker # app launcher
-    - zen-browser-bin
-    - elephant # provider backend for walker
-    - elephant-desktopapplications
-    - elephant-windows
-    - elephant-calc
-    - elephant-symbols
-    - elephant-providerlist # provider picker for walker
-    - elephant-bluetooth
-    - elephant-clipboard
-    - elephant-files
-    - elephant-bitwarden
-    - headlamp-bin # kubernetes manage gui
-    - sesh-bin # tmux session manager
-    - bluetuith # bluetooth TUI
-    - wifitui # wifi TUI
-    - proton-mail-bin
-    - semgrep-bin # static analysis
-
-  # Optional AUR packages. Not installed by any script; install by hand with
-  # `paru -S <pkg>` when needed.
-  paru_optional:
-    - betterbird-bin # thunderbird fork
-    - bruno-bin # API client (postman alternative)
-    - choosenim # nim toolchain installer
-    - coder # coder.com remote dev env CLI
-    - jetbrains-toolbox
-    - openshot # video editor
-    - podman-tui-bin # podman TUI

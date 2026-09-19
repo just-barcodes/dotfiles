@@ -1,5 +1,5 @@
 #!/bin/bash
-# Rendered from .chezmoidata/packages.yaml. Edit the YAML, not this script.
+# Rendered from .chezmoidata/apt.yaml. Edit the YAML, not this script.
 
 set -euo pipefail
 
@@ -13,7 +13,7 @@ exit 0
 {{ end -}}
 
 MINIMAL=(
-{{ range .packages.apt.minimal }}	{{ . }}
+{{ range .apt.minimal }}	{{ . }}
 {{ end -}}
 )
 
@@ -22,7 +22,7 @@ sudo apt-get install -y "${MINIMAL[@]}"
 
 {{ if default false (index . "aptExtensive") -}}
 EXTENSIVE=(
-{{ range .packages.apt.extensive }}	{{ . }}
+{{ range .apt.extensive }}	{{ . }}
 {{ end -}}
 )
 

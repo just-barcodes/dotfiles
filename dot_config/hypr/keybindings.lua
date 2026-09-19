@@ -60,6 +60,15 @@ hl.window_rule({
 	center = true,
 })
 
+-- Large floating TUIs (pacsea, pkgpick): 85% of the screen, centered
+hl.window_rule({
+	name = "windowrule-tui-large",
+	match = { class = "^(com\\.tui\\.large)$" },
+	float = true,
+	size = { "monitor_w*0.85", "monitor_h*0.85" },
+	center = true,
+})
+
 -- TUIs covering the whole screen
 hl.window_rule({
 	name = "windowrule-tui-fullscreen",

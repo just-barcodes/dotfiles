@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Simple walker script to select and launch a TUI
-CHOICE=$(printf "🔊 Audio (pulsemixer)\n🌐 Network (wifitui)\n Bluetooth (bluetuith)\n💻 System Monitor (btop)\n📁 Files (yazi)\n📅 Calendar (cal)\n📸 Screenshot (grim+swappy)\n🎨 Theme" | walker --dmenu)
+CHOICE=$(printf "🔊 Audio (pulsemixer)\n🌐 Network (wifitui)\n Bluetooth (bluetuith)\n💻 System Monitor (btop)\n📁 Files (yazi)\n📅 Calendar (cal)\n📸 Screenshot (grim+swappy)\n🎨 Theme\n📦 Packages (pkgpick)\n🗃️ Package browser (pacsea)" | walker --dmenu)
 
 case "$CHOICE" in
 *"Audio"*) ghostty --class=com.tui.centered -e pulsemixer ;;
@@ -15,4 +15,6 @@ case "$CHOICE" in
 	THEME=$(~/.local/bin/theme-switch list | walker --dmenu -p "Theme")
 	[ -n "$THEME" ] && ~/.local/bin/theme-switch "$THEME"
 	;;
+*"Packages"*) ghostty --class=com.tui.large -e sh -c 'pkgpick; [ $? -eq 130 ] || { printf "\nPress Enter to close"; read -r _; }' ;;
+*"Package browser"*) ghostty --class=com.tui.large -e pacsea ;;
 esac

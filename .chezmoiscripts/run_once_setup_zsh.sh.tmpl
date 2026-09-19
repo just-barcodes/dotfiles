@@ -7,7 +7,7 @@ echo "Coder workspace: skipping starship install"; exit 0
 
 {{ if or (eq .chezmoi.osRelease.id "debian") (eq .chezmoi.osRelease.id "ubuntu") -}}
 # zsh and fonts-powerline are installed from the centralized manifest
-# (packages.apt.minimal via run_onchange_apt_installs.sh.tmpl).
+# (apt.minimal via run_onchange_apt_installs.sh.tmpl).
 
 # Arch installs starship via pacman (see packages.yaml). On Debian/Ubuntu it
 # isn't packaged in stable channels, so fall back to the upstream installer.

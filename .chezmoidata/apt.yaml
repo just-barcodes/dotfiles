@@ -1,0 +1,88 @@
+# Debian/Ubuntu packages, consumed by .chezmoiscripts/run_onchange_apt_installs.sh.tmpl.
+# `minimal` always installs; `extensive` only when `aptExtensive = true` is set
+# in ~/.config/chezmoi/chezmoi.toml [data].
+apt:
+  minimal:
+    - vim
+    - git
+    - zsh
+    - fonts-powerline
+    - curl
+    - tmux
+    - htop
+    - fzf
+    - fd-find # binary is `fdfind`; alias in .zshrc if desired
+    - ripgrep
+    - jq
+    - build-essential
+
+  extensive:
+    # repo / install foundations (also used by the mise repo setup step)
+    - ca-certificates
+    - gnupg
+    - lsb-release
+    - software-properties-common # add-apt-repository
+    - apt-transport-https
+
+    # runtime/tool manager — installed from the mise apt repo (script adds it)
+    - mise
+
+    # dev tools (neovim, gh, shellcheck, bat, yq live in mise - see packages.yaml)
+    - git-lfs
+    - tig # ncurses git log/diff browser
+    - tldr
+    - tree
+    - httpie # friendlier curl (http/https commands)
+    - ncdu # ncurses disk usage browser
+    - entr # run a command when files change
+    - moreutils # sponge, ts, vidir, chronic, ...
+    - pv # progress meter for pipes
+    - rsync
+    - file
+    - universal-ctags # symbol index for editors
+    - pipx # isolated installs of python CLI apps
+
+    # network / diagnostics
+    - iputils-ping
+    - iproute2
+    - dnsutils
+    - whois
+    - mtr-tiny # ping + traceroute in one
+    - traceroute
+    - lsof # list open files/ports
+    - strace # syscall tracer
+    - net-tools # legacy ifconfig/netstat
+
+    # archives
+    - unzip
+    - zip
+    - xz-utils
+
+    # build toolchain (build-essential is in minimal)
+    - cmake
+    - pkg-config
+    - autoconf
+    - automake
+    - libtool
+
+    # python
+    - python3-pip
+    - python3-venv
+    - python3-dev
+
+    # common build deps for language toolchains (pyenv / ruby-build / node-from-source)
+    - libssl-dev
+    - libffi-dev
+    - zlib1g-dev
+    - libbz2-dev
+    - libreadline-dev
+    - libsqlite3-dev
+
+    # libclang is required to build tree-sitter-cli (rquickjs-sys uses bindgen)
+    - libclang-dev
+
+    # database clients
+    - postgresql-client
+    - default-mysql-client
+    - sqlite3
+    - redis-tools

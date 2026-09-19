@@ -1,0 +1,52 @@
+#!/bin/bash
+# Picker for the optional packages in .chezmoidata/packages.yaml.
+#   pkgpick          fzf over packages.optional: TAB marks, Enter installs,
+#                    ctrl-r removes the marked packages. Exits 130 when
+#                    cancelled (Esc) so wrappers can skip their pause.
+#   pkgpick --drift  list explicitly installed packages that are in neither
+#                    packages.core nor packages.optional
+set -euo pipefail
+
+data=$(chezmoi data)
+core=$(jq -r '.packages.core[][][]' <<<"$data" | sort -u)
+optional=$(jq -r '.packages.optional[][][]' <<<"$data" | sort -u)
+
+if [ "${1:-}" = --drift ]; then
+	comm -23 <(pacman -Qeq | sort) <(printf '%s\n%s\n' "$core" "$optional" | sort -u)
+	exit 0
+fi
+
+installed=$(pacman -Qq)
+rows=$(jq -r '.packages.optional | to_entries[] as $m | $m.value | to_entries[] as $g
+	| $g.value[] | "\($m.key)\t\($g.key)\t\(.)"' <<<"$data" |
+	while IFS=$'\t' read -r mgr grp pkg; do
+		if grep -qx "$pkg" <<<"$installed"; then mark="[x]"; else mark="[ ]"; fi
+		printf '%s %-6s %-10s %s\t%s\n' "$mark" "$mgr" "$grp" "$pkg" "$pkg"
+	done)
+
+out=$(fzf --multi --layout=reverse --delimiter=$'\t' --with-nth=1 --expect=ctrl-r \
+	--header 'TAB mark, Enter install, ctrl-r remove' \
+	--preview 'paru -Si {2} 2>/dev/null | head -25' --preview-window=right,50% <<<"$rows") || exit 130
+key=$(head -1 <<<"$out")
+mapfile -t pkgs < <(tail -n +2 <<<"$out" | cut -f2)
+[ ${#pkgs[@]} -eq 0 ] && exit 130
+
+if [ "$key" != ctrl-r ]; then
+	paru -S --needed "${pkgs[@]}"
+	exit 0
+fi
+
+# Removal guards: optional packages only, must be installed, and no core
+# package may depend on it. Then a dry run, then pacman's own prompt.
+for p in "${pkgs[@]}"; do
+	grep -qx "$p" <<<"$optional" || { echo "refusing: $p is not an optional package" >&2; exit 1; }
+	pacman -Qq "$p" >/dev/null 2>&1 || { echo "refusing: $p is not installed" >&2; exit 1; }
+	hit=$(comm -12 <(pactree -rl "$p" | sort -u) <(echo "$core"))
+	if [ -n "$hit" ]; then
+		echo "refusing: core packages depend on $p:" >&2
+		echo "$hit" >&2
+		exit 1
+	fi
+done
+sudo pacman -Rs --print "${pkgs[@]}"
+sudo pacman -Rs "${pkgs[@]}"

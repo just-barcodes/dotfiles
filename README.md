@@ -44,7 +44,7 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply git@github.com:just-barcode
 sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply https://github.com/just-barcodes/dotfiles.git
 ```
 
-**HTTPS + extensive apt dev packages (Debian/Ubuntu — adds mise + repo, neovim, db clients, language build deps, network tools, etc. See `packages.apt.extensive` in `.chezmoidata/packages.yaml`):**
+**HTTPS + extensive apt dev packages (Debian/Ubuntu — adds mise + repo, neovim, db clients, language build deps, network tools, etc. See `apt.extensive` in `.chezmoidata/apt.yaml`):**
 
 ```bash
 sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin" init https://github.com/just-barcodes/dotfiles.git \
@@ -54,6 +54,24 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin" init https://githu
 ```
 
 After install: store the GitHub MCP PAT in the keyring (see below).
+
+### Packages on Arch: core vs optional
+
+`chezmoi apply` only installs `packages.core` from `.chezmoidata/packages.yaml`
+(the Hyprland session, audio, a few fonts, and what the scripts themselves
+need). Everything else is in `packages.optional` and is never installed
+automatically. Bootstrap is therefore two steps: after the first apply and a
+reboot into Hyprland, run
+
+```bash
+pkgpick            # fzf over packages.optional: TAB marks, Enter installs, ctrl-r removes
+pkgpick --drift    # explicitly installed packages that are in neither list
+```
+
+`pkgpick` is also in the TUI launcher (`SUPER+ALT+C`), next to `pacsea` for
+browsing packages that are not in the list. Removal refuses core packages
+and anything a core package depends on, prints a `pacman -Rs --print` dry
+run, then hands over to pacman's own prompt.
 
 `chezmoi init` renders `.chezmoi.toml.tmpl`, which clones `git@github.com:just-barcodes/dotfiles-private.git` to `~/.config/chezmoi-private/` and inlines its `chezmoi.toml` (git identities, etc.) into `~/.config/chezmoi/chezmoi.toml`. Re-run `chezmoi init` to pull updates to the private data.
 

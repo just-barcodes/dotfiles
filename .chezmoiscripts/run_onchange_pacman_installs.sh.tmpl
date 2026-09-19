@@ -1,7 +1,7 @@
 #!/bin/bash
-# Rendered from .chezmoidata/packages.yaml. Edit the YAML, not this script.
-# Re-runs whenever the rendered output changes (i.e. when packages.yaml or the
-# host's entry in `machines:` changes).
+# Rendered from .chezmoidata/packages.yaml (packages.core.pacman). Edit the
+# YAML, not this script. Re-runs whenever the rendered output changes.
+# Optional packages are never installed here; use `pkgpick`.
 
 set -euo pipefail
 
@@ -10,23 +10,21 @@ echo "Not running arch... exiting"
 exit 0
 {{ end -}}
 
+{{- /* groups referenced by any machine are host-specific; skip them below */ -}}
+{{- $hostGroups := list -}}
+{{- range $_, $groups := .machines }}{{ $hostGroups = concat $hostGroups $groups }}{{ end -}}
+
 PACKAGES=(
-{{ range .packages.pacman.system    }}	{{ . }}
+{{ range $name, $pkgs := .packages.core.pacman -}}
+{{ if not (has $name $hostGroups) }}{{ range $pkgs }}	{{ . }}
+{{ end }}{{ end -}}
 {{ end -}}
-{{ range .packages.pacman.hyprland  }}	{{ . }}
+{{ range (index .machines .chezmoi.hostname) -}}
+{{ range (index $.packages.core.pacman .) }}	{{ . }}
 {{ end -}}
-{{ range .packages.pacman.developer }}	{{ . }}
 {{ end -}}
-{{ range .packages.pacman.fonts     }}	{{ . }}
-{{ end -}}
-{{ range .packages.pacman.apps      }}	{{ . }}
-{{ end -}}
-{{ range .packages.pacman.kde       }}	{{ . }}
-{{ end -}}
-{{- range (index .machines .chezmoi.hostname) -}}
-{{ range (index $.packages.pacman .) }}	{{ . }}
-{{ end -}}
-{{- end -}}
 )
 
-sudo pacman -Syu --needed --noconfirm "${PACKAGES[@]}"
+# No -y/-u on purpose: full upgrades have their own path. If a new package
+# 404s because the sync db is stale, upgrade first and re-apply.
+sudo pacman -S --needed --noconfirm "${PACKAGES[@]}"

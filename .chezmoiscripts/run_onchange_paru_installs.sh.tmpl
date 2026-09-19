@@ -1,5 +1,7 @@
 #!/bin/bash
-# Rendered from .chezmoidata/packages.yaml. Edit the YAML, not this script.
+# Rendered from .chezmoidata/packages.yaml (packages.core.paru). Edit the
+# YAML, not this script. Optional AUR packages are never installed here; use
+# `pkgpick`.
 
 set -euo pipefail
 
@@ -9,8 +11,10 @@ exit 0
 {{ end -}}
 
 PACKAGES=(
-{{ range .packages.paru }}	{{ . }}
+{{ range $_, $pkgs := .packages.core.paru -}}
+{{ range $pkgs }}	{{ . }}
+{{ end -}}
 {{ end -}}
 )
 
-paru -Syu --needed "${PACKAGES[@]}"
+paru -S --needed --noconfirm "${PACKAGES[@]}"
