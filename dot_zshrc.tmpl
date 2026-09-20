@@ -168,6 +168,13 @@ alias hm='sudo kanata --cfg ~/.config/kanata/config.kbd'
 hyprctl_restart() {
     export HYPRLAND_INSTANCE_SIGNATURE=$(basename "$(ls -td $XDG_RUNTIME_DIR/hypr/* | head -1)")
     export WAYLAND_DISPLAY=$(hyprctl -j instances | jq -r --arg s "$HYPRLAND_INSTANCE_SIGNATURE" '.[] | select(.instance == $s) | .wl_socket')
+    if pgrep -f '^Hyprland .*--safe-mode' >/dev/null; then
+        # Watchdog relaunch after a crash: no user config, VT restore never recovers.
+        # Restarting the lock client cannot help; exit so greetd comes back on tty1.
+        echo "Hyprland is running in safe mode (crashed); exiting it, log in again on tty1"
+        hyprctl dispatch 'hl.dsp.exit()'
+        return
+    fi
     hyprctl --instance 0 eval "hl.config({ misc = {allow_session_lock_restore = true } })" || return
     pgrep -x qs >/dev/null && { qs kill; sleep 1; }
     hyprctl dispatch "hl.dsp.exec_cmd(\"qs -d\")"
