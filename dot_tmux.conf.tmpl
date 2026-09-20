@@ -68,9 +68,8 @@ bind -n M-l resize-pane -R 5
 # Requires wl-copy or xclip installed.
 bind -T copy-mode-vi y send -X copy-pipe-and-cancel 'sh -c "command -v wl-copy >/dev/null && wl-copy || xclip -i -sel clip"'
 
-##### Status bar — two-line layout ############################################
+##### Status bar ##############################################################
 set -g status on
-set -g status 2
 set -g status-position bottom
 set -g status-interval 5
 set -g status-justify left
@@ -82,8 +81,8 @@ set -g pane-border-lines heavy
 set -g window-style ''
 set -g window-active-style ''
 
-# Line 0 (bottom) — windows + cwd
-set -g status-left ""
+# Git branch, windows, session name; status-left/right are set in the theme
+# template because they carry colours.
 
 # Colours come from the active theme in ~/.config/theme/current. `theme-switch`
 # re-sources this file, so a switch repaints tmux without restarting it.

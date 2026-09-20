@@ -51,6 +51,13 @@ Scope {
                 Workspaces {
                     screenName: win.modelData.name
                 }
+
+                Item {
+                    implicitWidth: 12
+                    implicitHeight: 1
+                }
+
+                TmuxTitle {}
             }
 
             Row {
