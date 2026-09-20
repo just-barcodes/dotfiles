@@ -4,8 +4,8 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-// cpu, memory and temperature for the bar, on one timer and one set of
-// FileViews. FileView.reload() works on procfs; watchChanges does not, because
+// cpu, memory, temperature and load for the control-centre stats block and
+// the memory warning chip in the bar, on one timer and one set of FileViews. FileView.reload() works on procfs; watchChanges does not, because
 // procfs emits no inotify events, so this polls.
 //
 // The state lives here rather than on the chips because cpu needs the previous
@@ -17,14 +17,25 @@ Singleton {
     // three here, and 5s makes the cpu figure mean something.
     readonly property int interval: 5000
 
+    // The bar only shows memory above this; the panel colours its meter red.
+    readonly property int memoryWarnPercent: 80
+
+    function meminfoField(name: string): int {
+        return parseInt(meminfo.text().match(new RegExp(name + ":\\s+(\\d+)"))?.[1]) || 0;
+    }
+
+    readonly property int memoryTotalKb: meminfoField("MemTotal")
+    readonly property int memoryAvailableKb: meminfoField("MemAvailable")
+    readonly property int swapTotalKb: meminfoField("SwapTotal")
+    readonly property int swapFreeKb: meminfoField("SwapFree")
+
     // (MemTotal - MemAvailable) / MemTotal, which is the figure waybar shows.
     // Deriving "used" from MemFree plus Buffers and Cached instead lands two to
     // four points lower.
-    readonly property int memoryUsage: {
-        const total = parseInt(meminfo.text().match(/MemTotal:\s+(\d+)/)?.[1]) || 0;
-        const available = parseInt(meminfo.text().match(/MemAvailable:\s+(\d+)/)?.[1]) || 0;
-        return total > 0 ? Math.round((1 - available / total) * 100) : 0;
-    }
+    readonly property int memoryUsage: memoryTotalKb > 0 ? Math.round((1 - memoryAvailableKb / memoryTotalKb) * 100) : 0
+
+    // "0.42 0.51 0.48", the first three fields of /proc/loadavg.
+    readonly property string loadAverage: loadavg.text().trim().split(/\s+/).slice(0, 3).join(" ")
 
     readonly property real temperature: (parseInt(tempFile.text()) || 0) / 1000
 
@@ -76,6 +87,12 @@ Singleton {
     }
 
     FileView {
+        id: loadavg
+
+        path: "/proc/loadavg"
+    }
+
+    FileView {
         id: tempFile
 
         path: root.temperaturePath
@@ -111,6 +128,7 @@ Singleton {
         onTriggered: {
             stat.reload();
             meminfo.reload();
+            loadavg.reload();
             if (root.temperaturePath !== "")
                 tempFile.reload();
         }

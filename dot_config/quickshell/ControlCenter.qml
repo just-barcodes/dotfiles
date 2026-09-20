@@ -6,8 +6,9 @@ import Quickshell.Hyprland
 import qs
 import qs.components
 
-// Right-hand panel: settings block, media player, then notification history.
-// Same widget order as the swaync config it replaces, minus inhibitors.
+// Right-hand panel: system stats, settings block, media player, then
+// notification history. Same widget order as the swaync config it replaces,
+// minus inhibitors and plus the stats block.
 PanelWindow {
     id: root
 
@@ -85,6 +86,22 @@ PanelWindow {
             anchors.leftMargin: Theme.margin
             anchors.rightMargin: Theme.margin
             spacing: 8
+
+            // CPU and memory, moved here from the bar. Click opens btop.
+            Rectangle {
+                Layout.fillWidth: true
+                implicitHeight: stats.implicitHeight + 2 * Theme.padding
+                radius: Theme.radius
+                color: Theme.surface
+
+                SystemStatsWidget {
+                    id: stats
+                    anchors.fill: parent
+                    anchors.margins: Theme.padding
+
+                    onActivated: root.shown = false
+                }
+            }
 
             // Settings block — backlight (laptops only), volume, DND.
             Rectangle {

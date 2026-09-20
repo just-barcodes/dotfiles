@@ -65,9 +65,9 @@ Scope {
                     implicitHeight: 1
                 }
 
+                // Only visible above SystemStats.memoryWarnPercent; the full
+                // figures live in the control centre.
                 Memory {}
-
-                Cpu {}
 
                 Temperature {}
 
