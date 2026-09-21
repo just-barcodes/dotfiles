@@ -2,37 +2,40 @@
 # Interactive picker for the optional mise tools in .chezmoidata/mise.yaml.
 # Chosen tools are written to ~/.config/mise/conf.d/optional.toml, which
 # chezmoi does not manage, so `chezmoi apply` neither adds nor removes them.
-#   misepick          fzf: TAB to mark, Enter installs, ctrl-r removes
+#   misepick          fzf: TAB to mark, Enter installs, ctrl-r removes.
+#                     Reopens after each action; exits 130 on Esc.
 #   misepick --drift  list installed tools that are in no mise config file
 set -euo pipefail
 
 conf="${XDG_CONFIG_HOME:-$HOME/.config}/mise/conf.d/optional.toml"
-ls_json=$(mise ls --json)
 
 if [ "${1:-}" = --drift ]; then
-	jq -r 'to_entries[] | select(all(.value[]; .source == null)) | .key' <<<"$ls_json"
+	mise ls --json | jq -r 'to_entries[] | select(all(.value[]; .source == null)) | .key'
 	exit 0
 fi
 
-installed=$(jq -r 'to_entries[] | select(any(.value[]; .installed)) | .key' <<<"$ls_json")
-rows=$(chezmoi data | jq -r '.mise.optional | to_entries[] as $g | $g.value | to_entries[]
-	| "\($g.key)\t\(.key)\t\(.value)"' |
-	while IFS=$'\t' read -r grp tool ver; do
-		if grep -qxF "$tool" <<<"$installed"; then mark="[x]"; else mark="[ ]"; fi
-		printf '%s %-16s %-40s %s\t%s\t%s\n' "$mark" "$grp" "$tool" "$ver" "$tool" "$ver"
-	done)
+while :; do
+	installed=$(mise ls --json | jq -r 'to_entries[] | select(any(.value[]; .installed)) | .key')
+	rows=$(chezmoi data | jq -r '.mise.optional | to_entries[] as $g | $g.value | to_entries[]
+		| "\($g.key)\t\(.key)\t\(.value)"' |
+		while IFS=$'\t' read -r grp tool ver; do
+			if grep -qxF "$tool" <<<"$installed"; then mark="[x]"; else mark="[ ]"; fi
+			printf '%s %-16s %-40s %s\t%s\t%s\n' "$mark" "$grp" "$tool" "$ver" "$tool" "$ver"
+		done)
 
-out=$(fzf --multi --layout=reverse --delimiter=$'\t' --with-nth=1 --expect=ctrl-r \
-	--header 'TAB mark, Enter install, ctrl-r remove' \
-	--preview 'mise ls {2} 2>/dev/null' --preview-window=right,40% <<<"$rows") || exit 130
-key=$(head -1 <<<"$out")
-mapfile -t sel < <(tail -n +2 <<<"$out" | cut -f2,3)
-[ ${#sel[@]} -eq 0 ] && exit 130
+	out=$(fzf --multi --layout=reverse --delimiter=$'\t' --with-nth=1 --expect=ctrl-r \
+		--header 'TAB mark, Enter install, ctrl-r remove, Esc quit' \
+		--preview 'mise ls {2} 2>/dev/null' --preview-window=right,40% <<<"$rows") || exit 130
+	key=$(head -1 <<<"$out")
+	mapfile -t sel < <(tail -n +2 <<<"$out" | cut -f2,3)
+	[ ${#sel[@]} -eq 0 ] && exit 130
 
-mkdir -p "$(dirname "$conf")"
-if [ "$key" = ctrl-r ]; then
-	# unuse also prunes the installed version
-	mise unuse --path "$conf" "${sel[@]%%$'\t'*}"
-else
-	mise use --path "$conf" "${sel[@]/$'\t'/@}"
-fi
+	mkdir -p "$(dirname "$conf")"
+	if [ "$key" = ctrl-r ]; then
+		# unuse also prunes the installed version
+		mise unuse --path "$conf" "${sel[@]%%$'\t'*}" || true
+	else
+		mise use --path "$conf" "${sel[@]/$'\t'/@}" || true
+	fi
+	read -rsp $'\nPress Enter to return to the picker' _
+done
