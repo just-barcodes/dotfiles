@@ -21,12 +21,25 @@
 #     requires a recent glibc. Pacman ships it; apt extensive builds it with cargo.
 
 machines:
-  samPC: [pc]
+  samPC: []
   samTPLinux: [laptop]
 
 packages:
   core:
     pacman:
+      system:
+        - base
+        - linux
+        - linux-firmware
+        - intel-ucode # CPU microcode, kernel loads whichever matches the CPU
+        - amd-ucode
+        - grub
+        - efibootmgr
+        - os-prober # detect other OSes for grub
+        - networkmanager
+        - sudo
+        - reflector # mirrorlist updater
+        - ex-vi-compat # ex/vi symlinks to vim
       base:
         - vim
         - neovim
@@ -34,13 +47,13 @@ packages:
         - git
         - openssh
         - zsh
-        - gcc
         - base-devel
         - less
         - man-db
         - wget
         - fzf
         - fd
+        - ripgrep # rg, nvim grep picker
         - jq
         - starship # shell prompt
         - chezmoi
@@ -50,17 +63,25 @@ packages:
         - pacman-contrib # pactree, for pkgpick removal checks
         - zip
         - unzip
+        - 7zip
+        - atuin # shell history sync
+        - zoxide # smarter cd
         - wl-clipboard # wl-copy / wl-paste
         - usbutils # lsusb
         - dosfstools # mkfs.fat / fsck.fat
         - fwupd # firmware updates via LVFS
         - btop # autostarted on workspace 99
+        - figlet # ASCII banner text, sesh session scripts
+        - xdg-user-dirs # ~/Desktop, ~/Downloads etc.
       hyprland:
         - hyprland
         - uwsm # universal wayland session manager, runs hyprland under systemd
         - hypridle # idle daemon (lock/dpms timers)
         - quickshell # QML shell: bar, notifications, OSD, lock
         - hyprpolkitagent # polkit auth prompts
+        - sddm # login manager
+        - breeze-cursors # cursor theme, referenced by gtk-3.0/gtk-4.0 settings.ini
+        - breeze-icons # icon theme, same
         - xdg-desktop-portal-hyprland # screen sharing portal
         - xdg-desktop-portal-gtk # file picker portal
         - gnome-keyring # secret storage for apps
@@ -70,8 +91,8 @@ packages:
         - slurp # region selector for grim
         - swappy # screenshot annotation editor
         - brightnessctl # backlight control CLI
+        - playerctl # media keys (XF86Audio* keybindings)
         - network-manager-applet # nm-applet / nm-connection-editor
-        - nwg-displays # GUI monitor layout editor
       audio:
         - pipewire
         - pipewire-alsa
@@ -80,12 +101,12 @@ packages:
         - pipewire-zeroconf # mDNS audio device discovery
         - wireplumber # pipewire session manager
         - alsa-utils # alsamixer, aplay
-        - pavucontrol # pipewire/pulse GUI mixer
         - pulsemixer # pipewire/pulse TUI mixer (tui-launcher)
         - bluez
         - bluez-utils # bluetoothctl
       fonts:
         - ttf-jetbrains-mono-nerd
+        - ttf-firacode-nerd # ghostty font, first monospace preference in fontconfig
         - ttf-nerd-fonts-symbols # symbols-only nerd font fallback
         - ttf-dejavu
         - noto-fonts-emoji
@@ -94,8 +115,6 @@ packages:
         - iio-sensor-proxy # accelerometer/ambient light sensors
         - fprintd # fingerprint reader
         - power-profiles-daemon # power profile switching
-      pc:
-        - steam
     paru:
       desktop:
         - walker # app launcher
@@ -108,12 +127,12 @@ packages:
         - elephant-bluetooth
         - elephant-clipboard
         - elephant-files
-        - elephant-bitwarden
         - kanata # keyboard remapper
         - sesh-bin # tmux session manager
         - bluetuith # bluetooth TUI (tui-launcher)
         - wifitui # wifi TUI (tui-launcher)
         - pacsea-bin # package browser TUI (tui-launcher)
+        - paru # AUR helper, bootstrapped by run_once_install_paru.sh
 
   optional:
     pacman:
@@ -121,7 +140,7 @@ packages:
         - postgresql
         - apache # httpd
         - ansible
-        - dnsutils
+        - bind # dig, host, nslookup (provides dnsutils)
         - television # fuzzy finder TUI (tv)
         - tree-sitter-cli # parser generator, nvim-treesitter
         - trivy # container/IaC vulnerability scanner
@@ -146,15 +165,22 @@ packages:
         - proton-vpn-gtk-app
         - proton-vpn-cli
         - flatpak
+        - steam
+        - signal-desktop
+        - vlc
+        - vlc-plugin-ffmpeg
+        - pavucontrol # pipewire/pulse GUI mixer
       tools:
         - htop
         - tldr
         - trash-cli # trash-put etc., rm alternative
-        - figlet # ASCII banner text
         - openbsd-netcat # nc
         - cups
         - cups-pdf # print-to-PDF backend
         - ntfsprogs # NTFS filesystem tools
+        - ntfs-3g # NTFS FUSE driver
+        - wimlib # Windows WIM image tools
+        - nwg-displays # GUI monitor layout editor
       fonts:
         - ttf-fira-code
         - ttf-fira-mono
@@ -162,8 +188,7 @@ packages:
         - ttf-roboto-mono
         - ttf-bitstream-vera
         - ttf-input-nerd
-        - ttf-firacode-nerd
-        - nerd-fonts # meta package, all nerd fonts
+        - ttf-nerd-fonts-symbols-mono
       kde:
         - ark # archive manager
         - isoimagewriter # USB image writer
@@ -184,14 +209,15 @@ packages:
         - portmaster-bin # application firewall
         - betterbird-bin # thunderbird fork
         - jetbrains-toolbox
-        - openshot # video editor
+        - openshot-bin # video editor
+        - ventoy-bin # multi-ISO bootable USB
       developer:
         - x11docker # run GUI apps in docker
         - headlamp-bin # kubernetes manage gui
         - semgrep-bin # static analysis
         - bruno-bin # API client (postman alternative)
         - choosenim # nim toolchain installer
-        - coder # coder.com remote dev env CLI
+        - coder-bin # coder.com remote dev env CLI
         - podman-tui-bin # podman TUI
 
   npm_global:

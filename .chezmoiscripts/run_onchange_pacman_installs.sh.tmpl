@@ -27,4 +27,6 @@ PACKAGES=(
 
 # No -y/-u on purpose: full upgrades have their own path. If a new package
 # 404s because the sync db is stale, upgrade first and re-apply.
-sudo pacman -S --needed --noconfirm "${PACKAGES[@]}"
+# --asexplicit marks already-installed packages as explicit too, so core
+# packages that first arrived as dependencies survive `pacman -Rns` cleanups.
+sudo pacman -S --needed --noconfirm --asexplicit "${PACKAGES[@]}"
