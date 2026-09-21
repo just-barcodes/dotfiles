@@ -82,6 +82,13 @@ ensure_addon_prefs() {
     ensure_pref "$userjs" extensions.autoDisableScopes 14
 }
 
+# Skip zen's first-run welcome wizard. Everything it offers is either already
+# handled here (uBlock) or defaults to "no"; the default search engine can't be
+# set from user.js and needs an enterprise policy instead.
+ensure_welcome_skipped() {
+    ensure_pref "$ZEN_DIR/$1/user.js" zen.welcome-screen.seen true
+}
+
 # Downloads each xpi at most once per run, shared across profiles.
 CACHE=$(mktemp -d)
 trap 'rm -rf "$CACHE"' EXIT
@@ -116,6 +123,7 @@ ensure_addon() {
 for profile in "${PROFILES[@]}"; do
     ensure_profile "$profile"
     ensure_addon_prefs "$profile"
+    ensure_welcome_skipped "$profile"
     for entry in "${ADDONS[@]}"; do
         ensure_addon "$profile" "${entry%%=*}" "${entry##*=}"
     done
