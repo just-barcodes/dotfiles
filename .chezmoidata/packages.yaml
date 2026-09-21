@@ -64,7 +64,6 @@ packages:
         - zip
         - unzip
         - 7zip
-        - atuin # shell history sync
         - zoxide # smarter cd
         - wl-clipboard # wl-copy / wl-paste
         - usbutils # lsusb
@@ -219,10 +218,3 @@ packages:
         - choosenim # nim toolchain installer
         - coder-bin # coder.com remote dev env CLI
         - podman-tui-bin # podman TUI
-
-  npm_global:
-    - "@anthropic-ai/claude-code"
-    - "@earendil-works/pi-coding-agent" # pi coding agent CLI
-    - pnpm
-    - yarn
-    - hunkdiff # terminal diff viewer for agent changesets

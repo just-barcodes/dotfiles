@@ -27,7 +27,7 @@ apt:
     # runtime/tool manager — installed from the mise apt repo (script adds it)
     - mise
 
-    # dev tools (neovim, gh, shellcheck, bat, yq live in mise - see packages.yaml)
+    # dev tools (neovim lives in mise core, gh/shellcheck/bat/yq in mise.yaml optional)
     - git-lfs
     - tig # ncurses git log/diff browser
     - tldr
