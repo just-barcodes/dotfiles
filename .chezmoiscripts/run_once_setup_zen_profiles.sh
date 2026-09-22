@@ -80,6 +80,8 @@ ensure_addon_prefs() {
     local userjs="$ZEN_DIR/$1/user.js"
     ensure_pref "$userjs" extensions.startupScanScopes 1
     ensure_pref "$userjs" extensions.autoDisableScopes 14
+    # Skip zen's first-run welcome wizard; it only checks this pref at startup.
+    ensure_pref "$userjs" zen.welcome-screen.seen true
 }
 
 # Skip zen's first-run welcome wizard. Everything it offers is either already
