@@ -256,13 +256,31 @@ bind_app_workspace("T", 91, "class:^chrome-teams\\.microsoft\\.com.*$", "gtk-lau
 })
 
 ----------------------------------------------------------------
--- Tasks (P / 40)
+-- Tasks / Donetick + Tududi (P / 40)
+-- tabbed group
 ----------------------------------------------------------------
-bind_app_workspace("P", 40, "class:^TASKS$", "gtk-launch tasks", {
+hl.bind("SUPER + ALT + P", function()
+	hl.dispatch(hl.dsp.focus({ workspace = 40, on_current_monitor = true }))
+	if not hl.get_window("class:^TASKS$") then
+		hl.exec_cmd("gtk-launch tasks")
+	end
+	if not hl.get_window("class:^TUDUDI$") then
+		hl.exec_cmd("gtk-launch tududi")
+	end
+end)
+hl.window_rule({
 	name = "windowrule-tasks",
 	match = { class = "^(TASKS)$" },
 	workspace = "40",
+	group = "set",
 })
+hl.window_rule({
+	name = "windowrule-tududi",
+	match = { class = "^(TUDUDI)$" },
+	workspace = "40",
+	group = "set",
+})
+hl.bind("SUPER + ALT + SHIFT + p", hl.dsp.window.move({ workspace = 40, follow = false }))
 
 ----------------------------------------------------------------
 -- Email / Proton Mail + Outlook (U / 90)

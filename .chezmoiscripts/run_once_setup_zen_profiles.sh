@@ -12,7 +12,7 @@ set -euo pipefail
 ZEN_DIR="$HOME/.zen"
 INI="$ZEN_DIR/profiles.ini"
 
-PROFILES=(chatgpt youtube tasks)
+PROFILES=(chatgpt youtube tasks tududi)
 
 # "<gecko extension id>=<addons.mozilla.org slug>". The id must match the id in
 # the xpi's manifest.json, because zen keys the installed extension off the
