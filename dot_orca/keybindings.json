@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "keybindings": {},
+  "platforms": {
+    "linux": {
+      "terminal.closePane": null,
+      "terminal.clear": null,
+      "terminal.search": "Alt+Slash",
+      "terminal.focusPreviousPane": "Alt+BracketLeft",
+      "terminal.focusNextPane": "Alt+BracketRight",
+      "terminal.splitRight": "Alt+Shift+Backslash",
+      "terminal.splitDown": "Alt+Minus",
+      "terminal.expandPane": "Alt+F",
+      "tab.previousTerminal": "Alt+P",
+      "tab.nextTerminal": "Alt+N",
+      "tab.close": [],
+      "tab.closeAll": []
+    },
+    "darwin": {},
+    "win32": {}
+  }
+}

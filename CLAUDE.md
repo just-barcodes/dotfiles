@@ -54,6 +54,7 @@ chezmoi state delete-bucket --bucket=scriptState
   - `walker/`, `kanata/` — supporting Wayland stack
   - `sesh/sesh.toml` — session manager config; `sesh/scripts/<session-name>.sh` — per-session startup scripts (see below)
 - `dot_local/` — `~/.local/` (user binaries, systemd user units, etc.)
+- `dot_orca/` — `~/.orca/`: `keybindings.json` for the Orca agent IDE (the only Orca setting that is a plain file; everything else lives in `~/.config/orca/` and is edited in Orca's Settings UI) plus `orca.yaml.example`, a per-repo template to copy into a repo root.
 - `.chezmoiscripts/` — all `run_once_*` and `run_onchange_*` scripts live here. This is a chezmoi special directory: scripts run as normal, but the directory itself does not create a matching `~/.chezmoiscripts/` in the target. Notable contents:
   - `run_onchange_pacman_installs.sh.tmpl` — installs `packages.core.pacman` from `.chezmoidata/packages.yaml` with `pacman -S --needed --noconfirm` (no `-Syu`; upgrades are a separate path). Groups named in the `machines:` map are host-specific and only installed on the matching `.chezmoi.hostname`.
   - `run_onchange_paru_installs.sh.tmpl` — installs `packages.core.paru` (AUR) the same way.

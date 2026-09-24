@@ -4,20 +4,63 @@
 # needed), then focuses workspace 50. Falls back to opening a new ghostty if
 # no tmux client is running yet.
 
+# Orca worktrees (only while Orca is running; the CLI fails otherwise) as
+# "orca: <repo>/<worktree>" entries. Rows are "<label>\t<worktree id>".
+# Non-main worktrees are dropped from the sesh list below so they only appear
+# via the Orca route; main checkouts stay reachable both ways.
+orca_rows=$(
+    { timeout 3 orca-ide worktree list --json 2>/dev/null;
+      timeout 3 orca-ide repo list --json 2>/dev/null; } \
+    | jq -rs '
+        if length != 2 then empty else
+        (.[1].result.repos | map({key: .id, value: .displayName}) | from_entries) as $repos
+        | .[0].result.worktrees[]
+        | select(.isArchived | not)
+        | [ "orca: " + ($repos[.repoId] // "?") + "/" + .displayName, .id ]
+        | @tsv
+        end'
+)
+orca_taken=$(timeout 3 orca-ide worktree list --json 2>/dev/null \
+    | jq -r '.result.worktrees[] | select(.isMainWorktree | not) | .path | rtrimstr("/")')
+
 # Build list, dropping zoxide entries whose path matches a configured session
 # (otherwise e.g. "homelab" shows up alongside "~/workspace/homelab").
 sessions=$(sesh list -d --json)
 configured_paths=$(sesh list -c --json | jq -r '.[].Path | rtrimstr("/")')
-sel=$(echo "$sessions" \
-    | jq -r --arg taken "$configured_paths" '
-        ($taken | split("\n")) as $t
-        | .[]
-        | (.Path | rtrimstr("/")) as $p
-        | select(.Src != "zoxide" or (($t | index($p)) | not))
-        | .Name
-      ' \
-    | walker --dmenu)
+sel=$(
+    {
+        echo "$sessions" \
+        | jq -r --arg taken "$configured_paths" --arg orca "$orca_taken" '
+            ($taken | split("\n")) as $t
+            | ($orca | split("\n")) as $o
+            | .[]
+            | (.Path | rtrimstr("/")) as $p
+            | select(.Src != "zoxide" or (($t | index($p)) | not))
+            | select(($o | index($p)) | not)
+            | .Name
+          '
+        [ -n "$orca_rows" ] && printf '%s\n' "$orca_rows" | cut -f1
+    } | walker --dmenu)
 [ -z "$sel" ] && exit 0
+
+# Orca entry: bring a live terminal of that worktree to the front (or create
+# one), then raise the Orca window. hl.dsp.focus follows it to its workspace.
+case "$sel" in
+    "orca: "*)
+        id=$(printf '%s\n' "$orca_rows" | awk -F'\t' -v l="$sel" '$1 == l { print $2; exit }')
+        [ -n "$id" ] || exit 1
+        handle=$(orca-ide terminal list --json | jq -r --arg w "$id" \
+            'first(.result.terminals[] | select(.worktreeId == $w and .connected) | .handle) // empty')
+        if [ -n "$handle" ]; then
+            orca-ide terminal switch --terminal "$handle" >/dev/null
+        else
+            orca-ide terminal create --worktree "id:$id" --focus >/dev/null
+        fi
+        addr=$(hyprctl clients -j | jq -r 'first(.[] | select(.class == "orca") | .address) // empty')
+        [ -n "$addr" ] && hyprctl dispatch "hl.dsp.focus({window='address:$addr'})"
+        exit 0
+        ;;
+esac
 
 # Path-based entries (zoxide/dir) are named by their directory basename;
 # named config sessions use the name verbatim. basename on the latter would

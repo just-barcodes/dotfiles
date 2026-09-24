@@ -1,0 +1,7 @@
+# Orca per-repo config. Copy to <repo>/orca.yaml (committed) to give every new
+# worktree an nvim tab and a shell tab, mirroring the sesh editor/shell layout.
+# Orca asks for trust before running committed commands.
+defaultTabs:
+  - title: editor
+    command: nvim
+  - title: shell

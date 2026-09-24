@@ -81,7 +81,7 @@ hl.window_rule({
 ----------------------------------------------------------------
 hl.bind("SUPER + SHIFT + F9", hl.dsp.exec_cmd('hyprctl --batch "dispatch dpms off; sleep 2; dispatch dpms on"'))
 
-hl.bind("CTRL + ALT + SHIFT + P", hl.dsp.exec_cmd("~/.local/bin/sm-switch.sh"))
+hl.bind("CTRL + ALT + SHIFT + I", hl.dsp.exec_cmd("~/.local/bin/sm-switch.sh"))
 hl.bind("CTRL + ALT + SHIFT + O", hl.dsp.exec_cmd("~/.local/bin/sesh-picker"))
 hl.bind("CTRL + ALT + SHIFT + T", hl.dsp.exec_cmd("~/.local/bin/theme-switch"))
 
@@ -326,6 +326,12 @@ hl.bind("SUPER + ALT + SHIFT + l", hl.dsp.window.move({ workspace = 4, follow = 
 ----------------------------------------------------------------
 hl.bind("SUPER + ALT + period", hl.dsp.focus({ workspace = 60, on_current_monitor = true }))
 hl.bind("SUPER + ALT + SHIFT + period", hl.dsp.window.move({ workspace = 60, follow = false }))
+-- Orca (agentic IDE) lives here; sesh-picker raises it by window address
+hl.window_rule({
+	name = "windowrule-orca",
+	match = { class = "^(orca)$" },
+	workspace = "60",
+})
 
 ----------------------------------------------------------------
 -- Special: magic (S)

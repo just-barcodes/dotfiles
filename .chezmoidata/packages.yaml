@@ -215,6 +215,7 @@ packages:
         - headlamp-bin # kubernetes manage gui
         - semgrep-bin # static analysis
         - bruno-bin # API client (postman alternative)
+        - stably-orca-bin # Orca agentic coding IDE; CLI symlinked as ~/.local/bin/orca-ide
         - choosenim # nim toolchain installer
         - coder-bin # coder.com remote dev env CLI
         - podman-tui-bin # podman TUI
