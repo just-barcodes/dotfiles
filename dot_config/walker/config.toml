@@ -46,6 +46,7 @@ max_results = 50 # global max results
 
 [providers.sets] # define your own defaults/empty sets of providers
 [providers.max_results_provider] # define max results per provider in here
+"menus:sessions" = 200 # sessions picker (dot_config/elephant/menus): show every entry
 
 [[providers.prefixes]]
 prefix = ";"

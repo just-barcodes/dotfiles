@@ -126,6 +126,7 @@ packages:
         - elephant-bluetooth
         - elephant-clipboard
         - elephant-files
+        - elephant-menus # custom menus (sessions picker, dot_config/elephant/menus)
         - kanata # keyboard remapper
         - sesh-bin # tmux session manager
         - bluetuith # bluetooth TUI (tui-launcher)

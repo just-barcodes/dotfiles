@@ -51,7 +51,8 @@ chezmoi state delete-bucket --bucket=scriptState
   - `hypr/` — Hyprland WM (Lua config since 0.55) split into focused files: `hyprland.lua` (entry, `require`s the others), `keybindings.lua`, `input.lua`, `style.lua`, and `workspaces.lua` (an intentionally empty placeholder kept via the source name `empty_workspaces.lua` so `require("workspaces")` resolves). `hypridle.conf` is a separate program and stays in hyprlang format (hyprlock was replaced by quickshell's `Lock.qml`). `monitors.lua` is machine-local and not tracked by chezmoi.
   - `ghostty/config.ghostty` — primary terminal (replaced alacritty)
   - `quickshell/` — QML shell (QtQuick): the top bar, notification daemon, popups, control center, OSD and session lock (replaced swaync, swayosd, hyprlock and waybar). `shell.qml` is the entry point; `Theme.qml`, `Notifications.qml`, `Backlight.qml` and `SystemStats.qml` are singletons; `Bar.qml` plus `bar/` are the bar and its modules, other widgets live in `components/`. Driven by `qs ipc call <notifs|osd|network|lock> ...`
-  - `walker/`, `kanata/` — supporting Wayland stack
+  - `walker/`, `kanata/` — supporting Wayland stack; `walker/themes/minimal/item_menus.xml` lays out elephant menu items as two columns
+  - `elephant/menus/sessions.lua` — walker "sessions" menu (tmux sessions, dirs, Orca worktrees) fed by the cache that `dot_local/bin/executable_sesh-picker` maintains (`sesh-picker refresh|list|open`)
   - `sesh/sesh.toml` — session manager config; `sesh/scripts/<session-name>.sh` — per-session startup scripts (see below)
 - `dot_local/` — `~/.local/` (user binaries, systemd user units, etc.)
 - `dot_orca/` — `~/.orca/`: `keybindings.json` for the Orca agent IDE (the only Orca setting that is a plain file; everything else lives in `~/.config/orca/` and is edited in Orca's Settings UI) plus `orca.yaml.example`, a per-repo template to copy into a repo root.

@@ -1,54 +1,101 @@
 #!/bin/bash
-# Pick a sesh session via walker dmenu.
-# Switches the existing tmux client to the selected session (creating it if
-# needed), then focuses workspace 50. Falls back to opening a new ghostty if
-# no tmux client is running yet.
+# sesh-picker: jump to a tmux session, a directory, or an Orca worktree.
+#
+#   sesh-picker              walker dmenu over the cached list
+#   sesh-picker list         print the cache: name, info, kind, path, orca id (TSV)
+#   sesh-picker refresh      rebuild the cache
+#   sesh-picker open NAME    switch to NAME; open-b64 takes NAME base64-encoded
+#                            (used by the elephant "sessions" menu, whose action
+#                            string cannot quote names with spaces)
+#
+# The cache is what makes the picker open instantly: sesh plus the Orca CLI
+# take ~250 ms, which was the whole perceived delay. Every run kicks off a
+# background refresh, so the list is at most one run stale.
+set -u
 
-# Orca worktrees (only while Orca is running; the CLI fails otherwise) as
-# "orca: <repo>/<worktree>" entries. Rows are "<label>\t<worktree id>".
-# Non-main worktrees are dropped from the sesh list below so they only appear
-# via the Orca route; main checkouts stay reachable both ways.
-orca_rows=$(
-    { timeout 3 orca-ide worktree list --json 2>/dev/null;
-      timeout 3 orca-ide repo list --json 2>/dev/null; } \
-    | jq -rs '
-        if length != 2 then empty else
-        (.[1].result.repos | map({key: .id, value: .displayName}) | from_entries) as $repos
-        | .[0].result.worktrees[]
-        | select(.isArchived | not)
-        | [ "orca: " + ($repos[.repoId] // "?") + "/" + .displayName, .id ]
-        | @tsv
-        end'
-)
-orca_taken=$(timeout 3 orca-ide worktree list --json 2>/dev/null \
-    | jq -r '.result.worktrees[] | select(.isMainWorktree | not) | .path | rtrimstr("/")')
+cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/sesh-picker"
+cache="$cache_dir/entries.tsv"
 
-# Build list, dropping zoxide entries whose path matches a configured session
-# (otherwise e.g. "homelab" shows up alongside "~/workspace/homelab").
-sessions=$(sesh list -d --json)
-configured_paths=$(sesh list -c --json | jq -r '.[].Path | rtrimstr("/")')
-sel=$(
-    {
-        echo "$sessions" \
-        | jq -r --arg taken "$configured_paths" --arg orca "$orca_taken" '
-            ($taken | split("\n")) as $t
-            | ($orca | split("\n")) as $o
-            | .[]
-            | (.Path | rtrimstr("/")) as $p
-            | select(.Src != "zoxide" or (($t | index($p)) | not))
-            | select(($o | index($p)) | not)
-            | .Name
-          '
-        [ -n "$orca_rows" ] && printf '%s\n' "$orca_rows" | cut -f1
-    } | walker --dmenu)
-[ -z "$sel" ] && exit 0
+refresh() {
+    mkdir -p "$cache_dir"
+    local tmp
+    tmp=$(mktemp -d) || exit 1
+    # All sources in parallel. Orca and sm may be down; an empty file slurps
+    # to [] below and simply contributes no rows.
+    sesh list -d --json >"$tmp/sesh" 2>/dev/null &
+    sesh list -c --json >"$tmp/cfg" 2>/dev/null &
+    timeout 3 orca-ide worktree list --json >"$tmp/orca" 2>/dev/null &
+    timeout 3 sm status --json >"$tmp/sm" 2>/dev/null &
+    wait
+    jq -r -n --arg home "$HOME" \
+        --slurpfile sesh "$tmp/sesh" --slurpfile cfg "$tmp/cfg" \
+        --slurpfile orca "$tmp/orca" --slurpfile sm "$tmp/sm" '
+        def tilde: sub("^\($home)"; "~");
+        ($sesh[0] // []) as $sessions
+        | ($cfg[0] // [] | map(.Path | rtrimstr("/"))) as $taken
+        | ($orca[0].result.worktrees // [] | map(select(.isArchived | not))) as $wts
+        | ($wts | map(select(.isMainWorktree | not) | .path | rtrimstr("/"))) as $orca_paths
+        # live agents per directory, e.g. "🔴1 🟢2" (waiting / running / idle)
+        | ($sm[0] // []
+           | map(select(.Status == "waiting" or .Status == "running" or .Status == "idle"))
+           | group_by(.CWD | rtrimstr("/"))
+           | map({ key: (.[0].CWD | rtrimstr("/")),
+                   value: ([ ((map(select(.Status == "waiting")) | length) as $n | select($n > 0) | "🔴\($n)"),
+                             ((map(select(.Status == "running")) | length) as $n | select($n > 0) | "🟢\($n)"),
+                             ((map(select(.Status == "idle"))    | length) as $n | select($n > 0) | "🟡\($n)") ]
+                           | join(" ")) })
+           | from_entries) as $agents
+        | def agents($p): if ($agents[$p] // "") != "" then " · \($agents[$p])" else "" end;
+        # row order: tmux and sesh sessions, Orca worktrees by last activity,
+        # then directories in zoxide order
+        def session_row:
+            (.Path | rtrimstr("/")) as $p
+            | select(.Src != "zoxide" or (($taken | index($p)) | not))
+            | select(($orca_paths | index($p)) | not)
+            | [ .Name,
+                (if .Src == "tmux" then "tmux · \(.Windows) win · \($p | tilde)"
+                 elif .Src == "config" then "sesh · \($p | tilde)"
+                 else "dir" end) + agents($p),
+                .Src, $p, "" ];
+        def orca_row:
+            (.path | rtrimstr("/")) as $p
+            | (if .isMainWorktree then ($p | split("/") | last) else ($p | split("/") | .[-2]) end) as $repo
+            | [ "orca: \($repo)/\(.displayName)",
+                "orca · \(.branch | sub("^refs/heads/"; "")) · \(.workspaceStatus)" + agents($p),
+                "orca", $p, .id ];
+        # zoxide duplicates of configured sessions and non-main Orca worktrees
+        # are dropped from the sesh rows (the latter appear as orca rows)
+        ( $sessions[] | select(.Src != "zoxide") | session_row ),
+        ( $wts | sort_by(-(.lastActivityAt // 0))[] | orca_row ),
+        ( $sessions[] | select(.Src == "zoxide") | session_row )
+        | @tsv' >"$tmp/out" && mv "$tmp/out" "$cache"
+    rm -rf "$tmp"
+}
 
-# Orca entry: bring a live terminal of that worktree to the front (or create
-# one), then raise the Orca window. hl.dsp.focus follows it to its workspace.
-case "$sel" in
-    "orca: "*)
-        id=$(printf '%s\n' "$orca_rows" | awk -F'\t' -v l="$sel" '$1 == l { print $2; exit }')
-        [ -n "$id" ] || exit 1
+ensure_cache() { [ -s "$cache" ] || refresh; }
+
+focus_orca_window() {
+    local addr
+    addr=$(hyprctl clients -j | jq -r 'first(.[] | select(.class == "orca") | .address) // empty')
+    [ -n "$addr" ] && hyprctl dispatch "hl.dsp.focus({window='address:$addr'})"
+}
+
+open_entry() {
+    local sel="$1" row
+    ensure_cache
+    row=$(awk -F'\t' -v n="$sel" '$1 == n { print; exit }' "$cache")
+    if [ -z "$row" ]; then
+        refresh
+        row=$(awk -F'\t' -v n="$sel" '$1 == n { print; exit }' "$cache")
+        [ -n "$row" ] || { echo "sesh-picker: unknown entry: $sel" >&2; exit 1; }
+    fi
+    local kind path id
+    kind=$(cut -f3 <<<"$row"); path=$(cut -f4 <<<"$row"); id=$(cut -f5 <<<"$row")
+
+    if [ "$kind" = orca ]; then
+        # Bring a live terminal of that worktree to the front (or create one),
+        # then raise the Orca window. hl.dsp.focus follows it to its workspace.
+        local handle
         handle=$(orca-ide terminal list --json | jq -r --arg w "$id" \
             'first(.result.terminals[] | select(.worktreeId == $w and .connected) | .handle) // empty')
         if [ -n "$handle" ]; then
@@ -56,41 +103,60 @@ case "$sel" in
         else
             orca-ide terminal create --worktree "id:$id" --focus >/dev/null
         fi
-        addr=$(hyprctl clients -j | jq -r 'first(.[] | select(.class == "orca") | .address) // empty')
-        [ -n "$addr" ] && hyprctl dispatch "hl.dsp.focus({window='address:$addr'})"
-        exit 0
-        ;;
-esac
-
-# Path-based entries (zoxide/dir) are named by their directory basename;
-# named config sessions use the name verbatim. basename on the latter would
-# mangle names containing "/" (e.g. "chezmoi (configs / dotfiles)").
-case "$sel" in
-    /* | "~"*) name=$(basename "$sel") ;;
-    *) name=$sel ;;
-esac
-# Resolve absolute path for -c: zoxide entries' Name uses literal "~" which
-# won't expand inside quotes, so look up the absolute Path from the JSON.
-sel_path=$(echo "$sessions" | jq -r --arg n "$sel" 'first(.[] | select(.Name == $n) | .Path) // empty')
-
-# Create the session if it doesn't exist yet
-if ! tmux has-session -t "$name" 2>/dev/null; then
-    if [ -d "$sel_path" ]; then
-        tmux new-session -ds "$name" -c "$sel_path"
-    else
-        tmux new-session -ds "$name"
+        focus_orca_window
+        return
     fi
-    # Run session startup script if one exists (mirrors sesh startup_command)
-    startup="$HOME/.config/sesh/scripts/${name}.sh"
-    [ -f "$startup" ] && bash "$startup"
-fi
 
-# Tell the existing tmux client to switch, then focus workspace 50
-client=$(tmux list-clients -F '#{client_name}' | head -1)
-if [ -n "$client" ]; then
-    tmux switch-client -c "$client" -t "$name"
-    hyprctl dispatch 'hl.dsp.focus({ workspace = 50, on_current_monitor = true })'
-else
-    # No tmux running yet — open ghostty as a fallback
-    ghostty -e sesh connect "$sel"
-fi
+    # Path-based entries (zoxide/dir) are named by their directory basename;
+    # named config sessions use the name verbatim. basename on the latter would
+    # mangle names containing "/" (e.g. "chezmoi (configs / dotfiles)").
+    local name
+    case "$sel" in
+        /* | "~"*) name=$(basename "$sel") ;;
+        *) name=$sel ;;
+    esac
+
+    if ! tmux has-session -t "$name" 2>/dev/null; then
+        if [ -d "$path" ]; then
+            tmux new-session -ds "$name" -c "$path"
+        else
+            tmux new-session -ds "$name"
+        fi
+        # Run session startup script if one exists (mirrors sesh startup_command)
+        local startup="$HOME/.config/sesh/scripts/${name}.sh"
+        [ -f "$startup" ] && bash "$startup"
+    fi
+
+    # Tell the existing tmux client to switch, then focus workspace 50
+    local client
+    client=$(tmux list-clients -F '#{client_name}' | head -1)
+    if [ -n "$client" ]; then
+        tmux switch-client -c "$client" -t "$name"
+        hyprctl dispatch 'hl.dsp.focus({ workspace = 50, on_current_monitor = true })'
+    else
+        # No tmux running yet — open ghostty as a fallback
+        ghostty -e sesh connect "$sel"
+    fi
+}
+
+case "${1:-}" in
+    refresh) refresh ;;
+    list) ensure_cache; cat "$cache" ;;
+    open) open_entry "$2" ;;
+    open-b64) open_entry "$(printf '%s' "$2" | base64 -d)" ;;
+    "")
+        ensure_cache
+        setsid -f "$0" refresh >/dev/null 2>&1
+        # Snapshot the rows: the refresh above may rewrite the cache while
+        # walker is open, and the index walker returns refers to this list.
+        rows=$(cat "$cache")
+        idx=$(printf '%s\n' "$rows" \
+            | awk -F'\t' '{ n[NR] = $1; i[NR] = $2; if (length($1) > w) w = length($1) }
+                          END { for (k = 1; k <= NR; k++) printf "%-" w "s  %s\n", n[k], i[k] }' \
+            | walker --dmenu -i --width 1280 -p "session...")
+        [ -n "$idx" ] || exit 0
+        sel=$(printf '%s\n' "$rows" | sed -n "$((idx + 1))p" | cut -f1)
+        [ -n "$sel" ] && open_entry "$sel"
+        ;;
+    *) echo "usage: sesh-picker [list|refresh|open NAME|open-b64 B64]" >&2; exit 2 ;;
+esac
