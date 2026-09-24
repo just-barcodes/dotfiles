@@ -95,6 +95,20 @@ row:selected .item-box {
   color: @theme_fg_dim;
 }
 
+/* "agents" menu (item_menus-agents.xml): larger text and icons, tighter
+   padding so the row height stays the same as before. */
+.menus-agents.item-box {
+  padding: 12px 12px;
+}
+
+.menus-agents .item-text {
+  font-size: 18px;
+}
+
+.menus-agents .item-subtext {
+  font-size: 16px;
+}
+
 .providerlist .item-subtext {
   font-size: unset;
   opacity: 0.8;

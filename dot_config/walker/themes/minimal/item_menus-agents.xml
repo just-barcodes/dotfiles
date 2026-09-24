@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Menu items as two aligned columns (name | info) instead of the default
-     stacked text/subtext; used by the "sessions" menu. -->
+<!-- "agents" menu items: like item_menus-sessions.xml, but the image slot is a 80x40
+     picture so the 2:1 composite icon (agent | host) from sm-switch renders as
+     two 40px icons side by side. -->
 <interface>
   <requires lib="gtk" version="4.0"></requires>
   <object class="GtkBox" id="ItemBox">
@@ -10,11 +11,18 @@
     <property name="orientation">horizontal</property>
     <property name="spacing">16</property>
     <child>
-      <object class="GtkImage" id="ItemImage">
+      <!-- GtkPicture, not GtkImage: an image slot is square and would force
+           the row to 64px for a 32px-tall composite; a picture takes the
+           composite's 2:1 aspect at the requested height. -->
+      <object class="GtkPicture" id="ItemImage">
         <style>
           <class name="item-image"></class>
         </style>
-        <property name="icon-size">normal</property>
+        <property name="content-fit">contain</property>
+        <property name="can-shrink">true</property>
+        <property name="height-request">40</property>
+        <property name="width-request">80</property>
+        <property name="valign">center</property>
       </object>
     </child>
     <child>
@@ -23,8 +31,8 @@
           <class name="item-text"></class>
         </style>
         <property name="xalign">0</property>
-        <property name="width-chars">36</property>
-        <property name="max-width-chars">36</property>
+        <property name="width-chars">44</property>
+        <property name="max-width-chars">44</property>
         <property name="ellipsize">end</property>
         <property name="single-line-mode">true</property>
       </object>

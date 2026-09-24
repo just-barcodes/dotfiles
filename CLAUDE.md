@@ -51,7 +51,8 @@ chezmoi state delete-bucket --bucket=scriptState
   - `hypr/` — Hyprland WM (Lua config since 0.55) split into focused files: `hyprland.lua` (entry, `require`s the others), `keybindings.lua`, `input.lua`, `style.lua`, and `workspaces.lua` (an intentionally empty placeholder kept via the source name `empty_workspaces.lua` so `require("workspaces")` resolves). `hypridle.conf` is a separate program and stays in hyprlang format (hyprlock was replaced by quickshell's `Lock.qml`). `monitors.lua` is machine-local and not tracked by chezmoi.
   - `ghostty/config.ghostty` — primary terminal (replaced alacritty)
   - `quickshell/` — QML shell (QtQuick): the top bar, notification daemon, popups, control center, OSD and session lock (replaced swaync, swayosd, hyprlock and waybar). `shell.qml` is the entry point; `Theme.qml`, `Notifications.qml`, `Backlight.qml` and `SystemStats.qml` are singletons; `Bar.qml` plus `bar/` are the bar and its modules, other widgets live in `components/`. Driven by `qs ipc call <notifs|osd|network|lock> ...`
-  - `walker/`, `kanata/` — supporting Wayland stack; `walker/themes/minimal/item_menus.xml` lays out elephant menu items as two columns
+  - `walker/`, `kanata/` — supporting Wayland stack; `walker/themes/minimal/item_menus-<menu>.xml` lays out elephant menu items as two columns (per menu; a generic item_menus.xml is ignored)
+  - `elephant/menus/agents.lua` — walker "agents" menu over `sm-switch.sh list` (live agent sessions from sm); agent icons in `dot_local/share/icons/hicolor/scalable/apps/agent-*.svg`
   - `elephant/menus/sessions.lua` — walker "sessions" menu (tmux sessions, dirs, Orca worktrees) fed by the cache that `dot_local/bin/executable_sesh-picker` maintains (`sesh-picker refresh|list|open`)
   - `sesh/sesh.toml` — session manager config; `sesh/scripts/<session-name>.sh` — per-session startup scripts (see below)
 - `dot_local/` — `~/.local/` (user binaries, systemd user units, etc.)

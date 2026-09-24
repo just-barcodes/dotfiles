@@ -81,7 +81,8 @@ hl.window_rule({
 ----------------------------------------------------------------
 hl.bind("SUPER + SHIFT + F9", hl.dsp.exec_cmd('hyprctl --batch "dispatch dpms off; sleep 2; dispatch dpms on"'))
 
-hl.bind("CTRL + ALT + SHIFT + I", hl.dsp.exec_cmd("~/.local/bin/sm-switch.sh"))
+-- agent sessions picker: elephant menu over `sm-switch.sh list` (plain sm-switch.sh is the dmenu fallback)
+hl.bind("CTRL + ALT + SHIFT + I", hl.dsp.exec_cmd("walker -m menus:agents --width 1280"))
 -- sessions picker: elephant menu over sesh-picker's cache (plain `sesh-picker` is the dmenu fallback)
 hl.bind("CTRL + ALT + SHIFT + O", hl.dsp.exec_cmd("walker -m menus:sessions --width 1280"))
 hl.bind("CTRL + ALT + SHIFT + T", hl.dsp.exec_cmd("~/.local/bin/theme-switch"))

@@ -1,0 +1,10 @@
+#!/bin/bash
+# Rebuild the user hicolor icon cache when the managed icons change. GTK
+# trusts a stale icon-theme.cache (created by e.g. JetBrains Toolbox) over the
+# directory contents, so newly added icons stay invisible until it is rebuilt.
+# icons hash: {{ range (list "agent-claude" "agent-opencode" "agent-gemini") }}{{ include (joinPath $.chezmoi.sourceDir (printf "dot_local/share/icons/hicolor/scalable/apps/%s.svg" .)) | sha256sum }} {{ end }}
+set -euo pipefail
+dir="$HOME/.local/share/icons/hicolor"
+[ -f "$dir/icon-theme.cache" ] || exit 0
+command -v gtk-update-icon-cache >/dev/null || exit 0
+gtk-update-icon-cache -f -t "$dir"
