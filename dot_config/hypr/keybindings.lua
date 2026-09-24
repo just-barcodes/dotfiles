@@ -33,6 +33,15 @@ end
 -- Misc
 ----------------------------------------------------------------
 hl.bind("CTRL + ALT + Q", hl.dsp.exec_cmd(terminal))
+-- Ctrl+Q: swallowed in Orca (its File > Exit is an Electron menu accelerator
+-- that ~/.orca/keybindings.json cannot unbind), forwarded to any other window.
+hl.bind("CTRL + Q", function()
+	local w = hl.get_active_window()
+	if not w or w.class == "orca" then
+		return
+	end
+	hl.dispatch(hl.dsp.send_shortcut({ mods = "CTRL", key = "q" }))
+end)
 hl.bind("ALT + F4", hl.dsp.window.close())
 hl.bind("SUPER + ALT + E", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
