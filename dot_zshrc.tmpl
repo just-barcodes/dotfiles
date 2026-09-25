@@ -153,6 +153,14 @@ q() {
         '
 }
 
+# a: fzf-pick an installed coding agent; extra args are passed through
+a() {
+    local agent
+    agent=$(for c in claude opencode pi codex gemini; do command -v "$c" >/dev/null && echo "$c"; done \
+        | fzf --height=~10 --reverse --prompt='agent> ') || return
+    "$agent" "$@"
+}
+
 # kanata
 alias hm='sudo kanata --cfg ~/.config/kanata/config.kbd'
 
