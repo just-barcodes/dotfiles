@@ -1,0 +1,34 @@
+# Warp theme, rendered per theme from the palette .env, for Orca's
+# Settings > Terminal Appearance > "Import Warp Theme Folder" (point it at
+# ~/.config/theme/generated). Orca ships no Selenized or Flexoki, and its
+# Ghostty importer cannot see a theme set through config-file includes.
+#
+# `name` reuses ghostty_theme: the palette file has no name key by design, and
+# this is the same label Ghostty shows. Orca derives the id from it.
+# black/white follow Ghostty's own Selenized mapping: normal = bg_1/fg_0,
+# bright = dim_0/fg_1.
+name: "${ghostty_theme}"
+details: ${polarity}er
+accent: "${blue}"
+background: "${bg_0}"
+foreground: "${fg_0}"
+cursor: "${fg_0}"
+terminal_colors:
+  normal:
+    black: "${bg_1}"
+    red: "${red}"
+    green: "${green}"
+    yellow: "${yellow}"
+    blue: "${blue}"
+    magenta: "${magenta}"
+    cyan: "${cyan}"
+    white: "${fg_0}"
+  bright:
+    black: "${dim_0}"
+    red: "${br_red}"
+    green: "${br_green}"
+    yellow: "${br_yellow}"
+    blue: "${br_blue}"
+    magenta: "${br_magenta}"
+    cyan: "${br_cyan}"
+    white: "${fg_1}"
