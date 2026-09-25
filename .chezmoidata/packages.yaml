@@ -182,6 +182,11 @@ packages:
         - ntfs-3g # NTFS FUSE driver
         - wimlib # Windows WIM image tools
         - nwg-displays # GUI monitor layout editor
+      intel-gpu:
+        - vulkan-intel # Vulkan ICD for Intel iGPU; without it vulkan-icd-loader finds no device
+        - vulkan-tools # vulkaninfo, to verify the ICD
+        - intel-media-driver # VA-API backend for Intel Gen8+ (hardware video decode in chromium/vlc/ffmpeg)
+        - libva-utils # vainfo, to verify VA-API
       fonts:
         - ttf-fira-code
         - ttf-fira-mono
