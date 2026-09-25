@@ -11,10 +11,22 @@
       "terminal.splitRight": "Alt+Shift+Backslash",
       "terminal.splitDown": "Alt+Minus",
       "terminal.expandPane": "Alt+F",
-      "tab.previousTerminal": "Alt+P",
-      "tab.nextTerminal": "Alt+N",
+      "tab.previousTerminal": [],
+      "tab.nextTerminal": [],
       "tab.close": [],
-      "tab.closeAll": []
+      "tab.closeAll": [],
+      "tab.previousRecent": [],
+      "tab.nextSameType": [],
+      "tab.previousSameType": [],
+      "tab.nextAllTypes": [
+        "Mod+Tab",
+        "Alt+N"
+      ],
+      "tab.previousAllTypes": [
+        "Mod+Shift+Tab",
+        "Alt+P"
+      ],
+      "worktree.quickOpen": []
     },
     "darwin": {},
     "win32": {}
