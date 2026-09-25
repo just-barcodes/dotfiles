@@ -78,7 +78,8 @@ packages:
         - hypridle # idle daemon (lock/dpms timers)
         - quickshell # QML shell: bar, notifications, OSD, lock
         - hyprpolkitagent # polkit auth prompts
-        - sddm # login manager
+        - greetd # login manager (see run_onchange_after_install_greetd)
+        - greetd-tuigreet # plain TUI greeter for greetd
         - breeze-cursors # cursor theme, referenced by gtk-3.0/gtk-4.0 settings.ini
         - breeze-icons # icon theme, same
         - xdg-desktop-portal-hyprland # screen sharing portal

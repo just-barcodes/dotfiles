@@ -1,0 +1,35 @@
+#!/bin/bash
+# Configure greetd with tuigreet as the login manager (replaced SDDM). The
+# greeter hands off to uwsm exactly as the hyprland-uwsm.desktop session did.
+#
+# `after_` so it runs once run_onchange_pacman_installs has installed greetd.
+# Only enables/disables units; the switch takes effect on the next boot so the
+# running session is never killed.
+
+set -euo pipefail
+
+if ! command -v greetd >/dev/null; then
+	echo "greetd not installed; skipping greetd setup"
+	exit 0
+fi
+
+CONFIG='# Managed by chezmoi: .chezmoiscripts/run_onchange_after_install_greetd.sh.tmpl
+[terminal]
+vt = 1
+
+[default_session]
+command = "tuigreet --remember --cmd '"'"'uwsm start -e -D Hyprland hyprland.desktop'"'"'"
+user = "greeter"'
+
+if [ "$(cat /etc/greetd/config.toml 2>/dev/null)" != "$CONFIG" ]; then
+	printf '%s\n' "$CONFIG" | sudo tee /etc/greetd/config.toml >/dev/null
+	echo "installed /etc/greetd/config.toml"
+fi
+
+if systemctl is-enabled --quiet sddm.service 2>/dev/null; then
+	sudo systemctl disable sddm.service
+fi
+if ! systemctl is-enabled --quiet greetd.service 2>/dev/null; then
+	sudo systemctl enable greetd.service
+	echo "greetd enabled; takes effect on next boot"
+fi
