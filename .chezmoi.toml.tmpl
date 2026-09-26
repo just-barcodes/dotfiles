@@ -5,7 +5,12 @@
   still applies cleanly — templates that reference private data must guard
   against missing keys (see e.g. dot_zshrc.tmpl).
 */ -}}
-{{- $coder := ne (env "CODER_WORKSPACE_NAME") "" -}}
+{{- /*
+  "coder" = headless mode: no sudo, no desktop. True inside Coder workspaces
+  and on the homelab coding-agent VMs (hostnames agent-*), which are
+  provisioned by Ansible and apply this repo as an unprivileged user.
+*/ -}}
+{{- $coder := or (ne (env "CODER_WORKSPACE_NAME") "") (hasPrefix "agent-" .chezmoi.hostname) -}}
 {{- $privateDir := joinPath .chezmoi.homeDir ".config" "chezmoi-private" -}}
 {{- $repo := "git@github.com:just-barcodes/dotfiles-private.git" -}}
 {{- if stat $privateDir -}}

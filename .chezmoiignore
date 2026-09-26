@@ -8,6 +8,11 @@ install.sh
 renovate.json
 .config/nvim/lazy-lock.json
 {{ if (dig "coder" false .) }}
+# No age identity on headless hosts: encrypted_ sources would abort the apply.
+.config/secrets
+# Orca rewrites ~/.claude/settings.json with its own hooks on the agent VMs,
+# and `sm hook` does not exist there.
+.claude/settings.json
 .config/ghostty
 .config/hypr
 .config/kanata

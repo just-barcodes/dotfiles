@@ -38,7 +38,7 @@ Pick the one-liner that matches the situation. All three pull this repo to `~/.l
 sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply git@github.com:just-barcodes/dotfiles.git
 ```
 
-**HTTPS (no access assumed — public bits only; the private config is silently skipped):**
+**HTTPS (no access assumed — public bits only; the private config is silently skipped). Without an age identity the apply stops at `.config/secrets` unless the host is headless (Coder workspace or an `agent-*` hostname), where that directory is ignored:**
 
 ```bash
 sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply https://github.com/just-barcodes/dotfiles.git
