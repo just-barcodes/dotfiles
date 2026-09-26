@@ -1,8 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
-{{ if (dig "coder" false .) -}}
-echo "Coder workspace: skipping starship install"; exit 0
+{{ if (dig "headless" false .) -}}
+echo "Headless host: skipping starship install"; exit 0
 {{ end -}}
 
 {{ if or (eq .chezmoi.osRelease.id "debian") (eq .chezmoi.osRelease.id "ubuntu") -}}

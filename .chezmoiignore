@@ -7,12 +7,16 @@ PACKAGE-UI-OPTIONS.md
 install.sh
 renovate.json
 .config/nvim/lazy-lock.json
-{{ if (dig "coder" false .) }}
-# No age identity on headless hosts: encrypted_ sources would abort the apply.
+{{ if eq (dig "config" "encryption" "" .chezmoi) "" }}
+# encrypted_ sources abort the apply when no encryption is configured.
 .config/secrets
+{{ end }}
+{{ if (dig "agentvm" false .) }}
 # Orca rewrites ~/.claude/settings.json with its own hooks on the agent VMs,
 # and `sm hook` does not exist there.
 .claude/settings.json
+{{ end }}
+{{ if (dig "headless" false .) }}
 .config/ghostty
 .config/hypr
 .config/kanata

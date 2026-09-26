@@ -3,8 +3,8 @@
 
 set -euo pipefail
 
-{{ if (dig "coder" false .) -}}
-echo "Coder workspace: skipping package installs"; exit 0
+{{ if (dig "headless" false .) -}}
+echo "Headless host: skipping package installs"; exit 0
 {{ end -}}
 
 {{ if not (or (eq .chezmoi.osRelease.id "debian") (eq .chezmoi.osRelease.id "ubuntu")) -}}

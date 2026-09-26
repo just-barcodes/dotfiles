@@ -6,11 +6,12 @@
   against missing keys (see e.g. dot_zshrc.tmpl).
 */ -}}
 {{- /*
-  "coder" = headless mode: no sudo, no desktop. True inside Coder workspaces
-  and on the homelab coding-agent VMs (hostnames agent-*), which are
-  provisioned by Ansible and apply this repo as an unprivileged user.
+  headless = no sudo, no desktop: true inside Coder workspaces and on the
+  homelab coding-agent VMs. agentvm marks the latter (their Ansible role runs
+  `DOTFILES_AGENTVM=1 chezmoi init`); Orca owns ~/.claude/settings.json there.
 */ -}}
-{{- $coder := or (ne (env "CODER_WORKSPACE_NAME") "") (hasPrefix "agent-" .chezmoi.hostname) -}}
+{{- $agentvm := ne (env "DOTFILES_AGENTVM") "" -}}
+{{- $headless := or (ne (env "CODER_WORKSPACE_NAME") "") $agentvm -}}
 {{- $privateDir := joinPath .chezmoi.homeDir ".config" "chezmoi-private" -}}
 {{- $repo := "git@github.com:just-barcodes/dotfiles-private.git" -}}
 {{- if stat $privateDir -}}
@@ -18,7 +19,8 @@
 {{- else -}}
 {{-   output "sh" "-c" (printf "git clone --quiet %q %q >/dev/null 2>&1 || true" $repo $privateDir) -}}
 {{- end }}
-data.coder = {{ $coder }}
+data.headless = {{ $headless }}
+data.agentvm = {{ $agentvm }}
 {{- $privateConfig := joinPath $privateDir "chezmoi.toml" -}}
 {{- if stat $privateConfig }}
 {{ include $privateConfig }}

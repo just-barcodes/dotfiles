@@ -25,7 +25,7 @@ chezmoi apply ~/.config/ghostty/config.ghostty
 | `run_once_foo.sh`     | Run once ever (state tracked in chezmoi DB) |
 | `run_onchange_foo.sh` | Re-run whenever file content changes        |
 
-Templates use `.chezmoi.osRelease.id` (`"arch"`, `"ubuntu"`, etc.) for OS-specific branching and `.chezmoi.hostname` for machine-specific branching (current mapping lives in `.chezmoidata/packages.yaml` under `machines:`).
+Templates use `.chezmoi.osRelease.id` (`"arch"`, `"ubuntu"`, etc.) for OS-specific branching and `.chezmoi.hostname` for machine-specific branching (current mapping lives in `.chezmoidata/packages.yaml` under `machines:`). Two boolean flags are set at `chezmoi init` time in `.chezmoi.toml.tmpl`: `headless` (Coder workspaces via `CODER_WORKSPACE_NAME`, agent VMs via `DOTFILES_AGENTVM`) skips package installs, desktop configs and theme rendering; `agentvm` additionally leaves `~/.claude/settings.json` to Orca.
 
 ## Essential commands
 
