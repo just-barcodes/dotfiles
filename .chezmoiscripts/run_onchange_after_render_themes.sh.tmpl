@@ -10,9 +10,8 @@
 # locations, so they must be written first.
 set -euo pipefail
 
-{{ if (dig "headless" false .) -}}
-echo "Headless host: skipping theme render"; exit 0
-{{ end -}}
+# Runs on headless hosts too: it only writes under ~/.config/theme and the
+# starship prompt and tmux colours in a plain SSH session come from it.
 
 # Re-trigger when any palette or template changes by embedding their hashes.
 {{ range (glob (joinPath .chezmoi.sourceDir "dot_config/theme/palettes/*.env")) -}}
