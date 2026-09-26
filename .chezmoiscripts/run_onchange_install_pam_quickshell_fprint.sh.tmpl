@@ -8,8 +8,8 @@
 
 set -euo pipefail
 
-{{ if (dig "coder" false .) -}}
-echo "Coder workspace: skipping quickshell fingerprint PAM setup"; exit 0
+{{ if (dig "headless" false .) -}}
+echo "Headless host: skipping quickshell fingerprint PAM setup"; exit 0
 {{ end -}}
 
 if [ ! -e /usr/lib/security/pam_fprintd.so ]; then

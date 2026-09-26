@@ -1,8 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
-{{ if (dig "coder" false .) -}}
-echo "Coder workspace: skipping package installs"; exit 0
+{{ if (dig "headless" false .) -}}
+echo "Headless host: skipping package installs"; exit 0
 {{ end -}}
 
 # Defensive: if mise was installed to a non-standard prefix, its shim dir is

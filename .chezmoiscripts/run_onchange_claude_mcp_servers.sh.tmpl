@@ -33,6 +33,12 @@ ensure_mcp_http_with_header() {
 }
 
 ensure_mcp context7 npx -y @upstash/context7-mcp
+{{ if (dig "headless" false .) -}}
+# Headless hosts have no keyring or secrets file, so ${GITHUB_PAT} could never
+# be set and the GitHub MCP would fail on every session start.
+claude mcp remove github -s user >/dev/null 2>&1 || true
+{{ else -}}
 # GitHub MCP uses PAT auth — token expanded from ${GITHUB_PAT} at runtime
 # (set by ~/.zshrc from gnome-keyring via `secret-tool lookup service github-mcp`).
 ensure_mcp_http_with_header github https://api.githubcopilot.com/mcp/ 'Authorization: Bearer ${GITHUB_PAT}'
+{{ end -}}
