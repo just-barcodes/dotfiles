@@ -1,0 +1,27 @@
+#!/bin/bash
+# pam_faillock: lock the account after 15 failed logins (Arch default is 3,
+# which is too easy to trip on a lock screen with a fingerprint fallback).
+# Edits the one key in place; the file stays owned by pam.
+
+set -euo pipefail
+
+{{ if not (eq .chezmoi.osRelease.id "arch") -}}
+echo "Not running arch... exiting"
+exit 0
+{{ end -}}
+{{ if (dig "headless" false .) -}}
+echo "Headless host: skipping faillock setup"; exit 0
+{{ end -}}
+
+CONF=/etc/security/faillock.conf
+[ -e "$CONF" ] || exit 0
+
+if grep -qE '^deny = 15$' "$CONF"; then
+	exit 0
+fi
+if grep -qE '^deny =' "$CONF"; then
+	sudo sed -i 's/^deny =.*/deny = 15/' "$CONF"
+else
+	sudo sed -i 's/^# deny = .*/&\ndeny = 15/' "$CONF"
+fi
+echo "set deny = 15 in $CONF"

@@ -1,0 +1,50 @@
+#!/bin/bash
+# Pre/post snapshots around every pacman transaction (snap-pac) on a btrfs
+# root. Timeline snapshots stay off; snap-pac is the recovery story here.
+# Rollback with systemd-boot has no boot menu: `snapper rollback` from the
+# previous kernel or a live USB.
+#
+# archinstall already mounts the @.snapshots subvolume at /.snapshots, which
+# `snapper create-config` refuses; the umount/recreate dance below is the Arch
+# wiki recipe for exactly that layout.
+
+set -euo pipefail
+
+{{ if not (eq .chezmoi.osRelease.id "arch") -}}
+echo "Not running arch... exiting"
+exit 0
+{{ end -}}
+{{ if (dig "headless" false .) -}}
+echo "Headless host: skipping snapper setup"; exit 0
+{{ end -}}
+
+if [ "$(findmnt -no FSTYPE /)" != "btrfs" ]; then
+	echo "root is not btrfs; skipping snapper setup"
+	exit 0
+fi
+if ! command -v snapper >/dev/null; then
+	echo "snapper not installed; skipping snapper setup"
+	exit 0
+fi
+
+if ! sudo snapper list-configs | grep -q '^root '; then
+	if grep -qE '\s/\.snapshots\s' /etc/fstab; then
+		# archinstall layout: a dedicated subvolume is mounted there already.
+		mountpoint -q /.snapshots && sudo umount /.snapshots
+		sudo rmdir /.snapshots
+		sudo snapper -c root create-config /
+		sudo btrfs subvolume delete /.snapshots
+		sudo mkdir /.snapshots
+		sudo mount /.snapshots
+	else
+		sudo snapper -c root create-config /
+	fi
+	sudo chmod 750 /.snapshots
+	sudo snapper -c root set-config TIMELINE_CREATE=no NUMBER_LIMIT=10 NUMBER_LIMIT_IMPORTANT=5
+	echo "created snapper config 'root'"
+fi
+
+if ! systemctl is-enabled --quiet snapper-cleanup.timer 2>/dev/null; then
+	sudo systemctl enable --now snapper-cleanup.timer
+	echo "snapper-cleanup.timer enabled"
+fi

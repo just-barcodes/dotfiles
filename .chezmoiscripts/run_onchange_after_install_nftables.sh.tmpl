@@ -1,0 +1,61 @@
+#!/bin/bash
+# Host firewall: drop unsolicited inbound, leave forwarding alone (docker and
+# tailscale manage their own tables; a forward chain with policy drop here
+# would silently break container networking). Only `table inet filter` is
+# owned and replaced, never the whole ruleset.
+#
+# To open a port on one machine, add a rule to /etc/nftables.d/local.nft
+# (included below, not managed) and `sudo systemctl reload nftables`.
+
+set -euo pipefail
+
+{{ if not (eq .chezmoi.osRelease.id "arch") -}}
+echo "Not running arch... exiting"
+exit 0
+{{ end -}}
+{{ if (dig "headless" false .) -}}
+echo "Headless host: skipping firewall setup"; exit 0
+{{ end -}}
+
+if ! command -v nft >/dev/null; then
+	echo "nftables not installed; skipping firewall setup"
+	exit 0
+fi
+
+CONFIG='#!/usr/bin/nft -f
+# Managed by chezmoi: .chezmoiscripts/run_onchange_after_install_nftables.sh.tmpl
+# Local additions go in /etc/nftables.d/local.nft.
+
+destroy table inet filter
+table inet filter {
+  chain input {
+    type filter hook input priority filter; policy drop;
+    ct state invalid drop
+    ct state { established, related } accept
+    iif lo accept
+    meta l4proto { icmp, icmpv6 } accept
+    iifname "tailscale0" accept comment "tailnet peers"
+    udp dport 41641 accept comment "tailscale direct connections"
+    pkttype host limit rate 5/second counter reject with icmpx type admin-prohibited
+    counter
+  }
+}
+
+include "/etc/nftables.d/*.nft"'
+
+sudo mkdir -p /etc/nftables.d
+[ -e /etc/nftables.d/local.nft ] || printf '# per-machine rules, e.g.:\n# add rule inet filter input tcp dport 8080 accept\n' | sudo tee /etc/nftables.d/local.nft >/dev/null
+
+if [ "$(cat /etc/nftables.conf 2>/dev/null)" != "$CONFIG" ]; then
+	printf '%s\n' "$CONFIG" | sudo tee /etc/nftables.conf >/dev/null
+	sudo nft -c -f /etc/nftables.conf
+	echo "installed /etc/nftables.conf"
+	if systemctl is-active --quiet nftables.service; then
+		sudo systemctl reload nftables.service
+	fi
+fi
+
+if ! systemctl is-enabled --quiet nftables.service 2>/dev/null; then
+	sudo systemctl enable --now nftables.service
+	echo "nftables enabled"
+fi

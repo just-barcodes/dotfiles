@@ -64,7 +64,8 @@ chezmoi apply -v
 This installs `packages.core` (pacman, then paru from the AUR), the mise tools,
 writes the greetd config, enables greetd, NetworkManager, bluetooth, the
 fstrim, paccache and fwupd-refresh timers (plus power-profiles-daemon on
-laptops), and renders the themes.
+laptops), installs a default-drop inbound firewall (nftables), sets up snapper
+on a btrfs root, unlocks the keyring at login, and renders the themes.
 Run it as your user, never with sudo. If a script fails, fix the cause and re-run
 `chezmoi apply`; do not reset chezmoi's script state as a first step.
 
@@ -102,7 +103,49 @@ sudo reflector --country Switzerland,Germany --protocol https --latest 10 --sort
 sudo systemctl enable --now reflector.timer   # weekly, uses the .conf, not the flags above
 ```
 
-## 8. Secrets and private config (optional, any time later)
+## 8. Secure Boot and TPM unlock (laptop, after the first successful boot)
+
+Encryption alone does not protect the unsigned kernel and loader on the EFI
+partition. `sbctl` signs them with your own keys; the TPM then releases the
+LUKS key only when the boot chain is unchanged, so the passphrase prompt goes
+away. Keep the passphrase slot as fallback.
+
+```bash
+sudo pacman -S --needed sbctl
+sudo sbctl status                       # setup mode must be enabled in firmware first
+sudo sbctl create-keys && sudo sbctl enroll-keys -m
+sudo sbctl sign -s /boot/EFI/BOOT/BOOTX64.EFI
+sudo sbctl sign -s /boot/EFI/systemd/systemd-bootx64.efi
+sudo sbctl sign -s /boot/vmlinuz-linux
+sudo sbctl verify && reboot             # then confirm: bootctl status shows Secure Boot: enabled
+sudo systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=7 /dev/<luks-partition>
+```
+
+Add `rd.luks.options=tpm2-device=auto` to the kernel command line in
+`/boot/loader/entries/*.conf`. A firmware update changes PCR 7; re-run the
+`cryptenroll` line with `--wipe-slot=tpm2` first.
+
+## 9. Encrypted DNS (optional)
+
+```bash
+sudo mkdir -p /etc/systemd/resolved.conf.d
+printf '[Resolve]
+DNS=9.9.9.9#dns.quad9.net 1.1.1.1#cloudflare-dns.com
+DNSOverTLS=yes
+' | sudo tee /etc/systemd/resolved.conf.d/dot.conf
+sudo systemctl enable --now systemd-resolved
+sudo ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
+```
+
+NetworkManager hands its DHCP DNS servers to resolved; the static ones above
+take over for DNS over TLS. Skip this if Tailscale MagicDNS is enough.
+
+## 10. Backups
+
+Snapshots are not backups. Point restic or borg at `~` and a remote target
+before relying on the machine.
+
+## 11. Secrets and private config (optional, any time later)
 
 1. Put an SSH key on GitHub, then switch the source to SSH and re-init so the
    private companion repo gets pulled:
@@ -115,5 +158,5 @@ sudo systemctl enable --now reflector.timer   # weekly, uses the .conf, not the 
 - Monitor layout is machine-local: create `~/.config/hypr/monitors.lua` by hand.
 - kanata's user unit needs the `input` and `uinput` groups plus a udev rule;
   the repo ships neither.
-- gnome-keyring is not unlocked by greetd's PAM stack, so `secret-tool`
-  prompts on first use.
+- Firewall: inbound is dropped by default. Ports a machine must expose go in
+  `/etc/nftables.d/local.nft`, then `sudo systemctl reload nftables`.

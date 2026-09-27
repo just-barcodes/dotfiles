@@ -1,0 +1,31 @@
+#!/bin/bash
+# Unlock gnome-keyring with the login password at the greetd prompt, the way
+# /etc/pam.d/sddm did. Without it secret-tool (GitHub PAT, mise token) prompts
+# on first use every session. Appends to the package-owned file instead of
+# replacing it, so pacman updates never produce a .pacnew for this.
+
+set -euo pipefail
+
+{{ if not (eq .chezmoi.osRelease.id "arch") -}}
+echo "Not running arch... exiting"
+exit 0
+{{ end -}}
+{{ if (dig "headless" false .) -}}
+echo "Headless host: skipping greetd keyring PAM setup"; exit 0
+{{ end -}}
+
+if [ ! -e /etc/pam.d/greetd ] || [ ! -e /usr/lib/security/pam_gnome_keyring.so ]; then
+	echo "greetd or pam_gnome_keyring not installed; skipping"
+	exit 0
+fi
+
+if grep -q pam_gnome_keyring /etc/pam.d/greetd; then
+	exit 0
+fi
+
+printf '%s\n' \
+	'# Added by chezmoi: .chezmoiscripts/run_onchange_after_install_pam_greetd_keyring.sh.tmpl' \
+	'auth       optional    pam_gnome_keyring.so' \
+	'session    optional    pam_gnome_keyring.so    auto_start' |
+	sudo tee -a /etc/pam.d/greetd >/dev/null
+echo "added pam_gnome_keyring to /etc/pam.d/greetd"

@@ -37,6 +37,9 @@ packages:
         - networkmanager
         - sudo
         - reflector # mirrorlist updater
+        - nftables # host firewall, run_onchange_after_install_nftables
+        - snapper # btrfs snapshots, run_onchange_after_setup_snapper (no-op on ext4)
+        - snap-pac # pacman pre/post snapshot hook
         - ex-vi-compat # ex/vi symlinks to vim
       base:
         - vim
