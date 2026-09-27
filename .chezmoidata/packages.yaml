@@ -21,7 +21,7 @@
 #     requires a recent glibc. Pacman ships it; apt extensive builds it with cargo.
 
 profiles:
-  desktop: [grub]
+  desktop: [grub, nvidia]
   laptop: [laptop]
   headless: []
 
@@ -39,6 +39,7 @@ packages:
         - reflector # mirrorlist updater
         - nftables # host firewall, run_onchange_after_install_nftables
         - snapper # btrfs snapshots, run_onchange_after_setup_snapper (no-op on ext4)
+        - btrfs-progs # btrfs userspace tools, needed by snapper/snap-pac
         - snap-pac # pacman pre/post snapshot hook
         - ex-vi-compat # ex/vi symlinks to vim
       base:
@@ -66,6 +67,7 @@ packages:
         - unzip
         - 7zip
         - zoxide # smarter cd
+        - atuin # shell history (dot_zshrc, run_onchange_import_atuin_history)
         - wl-clipboard # wl-copy / wl-paste
         - usbutils # lsusb
         - dosfstools # mkfs.fat / fsck.fat
@@ -116,6 +118,8 @@ packages:
         - grub
         - efibootmgr
         - os-prober # detect other OSes for grub
+      nvidia: # desktop only; open kernel modules for the RTX GPU
+        - nvidia-open
       laptop:
         - sof-firmware # Intel Sound Open Firmware audio
         - iio-sensor-proxy # accelerometer/ambient light sensors
@@ -161,6 +165,8 @@ packages:
         - docker-compose
         - docker-buildx
         - qemu-full # VM emulator with all targets
+        - ollama # local LLM runner
+        - ollama-cuda # CUDA backend for ollama (nvidia)
       apps:
         - firefox-developer-edition
         - chromium
@@ -168,11 +174,14 @@ packages:
         - libreoffice-fresh
         - spotify-launcher # downloads/updates the spotify client
         - obs-studio
+        - gimp # raster image editor
+        - inkscape # vector graphics editor
         - tailscale # mesh VPN
         - proton-vpn-gtk-app
         - proton-vpn-cli
         - flatpak
         - steam
+        - lutris # game launcher (wine/proton/emulators)
         - signal-desktop
         - vlc
         - vlc-plugin-ffmpeg
@@ -187,6 +196,7 @@ packages:
         - ntfs-3g # NTFS FUSE driver
         - wimlib # Windows WIM image tools
         - nwg-displays # GUI monitor layout editor
+        - chrony # NTP daemon; replaces systemd-timesyncd where enabled by hand
       intel-gpu:
         - vulkan-intel # Vulkan ICD for Intel iGPU; without it vulkan-icd-loader finds no device
         - vulkan-tools # vulkaninfo, to verify the ICD
@@ -224,6 +234,8 @@ packages:
         - ventoy-bin # multi-ISO bootable USB
       developer:
         - x11docker # run GUI apps in docker
+        - nats-cclient-git # NATS C client library
+        - python-fastmcp-slim # FastMCP, MCP servers in python
         - docker-sbx-bin # docker sandboxes (sbx) for AI agents; versioned tarball, unlike docker-sbx
         - headlamp-bin # kubernetes manage gui
         - semgrep-bin # static analysis
