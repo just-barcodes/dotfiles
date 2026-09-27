@@ -157,6 +157,7 @@ packages:
         - trivy # container/IaC vulnerability scanner
         - gitleaks # git secret scanner
         - worktrunk # git worktree manager for parallel agents
+        - openai-codex # OpenAI Codex CLI coding agent; no self-updater
         - luarocks # lua package manager
         - cmake
         - podman
@@ -241,6 +242,7 @@ packages:
         - semgrep-bin # static analysis
         - bruno-bin # API client (postman alternative)
         - stably-orca-bin # Orca agentic coding IDE; CLI symlinked as ~/.local/bin/orca-ide
+        - claude-code # Claude Code CLI; /usr/bin wrapper sets DISABLE_UPDATES=1, pacman owns updates
         - choosenim # nim toolchain installer
         - coder-bin # coder.com remote dev env CLI
         - podman-tui-bin # podman TUI
