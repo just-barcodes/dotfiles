@@ -1,0 +1,24 @@
+#!/bin/bash
+set -euo pipefail
+
+{{ if (dig "headless" false .) -}}
+echo "Headless host: skipping user dirs"; exit 0
+{{ end -}}
+
+mkdir -p \
+	"$HOME/Desktop" \
+	"$HOME/Downloads" \
+	"$HOME/Templates" \
+	"$HOME/Public" \
+	"$HOME/Documents" \
+	"$HOME/Music" \
+	"$HOME/Pictures" \
+	"$HOME/Videos" \
+	"$HOME/workspace"
+
+# Write ~/.config/user-dirs.dirs once on a fresh machine. Never run it again:
+# on later runs xdg-user-dirs-update disables (reassigns to $HOME/) any
+# configured dir that is missing instead of recreating it.
+if [ ! -f "${XDG_CONFIG_HOME:-$HOME/.config}/user-dirs.dirs" ] && command -v xdg-user-dirs-update >/dev/null 2>&1; then
+	xdg-user-dirs-update
+fi

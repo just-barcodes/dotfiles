@@ -73,7 +73,6 @@ Run it as your user, never with sudo. If a script fails, fix the cause and re-ru
 
 ```bash
 chsh -s /usr/bin/zsh
-xdg-user-dirs-update
 systemctl --failed; systemctl is-enabled greetd
 reboot
 ```
