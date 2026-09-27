@@ -76,6 +76,12 @@ packages:
         - openbsd-netcat # nc, walker socket in the launcher keybinding
         - figlet # ASCII banner text, sesh session scripts
         - xdg-user-dirs # ~/Desktop, ~/Downloads etc.
+        - rsync # file sync/copy
+        - man-pages # Linux man pages (man-db alone has none)
+        - smartmontools # smartctl, disk health
+        - nvme-cli # NVMe health and firmware
+        - qt5-wayland # Wayland backend for leftover Qt5 apps
+        - linux-headers # needed by any DKMS module
       hyprland:
         - hyprland
         - uwsm # universal wayland session manager, runs hyprland under systemd
@@ -118,13 +124,19 @@ packages:
         - grub
         - efibootmgr
         - os-prober # detect other OSes for grub
+        - grub-btrfs # boot snapper snapshots from the GRUB menu
       nvidia: # desktop only; open kernel modules for the RTX GPU
         - nvidia-open
+        - nvtop # GPU process monitor
+        - nvidia-settings # NVIDIA control panel
       laptop:
         - sof-firmware # Intel Sound Open Firmware audio
         - iio-sensor-proxy # accelerometer/ambient light sensors
         - fprintd # fingerprint reader
         - power-profiles-daemon # power profile switching
+        - powertop # power consumption diagnostics
+        - acpi # battery/thermal status CLI
+        - thermald # Intel thermal daemon
     paru:
       desktop:
         - walker # app launcher
@@ -187,6 +199,10 @@ packages:
         - vlc
         - vlc-plugin-ffmpeg
         - pavucontrol # pipewire/pulse GUI mixer
+        - kdenlive # video editor
+        - audacity # audio editor
+        - mediainfo # media file metadata
+        - telegram-desktop
       tools:
         - htop
         - tldr
@@ -199,11 +215,23 @@ packages:
         - android-tools # adb, fastboot
         - nwg-displays # GUI monitor layout editor
         - chrony # NTP daemon; replaces systemd-timesyncd where enabled by hand
+        - arch-audit # CVEs against installed packages
+        - lostfiles # find files not owned by any package
+        - btrfs-assistant # GUI for snapper and btrfs subvolumes
+        - gparted # partition editor GUI
+        - nmap # port scanner
+        - tcpdump # packet capture
+        - wireshark-qt # packet analyzer GUI
+        - mtr # traceroute + ping
+        - whois
+        - iperf3 # network throughput testing
+        - sshfs # mount remote dirs over SSH
       intel-gpu:
         - vulkan-intel # Vulkan ICD for Intel iGPU; without it vulkan-icd-loader finds no device
         - vulkan-tools # vulkaninfo, to verify the ICD
         - intel-media-driver # VA-API backend for Intel Gen8+ (hardware video decode in chromium/vlc/ffmpeg)
         - libva-utils # vainfo, to verify VA-API
+        - intel-gpu-tools # intel_gpu_top
       fonts:
         - ttf-fira-code
         - ttf-fira-mono
@@ -212,6 +240,12 @@ packages:
         - ttf-bitstream-vera
         - ttf-input-nerd
         - ttf-nerd-fonts-symbols-mono
+        - noto-fonts # base Noto; without it non-Latin text renders as boxes
+        - noto-fonts-cjk # Chinese/Japanese/Korean
+        - inter-font # UI font
+        - otf-font-awesome # icon font
+        - hunspell-en_us # spell check dictionary
+        - hunspell-de # spell check dictionary
       kde:
         - ark # archive manager
         - isoimagewriter # USB image writer
@@ -221,6 +255,16 @@ packages:
         - archlinux-xdg-menu # app menus for dolphin open-with
         - okular # PDF/document viewer
         - system-config-printer # printer setup GUI
+      security:
+        - keepassxc # password manager
+        - yubikey-manager # ykman
+        - pam-u2f # FIDO2 keys for PAM login/sudo
+        - libfido2 # FIDO2 tooling (fido2-token)
+      virtualization:
+        - virt-manager # VM GUI
+        - libvirt # VM management daemon
+        - dnsmasq # NAT networking for libvirt
+        - distrobox # containers as distros
     paru:
       apps:
         - google-chrome
@@ -234,6 +278,7 @@ packages:
         - jetbrains-toolbox
         - openshot-bin # video editor
         - ventoy-bin # multi-ISO bootable USB
+        - slack-desktop # Slack, official build repackaged
       developer:
         - x11docker # run GUI apps in docker
         - nats-cclient-git # NATS C client library

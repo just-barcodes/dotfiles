@@ -22,6 +22,8 @@ mise:
       argocd: { version: "3.4.5", desc: "Argo CD CLI" }
       terraform: { version: "1.15", desc: "infrastructure as code CLI" }
       cloudflared: { version: "2026.6.1", desc: "Cloudflare tunnel client" }
+      k9s: { version: latest, desc: "Kubernetes TUI" }
+      kubectx: { version: latest, desc: "switch kubectl contexts/namespaces (kubectx, kubens)" }
     developer:
       rust: { version: "1.97.0", desc: "Rust toolchain (rustc, cargo)" }
       devcontainer-cli: { version: latest, desc: "dev containers CLI; devcontainer-wrapper, tmux prefix+U" }
