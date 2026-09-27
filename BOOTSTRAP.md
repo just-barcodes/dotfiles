@@ -162,6 +162,17 @@ before relying on the machine.
 2. Age key + GitHub token for mise: README, "Mise GitHub token".
 3. GitHub MCP PAT in the keyring: README, "Claude Code GitHub MCP".
 
+## Maintenance
+
+```bash
+sudo pacman -Syu && sudo pacdiff     # upgrade, then merge any /etc/*.pacnew
+chezmoi update                       # pull the repo and apply
+pkgpick --drift                      # explicit packages missing from both lists
+```
+
+Unmerged `.pacnew` files silently keep old mirrorlists, locales and PAM
+defaults; `pacdiff` needs `DIFFPROG=nvim` or similar in the environment.
+
 ## Known gaps (not automated yet)
 
 - Monitor layout is machine-local: create `~/.config/hypr/monitors.lua` by hand.

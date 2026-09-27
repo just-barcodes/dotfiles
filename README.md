@@ -72,7 +72,7 @@ Mise hits the GitHub releases API to resolve version aliases (`stable`, `latest`
 
 How the token is stored:
 
-- The PAT lives at `dot_config/secrets/encrypted_private_github.env` in this repo as an **age-encrypted** shell fragment. The ciphertext is safe to commit and push.
+- The PAT lives at `dot_config/private_secrets/encrypted_private_github.env` in this repo as an **age-encrypted** shell fragment. The ciphertext is safe to commit and push.
 - On `chezmoi apply`, it decrypts to `~/.config/secrets/github.env` with mode `0600` using the age key at `~/.config/sops/age/keys.txt`.
 - The first line of `~/.zshrc` sources that file, so `$GITHUB_TOKEN` is set before mise's shim path is wired up. Mise reads `GITHUB_TOKEN` from its process env at API-call time (not from its `[env]` table — that table only forwards env to child processes mise launches, not to mise itself).
 
@@ -105,7 +105,7 @@ To rotate the token (or set it up on a brand-new machine that has the age key bu
 ```bash
 # In any shell with the age key present:
 read -rs T && printf 'export GITHUB_TOKEN=%q\nexport GITHUB_API_TOKEN="$GITHUB_TOKEN"\n' "$T" > /tmp/secrets.env && unset T
-chezmoi encrypt < /tmp/secrets.env > ~/.local/share/chezmoi/dot_config/secrets/encrypted_private_github.env
+chezmoi encrypt < /tmp/secrets.env > ~/.local/share/chezmoi/dot_config/private_secrets/encrypted_private_github.env
 shred -u /tmp/secrets.env
 chezmoi apply ~/.config/secrets
 ```
