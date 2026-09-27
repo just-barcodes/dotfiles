@@ -125,20 +125,31 @@ Add `rd.luks.options=tpm2-device=auto` to the kernel command line in
 `/boot/loader/entries/*.conf`. A firmware update changes PCR 7; re-run the
 `cryptenroll` line with `--wipe-slot=tpm2` first.
 
-## 9. Encrypted DNS (optional)
+## 9. DNS
+
+**Machines in the tailnet.** DNS policy lives in the Tailscale admin console,
+not on the machine: DNS → Nameservers → AdGuard Home's Tailscale IP, with
+"Override local DNS" on. AdGuard Home carries the encrypted upstreams. Then:
+
+```bash
+sudo tailscale set --accept-dns=true
+tailscale dns status
+```
+
+**Machines outside the tailnet** (work laptops) get AdGuard from DHCP at home
+and nothing elsewhere. For an encrypted, filtered resolver everywhere:
 
 ```bash
 sudo mkdir -p /etc/systemd/resolved.conf.d
 printf '[Resolve]
-DNS=9.9.9.9#dns.quad9.net 1.1.1.1#cloudflare-dns.com
+DNS=94.140.14.14#dns.adguard-dns.com 94.140.15.15#dns.adguard-dns.com
 DNSOverTLS=yes
 ' | sudo tee /etc/systemd/resolved.conf.d/dot.conf
 sudo systemctl enable --now systemd-resolved
 sudo ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 ```
 
-NetworkManager hands its DHCP DNS servers to resolved; the static ones above
-take over for DNS over TLS. Skip this if Tailscale MagicDNS is enough.
+Public AdGuard DNS uses its own blocklists, not the AdGuard Home rules.
 
 ## 10. Backups
 
