@@ -141,10 +141,7 @@ and nothing elsewhere. For an encrypted, filtered resolver everywhere:
 
 ```bash
 sudo mkdir -p /etc/systemd/resolved.conf.d
-printf '[Resolve]
-DNS=9.9.9.9#dns.quad9.net 149.112.112.112#dns.quad9.net
-DNSOverTLS=yes
-' | sudo tee /etc/systemd/resolved.conf.d/dot.conf
+printf '[Resolve]\nDNS=9.9.9.9#dns.quad9.net 149.112.112.112#dns.quad9.net\nDNSOverTLS=yes\n' | sudo tee /etc/systemd/resolved.conf.d/dot.conf
 sudo systemctl enable --now systemd-resolved
 sudo ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 ```
