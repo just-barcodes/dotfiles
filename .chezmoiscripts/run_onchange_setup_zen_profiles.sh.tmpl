@@ -6,6 +6,11 @@
 # directory is missing, and registering it makes the profile visible in the manager.
 #
 # Also seeds each profile with uBlock Origin and Vimium.
+#
+# zen-browser is an optional package installed after the first apply, so this is
+# run_onchange rather than run_once: the line below changes once the binary
+# appears, which re-triggers the script instead of leaving it skipped forever.
+# zen-browser: {{ lookPath "zen-browser" }}
 
 set -euo pipefail
 
