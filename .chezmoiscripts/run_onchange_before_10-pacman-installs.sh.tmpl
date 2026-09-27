@@ -10,19 +10,25 @@ echo "Not running arch... exiting"
 exit 0
 {{ end -}}
 
-{{- /* groups referenced by any machine are host-specific; skip them below */ -}}
-{{- $hostGroups := list -}}
-{{- range $_, $groups := .machines }}{{ $hostGroups = concat $hostGroups $groups }}{{ end -}}
+{{- $machine := dig "machine" "" . -}}
+{{- if eq $machine "" -}}
+echo "data.machine is not set; re-run 'chezmoi init' and pick the machine type" >&2
+exit 1
+{{ end -}}
+
+{{- /* groups referenced by any profile are profile-specific; skip them below */ -}}
+{{- $profileGroups := list -}}
+{{- range $_, $groups := .profiles }}{{ $profileGroups = concat $profileGroups $groups }}{{ end -}}
 
 PACKAGES=(
 {{ range $name, $pkgs := .packages.core.pacman -}}
-{{ if not (has $name $hostGroups) }}{{ range $pkgs }}	{{ . }}
+{{ if not (has $name $profileGroups) }}{{ range $pkgs }}	{{ . }}
 {{ end }}{{ end -}}
 {{ end -}}
-{{ range (index .machines .chezmoi.hostname) -}}
+{{ if ne $machine "" }}{{ range (index .profiles $machine) -}}
 {{ range (index $.packages.core.pacman .) }}	{{ . }}
 {{ end -}}
-{{ end -}}
+{{ end }}{{ end -}}
 )
 
 # No -y/-u on purpose: full upgrades have their own path. If a new package

@@ -1,36 +1,14 @@
-# chezmoi
+# dotfiles
 
-# TODO
+[chezmoi](https://www.chezmoi.io/) repo for an Arch Linux Hyprland desktop
+(Hyprland + Quickshell + greetd, Neovim, tmux, zsh, mise), with a reduced
+Debian/Ubuntu mode for Coder workspaces and agent VMs.
 
-sudo systemctl enable --now chronyd
-sudo systemctl enable --now bluetooth
-sudo systemctl enable --now greetd
-sudo systemctl enable --now power-profiles-daemon
-
-`/etc/greetd/config.toml`:
-
-```bash
-[terminal]
-# The VT to run the greeter on. Can be "next", "current" or a number
-# designating the VT.
-vt = 1
-
-# The default session, also known as the greeter.
-[default_session]
-
-# `agreety` is the bundled agetty/login-lookalike. You can replace `/bin/sh`
-# with whatever you want started, such as `sway`.
-command = "tuigreet --cmd start-hyprland"
-
-# The user to run the command as. The privileges this user must have depends
-# on the greeter. A graphical greeter may for example require the user to be
-# in the `video` group.
-user = "greeter"
-```
+New machine from bare metal: see [`BOOTSTRAP.md`](BOOTSTRAP.md).
 
 ## Install
 
-Pick the one-liner that matches the situation. All three pull this repo to `~/.local/share/chezmoi/` and apply it.
+Pick the one-liner that matches the situation. All three pull this repo to `~/.local/share/chezmoi/` and apply it. On Arch, `chezmoi init` asks once for the machine type (`desktop` or `laptop`); it selects the profile in `.chezmoidata/packages.yaml`. Answer it non-interactively with `--promptChoice "Machine type=laptop"`.
 
 **SSH (preferred — also pulls `dotfiles-private` for secrets/identities; requires an authorized SSH key):**
 
@@ -77,19 +55,16 @@ run, then hands over to pacman's own prompt.
 
 ## Mise-managed dev tools
 
-These dev CLIs are pinned in `dot_config/mise/config.toml` and installed by
-`.chezmoiscripts/run_onchange_mise_installs.sh.tmpl` on every `chezmoi apply`
-where the config changes: `node`, `kubectl`, `helm`, `argocd`, `terraform`,
-`cloudflared`, `direnv`, `opencode`, `task`, `gh`, `lazygit`, `lazydocker`,
-`yazi`, `age`, `sops`, `neovim`, `shellcheck`, `bat`, `yq`, `atuin`.
+`dot_config/mise/config.toml` pins the tools the dotfiles themselves need
+(`neovim`, `atuin`, `yazi`). `.chezmoiscripts/run_onchange_mise_installs.sh.tmpl`
+runs `mise install` and `mise upgrade` whenever that file changes. Everything
+else lives in `.chezmoidata/mise.yaml` and is picked with `misepick`, which
+writes to the unmanaged `~/.config/mise/conf.d/optional.toml`.
 
 Fast-moving tools (notably `neovim`) live in mise rather than apt/pacman so
-they stay current on LTS distros — apt's `neovim` is typically a year+ behind.
-
-`tree-sitter-cli` is the exception: the prebuilt binary requires a recent
-glibc and breaks on Debian/Ubuntu LTS. Arch installs it from pacman
-(`tree-sitter-cli` in `packages.pacman.developer`); the apt extensive flow
-runs `cargo install tree-sitter-cli` so it links the local glibc.
+they stay current on LTS distros. `tree-sitter-cli` is the exception: the
+prebuilt binary needs a recent glibc, so Arch installs it from pacman
+(`packages.optional`) and the apt extensive flow runs `cargo install`.
 
 ## Mise GitHub token — encrypted-at-rest setup
 

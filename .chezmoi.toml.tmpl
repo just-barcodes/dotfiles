@@ -12,6 +12,15 @@
 */ -}}
 {{- $agentvm := ne (env "DOTFILES_AGENTVM") "" -}}
 {{- $headless := or (ne (env "CODER_WORKSPACE_NAME") "") $agentvm -}}
+{{- /*
+  machine selects the profile in .chezmoidata/packages.yaml (`profiles:`).
+  Asked once on the first `chezmoi init`; pass
+  `--promptChoice "Machine type=laptop"` to answer it non-interactively.
+*/ -}}
+{{- $machine := "headless" -}}
+{{- if not $headless -}}
+{{-   $machine = promptChoiceOnce . "machine" "Machine type" (list "desktop" "laptop") -}}
+{{- end -}}
 {{- $privateDir := joinPath .chezmoi.homeDir ".config" "chezmoi-private" -}}
 {{- $repo := "git@github.com:just-barcodes/dotfiles-private.git" -}}
 {{- if stat $privateDir -}}
@@ -21,6 +30,7 @@
 {{- end }}
 data.headless = {{ $headless }}
 data.agentvm = {{ $agentvm }}
+data.machine = {{ $machine | quote }}
 {{- $privateConfig := joinPath $privateDir "chezmoi.toml" -}}
 {{- if stat $privateConfig }}
 {{ include $privateConfig }}

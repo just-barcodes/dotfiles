@@ -2,7 +2,7 @@
 # into the template context as top-level keys (`.packages`, `.machines`,
 # `.apt` from apt.yaml).
 #
-#   packages.core     installed by .chezmoiscripts/run_onchange_{pacman,paru}_installs.sh.tmpl
+#   packages.core     installed by .chezmoiscripts/run_onchange_before_{10-pacman,30-paru}-installs.sh.tmpl
 #                     on every apply. Keep this to what the Hyprland session and
 #                     chezmoi's own scripts need.
 #   packages.optional never installed automatically. Pick from them with
@@ -10,8 +10,8 @@
 #                     handles removal and drift detection (`pkgpick --drift`).
 #
 # Group names under core/optional are free-form; optional groups are shown in
-# the picker. Machine-specific core groups are selected via `machines:` keyed
-# by `.chezmoi.hostname`.
+# the picker. Profile-specific core groups are selected via `profiles:` keyed
+# by `.machine`, which `chezmoi init` asks for (see .chezmoi.toml.tmpl).
 #
 # Notes:
 #   - Fast-moving CLIs are managed by mise (see dot_config/mise/config.toml):
@@ -20,9 +20,10 @@
 #   - `tree-sitter-cli` is intentionally NOT in mise — the prebuilt binary
 #     requires a recent glibc. Pacman ships it; apt extensive builds it with cargo.
 
-machines:
-  samPC: []
-  samTPLinux: [laptop]
+profiles:
+  desktop: [grub]
+  laptop: [laptop]
+  headless: []
 
 packages:
   core:
@@ -33,9 +34,6 @@ packages:
         - linux-firmware
         - intel-ucode # CPU microcode, kernel loads whichever matches the CPU
         - amd-ucode
-        - grub
-        - efibootmgr
-        - os-prober # detect other OSes for grub
         - networkmanager
         - sudo
         - reflector # mirrorlist updater
@@ -70,6 +68,7 @@ packages:
         - dosfstools # mkfs.fat / fsck.fat
         - fwupd # firmware updates via LVFS
         - btop # autostarted on workspace 99
+        - openbsd-netcat # nc, walker socket in the launcher keybinding
         - figlet # ASCII banner text, sesh session scripts
         - xdg-user-dirs # ~/Desktop, ~/Downloads etc.
       hyprland:
@@ -110,6 +109,10 @@ packages:
         - ttf-nerd-fonts-symbols # symbols-only nerd font fallback
         - ttf-dejavu
         - noto-fonts-emoji
+      grub: # desktop only; the laptop boots with systemd-boot (archinstall)
+        - grub
+        - efibootmgr
+        - os-prober # detect other OSes for grub
       laptop:
         - sof-firmware # Intel Sound Open Firmware audio
         - iio-sensor-proxy # accelerometer/ambient light sensors
@@ -133,7 +136,7 @@ packages:
         - bluetuith # bluetooth TUI (tui-launcher)
         - wifitui # wifi TUI (tui-launcher)
         - pacsea-bin # package browser TUI (tui-launcher)
-        - paru # AUR helper, bootstrapped by run_once_install_paru.sh
+        - paru # AUR helper, bootstrapped by run_once_before_20-install-paru.sh
 
   optional:
     pacman:
@@ -175,7 +178,6 @@ packages:
         - htop
         - tldr
         - trash-cli # trash-put etc., rm alternative
-        - openbsd-netcat # nc
         - cups
         - cups-pdf # print-to-PDF backend
         - ntfsprogs # NTFS filesystem tools

@@ -5,7 +5,7 @@ local mainMod = "SUPER"
 local terminal = "ghostty"
 local fileManager = "dolphin"
 -- faster way to start walker via its socket; cannot run terminal commands
-local menu = "nc -U /run/user/1000/walker/walker.sock"
+local menu = 'nc -U "$XDG_RUNTIME_DIR/walker/walker.sock"'
 
 -- Switch to a workspace, launching the app if it has no window yet.
 -- Deliberately no `focus({window = selector})` afterwards: the workspace

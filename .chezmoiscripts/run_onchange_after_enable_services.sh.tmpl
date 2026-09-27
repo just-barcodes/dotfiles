@@ -1,0 +1,34 @@
+#!/bin/bash
+# Enable the system services the core packages provide. greetd has its own
+# script. `after_` so the packages are installed first; only enables units
+# that are not enabled yet, so a routine apply never restarts anything.
+
+set -euo pipefail
+
+{{ if not (eq .chezmoi.osRelease.id "arch") -}}
+echo "Not running arch... exiting"
+exit 0
+{{ end -}}
+{{ if (dig "headless" false .) -}}
+echo "Headless host: skipping service setup"; exit 0
+{{ end -}}
+
+# Time sync is left to archinstall (systemd-timesyncd); reflector.timer is
+# left off because it rewrites the mirrorlist on its own schedule.
+UNITS=(
+	NetworkManager.service
+	bluetooth.service
+	fstrim.timer
+	paccache.timer # weekly: drop cached packages beyond the last 3 versions
+	fwupd-refresh.timer # LVFS metadata, so fwupdmgr get-updates is current
+{{- if eq (dig "machine" "" .) "laptop" }}
+	power-profiles-daemon.service
+{{- end }}
+)
+
+for unit in "${UNITS[@]}"; do
+	if ! systemctl is-enabled --quiet "$unit" 2>/dev/null; then
+		sudo systemctl enable --now "$unit"
+		echo "enabled $unit"
+	fi
+done

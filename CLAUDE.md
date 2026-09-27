@@ -25,7 +25,7 @@ chezmoi apply ~/.config/ghostty/config.ghostty
 | `run_once_foo.sh`     | Run once ever (state tracked in chezmoi DB) |
 | `run_onchange_foo.sh` | Re-run whenever file content changes        |
 
-Templates use `.chezmoi.osRelease.id` (`"arch"`, `"ubuntu"`, etc.) for OS-specific branching and `.chezmoi.hostname` for machine-specific branching (current mapping lives in `.chezmoidata/packages.yaml` under `machines:`). Two boolean flags are set at `chezmoi init` time in `.chezmoi.toml.tmpl`: `headless` (Coder workspaces via `CODER_WORKSPACE_NAME`, agent VMs via `DOTFILES_AGENTVM`) skips package installs and desktop configs; `agentvm` additionally leaves `~/.claude/settings.json` to Orca.
+Templates use `.chezmoi.osRelease.id` (`"arch"`, `"ubuntu"`, etc.) for OS-specific branching and `.machine` (`"desktop"`, `"laptop"` or `"headless"`) for machine-specific branching; the profile-to-package-group mapping lives in `.chezmoidata/packages.yaml` under `profiles:`. `.machine` is asked once at `chezmoi init` (`promptChoiceOnce` in `.chezmoi.toml.tmpl`; `--promptChoice "Machine type=laptop"` answers it non-interactively). Two boolean flags are set there too: `headless` (Coder workspaces via `CODER_WORKSPACE_NAME`, agent VMs via `DOTFILES_AGENTVM`) skips package installs and desktop configs and forces `machine = "headless"`; `agentvm` additionally leaves `~/.claude/settings.json` to Orca.
 
 ## Essential commands
 
@@ -58,20 +58,15 @@ chezmoi state delete-bucket --bucket=scriptState
 - `dot_local/` — `~/.local/` (user binaries, systemd user units, etc.)
 - `dot_orca/` — `~/.orca/`: `keybindings.json` for the Orca agent IDE (the only Orca setting that is a plain file; everything else lives in `~/.config/orca/` and is edited in Orca's Settings UI) plus `orca.yaml.example`, a per-repo template to copy into a repo root.
 - `.chezmoiscripts/` — all `run_once_*` and `run_onchange_*` scripts live here. This is a chezmoi special directory: scripts run as normal, but the directory itself does not create a matching `~/.chezmoiscripts/` in the target. Notable contents:
-  - `run_onchange_pacman_installs.sh.tmpl` — installs `packages.core.pacman` from `.chezmoidata/packages.yaml` with `pacman -S --needed --noconfirm` (no `-Syu`; upgrades are a separate path). Groups named in the `machines:` map are host-specific and only installed on the matching `.chezmoi.hostname`.
-  - `run_onchange_paru_installs.sh.tmpl` — installs `packages.core.paru` (AUR) the same way.
+  - `run_onchange_before_10-pacman-installs.sh.tmpl` — installs `packages.core.pacman` from `.chezmoidata/packages.yaml` with `pacman -S --needed --noconfirm` (no `-Syu`; upgrades are a separate path). Groups named in the `profiles:` map are profile-specific and only installed for the matching `.machine`. Fails if `.machine` is unset (re-run `chezmoi init`).
+  - `run_once_before_20-install-paru.sh.tmpl`, `run_onchange_before_30-paru-installs.sh.tmpl` — build paru, then install `packages.core.paru` (AUR) the same way. The three `before_NN-` names pin the order pacman → paru → AUR packages ahead of every other script, so tool-dependent scripts (mise, fingerprint PAM, themes) find their tools on a fresh machine.
+  - `run_onchange_after_enable_services.sh.tmpl` — enables NetworkManager, bluetooth, the fstrim/paccache/fwupd-refresh timers (and power-profiles-daemon on laptops) if not already enabled. greetd is enabled by its own script; time sync stays with archinstall's systemd-timesyncd.
   - `run_onchange_apt_installs.sh.tmpl` — Debian/Ubuntu installer, rendered from `apt.minimal` in `.chezmoidata/apt.yaml`. When `aptExtensive = true` is set under `[data]` in `~/.config/chezmoi/chezmoi.toml`, also adds the mise apt repo and installs `apt.extensive` (which includes `mise`). No-op on non-Debian hosts.
   - `run_onchange_mise_installs.sh.tmpl` — runs `mise install` for the tools pinned in `dot_config/mise/config.toml` (re-triggers on that file's hash); no-op if mise isn't installed
-- `.chezmoidata/packages.yaml` — source of truth for Arch packages, plus the per-host `machines:` map. `packages.core.{pacman,paru}` is installed on every apply; `packages.optional.{pacman,paru}` is never installed automatically and is managed interactively with `dot_local/bin/executable_pkgpick` (fzf: install, guarded remove, `--drift` to find explicit packages missing from both lists). Edit the YAML (not the scripts) to add or remove packages; new non-essential packages go under `optional`.
+- `.chezmoidata/packages.yaml` — source of truth for Arch packages, plus the `profiles:` map (desktop/laptop/headless → core groups; `grub` is desktop-only, the laptop uses systemd-boot). `packages.core.{pacman,paru}` is installed on every apply; `packages.optional.{pacman,paru}` is never installed automatically and is managed interactively with `dot_local/bin/executable_pkgpick` (fzf: install, guarded remove, `--drift` to find explicit packages missing from both lists). Edit the YAML (not the scripts) to add or remove packages; new non-essential packages go under `optional`.
 - `.chezmoidata/mise.yaml` — optional mise tools (`mise.optional`), never installed automatically; picked with `dot_local/bin/executable_misepick`, which writes them to `~/.config/mise/conf.d/optional.toml` (unmanaged). Always-installed mise tools stay in `dot_config/mise/config.toml`. npm globals go through mise's `npm:` backend, not a separate list.
 - `.chezmoidata/apt.yaml` — Debian/Ubuntu package lists (`apt.minimal`, `apt.extensive`). Top-level keys must stay distinct from `packages.yaml` because chezmoi merges all `.chezmoidata/` files into one context.
 
 ## New machine bootstrap
 
-```bash
-sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply git@github.com:just-barcodes/dotfiles.git
-# reboot into Hyprland, then pick optional packages:
-pkgpick
-```
-
-Or use `install.sh` if the repo is already cloned locally. The first apply only installs `packages.core`; everything under `packages.optional` is installed on demand with `pkgpick`.
+See `BOOTSTRAP.md` (archinstall → `chezmoi init` → `chezmoi apply` → `pkgpick`). The first apply only installs `packages.core`; everything under `packages.optional` is installed on demand with `pkgpick`. `BOOTSTRAP.md`, `README.md` and `CLAUDE.md` are listed in `.chezmoiignore` so they never deploy to `~`.
