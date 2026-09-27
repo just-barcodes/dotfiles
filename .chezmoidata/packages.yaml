@@ -224,6 +224,7 @@ packages:
         - ventoy-bin # multi-ISO bootable USB
       developer:
         - x11docker # run GUI apps in docker
+        - docker-sbx-bin # docker sandboxes (sbx) for AI agents; versioned tarball, unlike docker-sbx
         - headlamp-bin # kubernetes manage gui
         - semgrep-bin # static analysis
         - bruno-bin # API client (postman alternative)
