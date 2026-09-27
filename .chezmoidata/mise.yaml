@@ -7,39 +7,40 @@
 # Always-installed tools live in dot_config/mise/config.toml. Renovate only
 # bumps pins there, so prefer loose specs ("latest", major) in this file.
 # Group names are free-form and shown in the picker. Backend prefixes such as
-# "npm:" are part of the tool name.
+# "npm:" are part of the tool name. Each tool is { version, desc }; desc is
+# shown in the picker since mise has no package descriptions of its own.
 mise:
   optional:
     build:
-      task: "3.52.0"
-      lefthook: latest
-      go: latest
-      hugo: latest
+      task: { version: "3.52.0", desc: "task runner (Taskfile.yml)" }
+      lefthook: { version: latest, desc: "git hooks manager" }
+      go: { version: latest, desc: "Go toolchain" }
+      hugo: { version: latest, desc: "static site generator" }
     kubernetes-cloud:
-      kubectl: "1.36"
-      helm: "4.2"
-      argocd: "3.4.5"
-      terraform: "1.15"
-      cloudflared: "2026.6.1"
+      kubectl: { version: "1.36", desc: "Kubernetes CLI" }
+      helm: { version: "4.2", desc: "Kubernetes package manager" }
+      argocd: { version: "3.4.5", desc: "Argo CD CLI" }
+      terraform: { version: "1.15", desc: "infrastructure as code CLI" }
+      cloudflared: { version: "2026.6.1", desc: "Cloudflare tunnel client" }
     developer:
-      rust: "1.97.0"
-      devcontainer-cli: latest # devcontainer-wrapper, tmux prefix+U
-      opencode: "1.15"
-      lazygit: "0.63.0" # nvim <leader>gl via snacks
-      lazydocker: "0.25"
-      yq: "4.53.3"
-      direnv: "2.37" # zshrc hook is guarded
-      uv: "0.11.28"
-      gh: "2"
-      shellcheck: "0.11.0"
-      bat: "0.26.1" # television previews (optional pacman package)
-      herdr: latest # agent workspace manager; theme-switch reloads it when running
+      rust: { version: "1.97.0", desc: "Rust toolchain (rustc, cargo)" }
+      devcontainer-cli: { version: latest, desc: "dev containers CLI; devcontainer-wrapper, tmux prefix+U" }
+      opencode: { version: "1.15", desc: "terminal AI coding agent" }
+      lazygit: { version: "0.63.0", desc: "git TUI; nvim <leader>gl via snacks" }
+      lazydocker: { version: "0.25", desc: "docker TUI" }
+      yq: { version: "4.53.3", desc: "YAML/JSON/XML processor" }
+      direnv: { version: "2.37", desc: "per-directory env loader; zshrc hook is guarded" }
+      uv: { version: "0.11.28", desc: "Python package and project manager" }
+      gh: { version: "2", desc: "GitHub CLI" }
+      shellcheck: { version: "0.11.0", desc: "shell script linter" }
+      bat: { version: "0.26.1", desc: "cat with syntax highlighting; television previews (optional pacman package)" }
+      herdr: { version: latest, desc: "agent workspace manager; theme-switch reloads it when running" }
     secrets:
-      age: "1.3"
-      sops: "3.13"
+      age: { version: "1.3", desc: "file encryption tool" }
+      sops: { version: "3.13", desc: "encrypted secrets file editor (age/KMS)" }
     npm:
-      node: "22" # runtime for the npm: tools below, pick it with them
-      "npm:@earendil-works/pi-coding-agent": latest # pi coding agent CLI
-      "npm:pnpm": latest
-      "npm:yarn": latest
-      "npm:hunkdiff": latest # terminal diff viewer for agent changesets
+      node: { version: "22", desc: "Node.js runtime for the npm: tools below, pick it with them" }
+      "npm:@earendil-works/pi-coding-agent": { version: latest, desc: "pi coding agent CLI" }
+      "npm:pnpm": { version: latest, desc: "fast npm alternative" }
+      "npm:yarn": { version: latest, desc: "npm alternative" }
+      "npm:hunkdiff": { version: latest, desc: "terminal diff viewer for agent changesets" }

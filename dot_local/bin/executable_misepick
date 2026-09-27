@@ -17,10 +17,10 @@ fi
 while :; do
 	installed=$(mise ls --json | jq -r 'to_entries[] | select(any(.value[]; .installed)) | .key')
 	rows=$(chezmoi data | jq -r '.mise.optional | to_entries[] as $g | $g.value | to_entries[]
-		| "\($g.key)\t\(.key)\t\(.value)"' |
-		while IFS=$'\t' read -r grp tool ver; do
+		| "\($g.key)\t\(.key)\t\(.value.version)\t\(.value.desc)"' |
+		while IFS=$'\t' read -r grp tool ver desc; do
 			if grep -qxF "$tool" <<<"$installed"; then mark="[x]"; else mark="[ ]"; fi
-			printf '%s %-16s %-40s %s\t%s\t%s\n' "$mark" "$grp" "$tool" "$ver" "$tool" "$ver"
+			printf '%s %-16s %-36s %-9s %s\t%s\t%s\n' "$mark" "$grp" "$tool" "$ver" "$desc" "$tool" "$ver"
 		done)
 
 	out=$(fzf --multi --layout=reverse --delimiter=$'\t' --with-nth=1 --expect=ctrl-r \
