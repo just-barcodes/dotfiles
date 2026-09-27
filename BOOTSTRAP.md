@@ -109,9 +109,20 @@ partition. `sbctl` signs them with your own keys; the TPM then releases the
 LUKS key only when the boot chain is unchanged, so the passphrase prompt goes
 away. Keep the passphrase slot as fallback.
 
+Setup mode has to be enabled in the UEFI firmware first; it cannot be done
+from Linux. Reboot into firmware setup (`systemctl reboot --firmware-setup`),
+find the Secure Boot section (usually under Security or Boot) and clear or
+delete the existing keys ("Clear Secure Boot keys", "Reset to Setup Mode",
+"Delete all Secure Boot variables"; some firmwares expose it under
+"Secure Boot Mode: Custom"). Leave Secure Boot itself enabled. If the option is
+missing, setting a supervisor password usually unlocks the submenu. After
+rebooting, `sbctl status` should show `Setup Mode: Enabled` and
+`Secure Boot: Disabled`; the latter flips to enabled once keys are enrolled and
+the binaries are signed.
+
 ```bash
 sudo pacman -S --needed sbctl
-sudo sbctl status                       # setup mode must be enabled in firmware first
+sudo sbctl status                       # expect Setup Mode: Enabled
 sudo sbctl create-keys && sudo sbctl enroll-keys -m
 sudo sbctl sign -s /boot/EFI/BOOT/BOOTX64.EFI
 sudo sbctl sign -s /boot/EFI/systemd/systemd-bootx64.efi
