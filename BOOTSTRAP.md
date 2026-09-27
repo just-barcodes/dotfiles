@@ -142,14 +142,15 @@ and nothing elsewhere. For an encrypted, filtered resolver everywhere:
 ```bash
 sudo mkdir -p /etc/systemd/resolved.conf.d
 printf '[Resolve]
-DNS=94.140.14.14#dns.adguard-dns.com 94.140.15.15#dns.adguard-dns.com
+DNS=9.9.9.9#dns.quad9.net 149.112.112.112#dns.quad9.net
 DNSOverTLS=yes
 ' | sudo tee /etc/systemd/resolved.conf.d/dot.conf
 sudo systemctl enable --now systemd-resolved
 sudo ln -sf /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 ```
 
-Public AdGuard DNS uses its own blocklists, not the AdGuard Home rules.
+Quad9 blocks malware domains only, not ads; the AdGuard Home rules apply
+only inside the tailnet.
 
 ## 10. Backups
 
