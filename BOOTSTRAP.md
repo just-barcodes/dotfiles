@@ -128,8 +128,12 @@ sudo sbctl sign -s /boot/EFI/BOOT/BOOTX64.EFI
 sudo sbctl sign -s /boot/EFI/systemd/systemd-bootx64.efi
 sudo sbctl sign -s /boot/EFI/Linux/arch-linux.efi   # the UKI; -s makes the pacman hook re-sign it
 sudo sbctl verify && reboot             # then confirm: bootctl status shows Secure Boot: enabled
-sudo systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=7 /dev/<luks-partition>
+sudo systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=7 /dev/<luks-device>
 ```
+
+`<luks-device>` is whatever `lsblk -f` labels `crypto_LUKS`. With archinstall's
+LVM layout the partition is an LVM PV and the LUKS container is the logical
+volume, so that is `/dev/mapper/ArchinstallVg-root`, not `/dev/nvme0n1p2`.
 
 The kernel command line is baked into the UKI from `/etc/kernel/cmdline`
 (there are no `/boot/loader/entries/*.conf`). Add
