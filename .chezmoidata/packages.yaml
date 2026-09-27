@@ -196,6 +196,7 @@ packages:
         - ntfsprogs # NTFS filesystem tools
         - ntfs-3g # NTFS FUSE driver
         - wimlib # Windows WIM image tools
+        - android-tools # adb, fastboot
         - nwg-displays # GUI monitor layout editor
         - chrony # NTP daemon; replaces systemd-timesyncd where enabled by hand
       intel-gpu:
