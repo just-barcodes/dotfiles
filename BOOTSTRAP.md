@@ -19,7 +19,7 @@ In the installer:
 | ---------------- | ----------------------------------------------------------- |
 | Disk             | the internal SSD only, best-effort layout, **btrfs**, subvolumes, compression |
 | Encryption       | LUKS on the Linux partition                                 |
-| Bootloader       | systemd-boot                                                |
+| Bootloader       | systemd-boot, unified kernel images on                      |
 | Kernel           | linux                                                       |
 | Profile          | Minimal                                                     |
 | Network          | NetworkManager                                              |
@@ -126,14 +126,16 @@ sudo sbctl status                       # expect Setup Mode: Enabled
 sudo sbctl create-keys && sudo sbctl enroll-keys -m
 sudo sbctl sign -s /boot/EFI/BOOT/BOOTX64.EFI
 sudo sbctl sign -s /boot/EFI/systemd/systemd-bootx64.efi
-sudo sbctl sign -s /boot/vmlinuz-linux
+sudo sbctl sign -s /boot/EFI/Linux/arch-linux.efi   # the UKI; -s makes the pacman hook re-sign it
 sudo sbctl verify && reboot             # then confirm: bootctl status shows Secure Boot: enabled
 sudo systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=7 /dev/<luks-partition>
 ```
 
-Add `rd.luks.options=tpm2-device=auto` to the kernel command line in
-`/boot/loader/entries/*.conf`. A firmware update changes PCR 7; re-run the
-`cryptenroll` line with `--wipe-slot=tpm2` first.
+The kernel command line is baked into the UKI from `/etc/kernel/cmdline`
+(there are no `/boot/loader/entries/*.conf`). Add
+`rd.luks.options=tpm2-device=auto` there and run `sudo mkinitcpio -P` to
+rebuild the UKI; the sbctl hook re-signs it. A firmware update changes PCR 7;
+re-run the `cryptenroll` line with `--wipe-slot=tpm2` first.
 
 ## 9. DNS
 
