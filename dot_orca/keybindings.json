@@ -18,15 +18,10 @@
       "tab.previousRecent": [],
       "tab.nextSameType": [],
       "tab.previousSameType": [],
-      "tab.nextAllTypes": [
-        "Mod+Tab",
-        "Alt+N"
-      ],
-      "tab.previousAllTypes": [
-        "Mod+Shift+Tab",
-        "Alt+P"
-      ],
-      "worktree.quickOpen": []
+      "tab.nextAllTypes": ["Mod+Tab", "Alt+N"],
+      "tab.previousAllTypes": ["Mod+Shift+Tab", "Alt+P"],
+      "sidebar.right.toggle": [],
+      "worktree.quickOpen": ["Mod+Shift+P"]
     },
     "darwin": {},
     "win32": {}
