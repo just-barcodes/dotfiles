@@ -13,6 +13,7 @@ set -euo pipefail
 
 if [ "${1:-}" = install ]; then
 	shift
+	echo "\$ paru -S --needed $*"
 	paru -S --needed "$@" || true
 	read -rsp $'\nPress Enter to close' _
 	exit 0
