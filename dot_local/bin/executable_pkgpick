@@ -6,7 +6,17 @@
 #                    skip their pause.
 #   pkgpick --drift  list explicitly installed packages that are in neither
 #                    packages.core nor packages.optional
+#   pkgpick install <pkg>...  install without the picker, then wait for Enter
+#                    (used by the walker "packages" menu, which runs it in a
+#                    terminal; paru's own prompt is the confirmation)
 set -euo pipefail
+
+if [ "${1:-}" = install ]; then
+	shift
+	paru -S --needed "$@" || true
+	read -rsp $'\nPress Enter to close' _
+	exit 0
+fi
 
 data=$(chezmoi data)
 core=$(jq -r '.packages.core[][][]' <<<"$data" | sort -u)

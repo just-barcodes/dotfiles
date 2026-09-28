@@ -30,6 +30,7 @@ page_up = ["Page_Up"]
 default = [
   "desktopapplications",
   "calc",
+  "menus:packages", # optional packages not installed (dot_config/elephant/menus)
   # "websearch",
   # "symbols",
   # "files",
