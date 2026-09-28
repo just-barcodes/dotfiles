@@ -1,0 +1,32 @@
+#!/bin/bash
+# Install the pacman hook arch-audit ships (but does not enable) so every
+# install/upgrade ends with a report of packages that have open CVEs.
+# arch-audit is an optional package (pkgpick); skips if it is not installed.
+# The next line changes the rendered hash when the package appears, so this
+# reruns after a later pkgpick install:
+# arch-audit: {{ lookPath "arch-audit" }}
+
+set -euo pipefail
+
+{{ if not (eq .chezmoi.osRelease.id "arch") -}}
+echo "Not running arch... exiting"
+exit 0
+{{ end -}}
+{{ if (dig "headless" false .) -}}
+echo "Headless host: skipping arch-audit hook"; exit 0
+{{ end -}}
+
+SRC=/usr/share/arch-audit/arch-audit.hook
+DST=/etc/pacman.d/hooks/arch-audit.hook
+
+if [ ! -e "$SRC" ]; then
+	echo "arch-audit not installed; skipping"
+	exit 0
+fi
+
+if [ -e "$DST" ] && cmp -s "$SRC" "$DST"; then
+	exit 0
+fi
+
+sudo install -Dm644 "$SRC" "$DST"
+echo "installed $DST"
