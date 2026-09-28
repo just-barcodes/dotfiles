@@ -124,7 +124,7 @@ packages:
         - grub
         - efibootmgr
         - os-prober # detect other OSes for grub
-        - grub-btrfs # boot snapper snapshots from the GRUB menu
+        - grub-btrfs # boot snapper snapshots from the GRUB menu; pacman hook regenerates the menu, grub-btrfsd.service (auto-refresh on new snapshots) is optional and not enabled
       nvidia: # desktop only; open kernel modules for the RTX GPU
         - nvidia-open
         - nvtop # GPU process monitor
