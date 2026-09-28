@@ -23,6 +23,7 @@ UNITS=(
 	fwupd-refresh.timer # LVFS metadata, so fwupdmgr get-updates is current
 {{- if eq (dig "machine" "" .) "laptop" }}
 	power-profiles-daemon.service
+	thermald.service # Intel thermal management
 {{- end }}
 )
 
