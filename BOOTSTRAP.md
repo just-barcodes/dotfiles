@@ -90,17 +90,12 @@ misepick     # extra dev CLIs
 If the session does not start: `Ctrl+Alt+F3`, then
 `journalctl -b -u greetd` and `journalctl --user -b -p warning`.
 
-## 7. Mirrors (optional)
+## 7. Mirrors
 
-`reflector` is in core but its timer is not enabled, because it rewrites
-`/etc/pacman.d/mirrorlist` on its own schedule. To let it, set the countries
-in `/etc/xdg/reflector/reflector.conf` (the default is the 5 freshest mirrors
-worldwide) and enable it:
-
-```bash
-sudo reflector --country Switzerland,Germany --protocol https --latest 10 --sort rate --save /etc/pacman.d/mirrorlist
-sudo systemctl enable --now reflector.timer   # weekly, uses the .conf, not the flags above
-```
+`run_onchange_after_setup_reflector.sh.tmpl` writes
+`/etc/xdg/reflector/reflector.conf` (https mirrors in AT/CH/DE/FR, sorted by
+rate) and enables `reflector.timer`, which rewrites `/etc/pacman.d/mirrorlist`
+weekly. To refresh by hand: `sudo systemctl start reflector.service`.
 
 ## 8. Secure Boot and TPM unlock (laptop, after the first successful boot)
 

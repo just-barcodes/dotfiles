@@ -14,7 +14,7 @@ echo "Headless host: skipping service setup"; exit 0
 {{ end -}}
 
 # Time sync is left to archinstall (systemd-timesyncd); reflector.timer is
-# left off because it rewrites the mirrorlist on its own schedule.
+# enabled by run_onchange_after_setup_reflector together with its config.
 UNITS=(
 	NetworkManager.service
 	bluetooth.service

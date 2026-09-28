@@ -1,0 +1,39 @@
+#!/bin/bash
+# Keep /etc/pacman.d/mirrorlist fresh: write the reflector config and enable
+# reflector.timer (weekly). Only rewrites the config when it differs, and
+# refreshes the mirrorlist right away in that case.
+
+set -euo pipefail
+
+{{ if not (eq .chezmoi.osRelease.id "arch") -}}
+echo "Not running arch... exiting"
+exit 0
+{{ end -}}
+{{ if (dig "headless" false .) -}}
+echo "Headless host: skipping reflector setup"; exit 0
+{{ end -}}
+
+if ! command -v reflector >/dev/null; then
+	echo "reflector not installed; skipping"
+	exit 0
+fi
+
+CONFIG='# Managed by chezmoi: .chezmoiscripts/run_onchange_after_setup_reflector.sh.tmpl
+--save /etc/pacman.d/mirrorlist
+--protocol https
+--country Austria,France,Germany,Switzerland
+--age 18
+--sort rate'
+
+DST=/etc/xdg/reflector/reflector.conf
+if [ "$(cat "$DST" 2>/dev/null)" != "$CONFIG" ]; then
+	printf '%s\n' "$CONFIG" | sudo tee "$DST" >/dev/null
+	echo "installed $DST"
+	sudo systemctl start reflector.service
+	echo "mirrorlist refreshed"
+fi
+
+if ! systemctl is-enabled --quiet reflector.timer 2>/dev/null; then
+	sudo systemctl enable --now reflector.timer
+	echo "reflector.timer enabled"
+fi

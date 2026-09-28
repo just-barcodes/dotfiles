@@ -63,6 +63,8 @@ packages:
         - mise
         - usage # CLI spec tool, mise completions
         - pacman-contrib # pactree, for pkgpick removal checks
+        - rebuild-detector # checkrebuild: AUR packages linked against removed sonames
+        - informant # pacman hook, blocks upgrades until Arch news is read (informant read)
         - zip
         - unzip
         - 7zip
@@ -99,7 +101,8 @@ packages:
         - ghostty
         - grim # Wayland screenshots
         - slurp # region selector for grim
-        - swappy # screenshot annotation editor
+        - satty # screenshot annotation editor
+        - swayimg # image viewer
         - brightnessctl # backlight control CLI
         - playerctl # media keys (XF86Audio* keybindings)
         - network-manager-applet # nm-applet / nm-connection-editor
@@ -108,7 +111,6 @@ packages:
         - pipewire-alsa
         - pipewire-pulse
         - pipewire-jack # JACK API compatibility
-        - pipewire-zeroconf # mDNS audio device discovery
         - wireplumber # pipewire session manager
         - alsa-utils # alsamixer, aplay
         - pulsemixer # pipewire/pulse TUI mixer (tui-launcher)
@@ -119,6 +121,7 @@ packages:
         - ttf-firacode-nerd # ghostty font, first monospace preference in fontconfig
         - ttf-nerd-fonts-symbols # symbols-only nerd font fallback
         - ttf-dejavu
+        - noto-fonts # base Noto; without it non-Latin text renders as boxes
         - noto-fonts-emoji
       grub: # desktop only; the laptop boots with systemd-boot (archinstall)
         - grub
@@ -129,6 +132,7 @@ packages:
         - nvidia-open
         - nvtop # GPU process monitor
         - nvidia-settings # NVIDIA control panel
+        - libva-nvidia-driver # VA-API on NVIDIA (hardware video decode in chromium/vlc/ffmpeg)
       laptop:
         - sof-firmware # Intel Sound Open Firmware audio
         - iio-sensor-proxy # accelerometer/ambient light sensors
@@ -211,6 +215,7 @@ packages:
         - cups-pdf # print-to-PDF backend
         - ntfsprogs # NTFS filesystem tools
         - ntfs-3g # NTFS FUSE driver
+        - exfatprogs # exFAT filesystem tools, USB sticks
         - wimlib # Windows WIM image tools
         - android-tools # adb, fastboot
         - nwg-displays # GUI monitor layout editor
@@ -240,7 +245,6 @@ packages:
         - ttf-bitstream-vera
         - ttf-input-nerd
         - ttf-nerd-fonts-symbols-mono
-        - noto-fonts # base Noto; without it non-Latin text renders as boxes
         - noto-fonts-cjk # Chinese/Japanese/Korean
         - inter-font # UI font
         - otf-font-awesome # icon font
@@ -252,6 +256,8 @@ packages:
         - kcalc # calculator
         - dolphin # file manager
         - dolphin-plugins
+        - ffmpegthumbs # video thumbnails in dolphin
+        - kdegraphics-thumbnailers # PDF/image thumbnails in dolphin
         - archlinux-xdg-menu # app menus for dolphin open-with
         - okular # PDF/document viewer
         - system-config-printer # printer setup GUI

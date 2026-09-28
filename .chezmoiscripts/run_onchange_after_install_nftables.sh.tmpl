@@ -34,7 +34,7 @@ table inet filter {
     ct state { established, related } accept
     iif lo accept
     meta l4proto { icmp, icmpv6 } accept
-    udp dport 5353 accept comment "mDNS: printers, casting, pipewire-zeroconf"
+    udp dport 5353 accept comment "mDNS: printers, casting"
     ip6 saddr fe80::/10 udp dport 546 accept comment "DHCPv6 client"
     iifname "tailscale0" accept comment "tailnet peers"
     udp dport 41641 accept comment "tailscale direct connections"

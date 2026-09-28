@@ -1,0 +1,23 @@
+#!/bin/bash
+# Put the user in the informant group so `informant read` works without sudo.
+# informant is a core package; the group is created by its package install.
+
+set -euo pipefail
+
+{{ if not (eq .chezmoi.osRelease.id "arch") -}}
+echo "Not running arch... exiting"
+exit 0
+{{ end -}}
+{{ if (dig "headless" false .) -}}
+echo "Headless host: skipping informant group"; exit 0
+{{ end -}}
+
+if ! getent group informant >/dev/null; then
+	echo "informant group missing (package not installed?); skipping"
+	exit 0
+fi
+
+if ! id -nG "$USER" | tr ' ' '\n' | grep -qx informant; then
+	sudo usermod -aG informant "$USER"
+	echo "added $USER to informant group (takes effect at next login)"
+fi
