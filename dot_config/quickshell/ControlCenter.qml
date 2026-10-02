@@ -76,6 +76,9 @@ PanelWindow {
                 Notifications.clearAll();
                 root.shown = false;
                 event.accepted = true;
+            } else if (event.key === Qt.Key_D && (event.modifiers & Qt.ControlModifier)) {
+                Notifications.toggleDnd();
+                event.accepted = true;
             }
         }
 
