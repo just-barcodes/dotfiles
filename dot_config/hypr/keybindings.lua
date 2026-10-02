@@ -29,6 +29,43 @@ local function bind_app_workspace(key, workspace, selector, launch_cmd, rule)
 	hl.bind("SUPER + ALT + SHIFT + " .. key:lower(), hl.dsp.window.move({ workspace = workspace, follow = false }))
 end
 
+local function file_exists(path)
+	local f = io.open(path, "r")
+	if f then
+		f:close()
+	end
+	return f ~= nil
+end
+
+-- Group on open instead of a `group = "set"` rule: that rule only merges the
+-- second window if the first one's group is focused when it maps, which
+-- depends on launch timing. Here a later window matching <is_member> joins
+-- the earlier one on <workspace>.
+local function group_on_open(workspace, is_member)
+	hl.on("window.open", function(w)
+		if not (w and is_member(w) and not w.group and w.workspace and w.workspace.id == workspace) then
+			return
+		end
+		for _, other in ipairs(w.workspace:get_windows()) do
+			if other.address ~= w.address and is_member(other) then
+				local g = other.group
+				if not g then
+					hl.dispatch(hl.dsp.focus({ window = "address:" .. other.address }))
+					hl.dispatch(hl.dsp.group.toggle())
+					local active = hl.get_active_window()
+					g = active and active.group
+				end
+				if g then
+					g:add(w)
+				end
+				-- group:add() drops keyboard focus entirely (active window becomes nil)
+				hl.dispatch(hl.dsp.focus({ window = "address:" .. w.address }))
+				return
+			end
+		end
+	end)
+end
+
 ----------------------------------------------------------------
 -- Misc
 ----------------------------------------------------------------
@@ -247,13 +284,39 @@ bind_app_workspace("Y", 95, "class:^YOUTUBE$", "gtk-launch youtube", {
 })
 
 ----------------------------------------------------------------
--- Teams (T / 91)
+-- Chat / Teams + Slack (T / 91)
+-- each app launches only if installed; tabbed group only when both are
 ----------------------------------------------------------------
-bind_app_workspace("T", 91, "class:^chrome-teams\\.microsoft\\.com.*$", "gtk-launch teams", {
+local has_teams = file_exists(os.getenv("HOME") .. "/.local/share/applications/teams.desktop")
+	and file_exists("/usr/bin/chromium")
+local has_slack = file_exists("/usr/bin/slack")
+
+hl.bind("SUPER + ALT + T", function()
+	hl.dispatch(hl.dsp.focus({ workspace = 91, on_current_monitor = true }))
+	if has_teams and not hl.get_window("class:^chrome-teams\\.microsoft\\.com.*$") then
+		hl.exec_cmd("gtk-launch teams")
+	end
+	if has_slack and not hl.get_window("class:^Slack$") then
+		hl.exec_cmd("slack")
+	end
+end)
+hl.window_rule({
 	name = "windowrule-teams",
 	match = { class = "^chrome-teams\\.microsoft\\.com.*$" },
 	workspace = "91",
 })
+hl.window_rule({
+	name = "windowrule-slack",
+	match = { class = "^Slack$" },
+	workspace = "91",
+})
+hl.bind("SUPER + ALT + SHIFT + t", hl.dsp.window.move({ workspace = 91, follow = false }))
+
+if has_teams and has_slack then
+	group_on_open(91, function(w)
+		return w.class == "Slack" or w.class:find("^chrome%-teams%.microsoft%.com") ~= nil
+	end)
+end
 
 ----------------------------------------------------------------
 -- Tasks / Donetick + Tududi (P / 40)
@@ -286,13 +349,6 @@ hl.bind("SUPER + ALT + SHIFT + p", hl.dsp.window.move({ workspace = 40, follow =
 -- Email / Proton Mail + Outlook (U / 90)
 -- each app launches only if installed; tabbed group only when both are
 ----------------------------------------------------------------
-local function file_exists(path)
-	local f = io.open(path, "r")
-	if f then
-		f:close()
-	end
-	return f ~= nil
-end
 local has_proton_mail = file_exists("/usr/bin/proton-mail")
 local has_outlook = file_exists(os.getenv("HOME") .. "/.local/share/applications/outlook.desktop")
 	and file_exists("/usr/bin/chromium")
@@ -318,38 +374,10 @@ hl.window_rule({
 })
 hl.bind("SUPER + ALT + SHIFT + u", hl.dsp.window.move({ workspace = 90, follow = false }))
 
--- Group on open instead of a `group = "set"` rule: that rule only merges the
--- second window if the first one's group is focused when it maps, which
--- depends on launch timing. Here the later window joins the earlier one.
-local function is_mail(w)
-	return w.class == "Proton Mail" or w.class == "proton-mail" or w.class:find("^chrome%-outlook%.office%.com") ~= nil
-end
-
-local function group_mail_window(w)
-	if not (w and is_mail(w) and not w.group and w.workspace and w.workspace.id == 90) then
-		return
-	end
-	for _, other in ipairs(w.workspace:get_windows()) do
-		if other.address ~= w.address and is_mail(other) then
-			local g = other.group
-			if not g then
-				hl.dispatch(hl.dsp.focus({ window = "address:" .. other.address }))
-				hl.dispatch(hl.dsp.group.toggle())
-				local active = hl.get_active_window()
-				g = active and active.group
-			end
-			if g then
-				g:add(w)
-			end
-			-- group:add() drops keyboard focus entirely (active window becomes nil)
-			hl.dispatch(hl.dsp.focus({ window = "address:" .. w.address }))
-			return
-		end
-	end
-end
-
 if has_proton_mail and has_outlook then
-	hl.on("window.open", group_mail_window)
+	group_on_open(90, function(w)
+		return w.class == "Proton Mail" or w.class == "proton-mail" or w.class:find("^chrome%-outlook%.office%.com") ~= nil
+	end)
 end
 
 ----------------------------------------------------------------
