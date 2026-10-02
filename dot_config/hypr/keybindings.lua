@@ -284,30 +284,73 @@ hl.bind("SUPER + ALT + SHIFT + p", hl.dsp.window.move({ workspace = 40, follow =
 
 ----------------------------------------------------------------
 -- Email / Proton Mail + Outlook (U / 90)
--- tabbed group
+-- each app launches only if installed; tabbed group only when both are
 ----------------------------------------------------------------
+local function file_exists(path)
+	local f = io.open(path, "r")
+	if f then
+		f:close()
+	end
+	return f ~= nil
+end
+local has_proton_mail = file_exists("/usr/bin/proton-mail")
+local has_outlook = file_exists(os.getenv("HOME") .. "/.local/share/applications/outlook.desktop")
+	and file_exists("/usr/bin/chromium")
+
 hl.bind("SUPER + ALT + U", function()
 	hl.dispatch(hl.dsp.focus({ workspace = 90, on_current_monitor = true }))
-	if not hl.get_window("class:^Proton Mail$") then
+	if has_proton_mail and not hl.get_window("class:^(Proton Mail|proton-mail)$") then
 		hl.exec_cmd("proton-mail")
 	end
-	if not hl.get_window("class:^chrome-outlook\\.office\\.com.*$") then
+	if has_outlook and not hl.get_window("class:^chrome-outlook\\.office\\.com.*$") then
 		hl.exec_cmd("gtk-launch outlook")
 	end
 end)
 hl.window_rule({
 	name = "windowrule-proton-mail",
-	match = { class = "^(Proton Mail)$" },
+	match = { class = "^(Proton Mail|proton-mail)$" },
 	workspace = "90",
-	group = "set",
 })
 hl.window_rule({
 	name = "windowrule-outlook",
 	match = { class = "^chrome-outlook\\.office\\.com.*$" },
 	workspace = "90",
-	group = "set",
 })
 hl.bind("SUPER + ALT + SHIFT + u", hl.dsp.window.move({ workspace = 90, follow = false }))
+
+-- Group on open instead of a `group = "set"` rule: that rule only merges the
+-- second window if the first one's group is focused when it maps, which
+-- depends on launch timing. Here the later window joins the earlier one.
+local function is_mail(w)
+	return w.class == "Proton Mail" or w.class == "proton-mail" or w.class:find("^chrome%-outlook%.office%.com") ~= nil
+end
+
+local function group_mail_window(w)
+	if not (w and is_mail(w) and not w.group and w.workspace and w.workspace.id == 90) then
+		return
+	end
+	for _, other in ipairs(w.workspace:get_windows()) do
+		if other.address ~= w.address and is_mail(other) then
+			local g = other.group
+			if not g then
+				hl.dispatch(hl.dsp.focus({ window = "address:" .. other.address }))
+				hl.dispatch(hl.dsp.group.toggle())
+				local active = hl.get_active_window()
+				g = active and active.group
+			end
+			if g then
+				g:add(w)
+			end
+			-- group:add() drops keyboard focus entirely (active window becomes nil)
+			hl.dispatch(hl.dsp.focus({ window = "address:" .. w.address }))
+			return
+		end
+	end
+end
+
+if has_proton_mail and has_outlook then
+	hl.on("window.open", group_mail_window)
+end
 
 ----------------------------------------------------------------
 -- Lazydocker (D / 98)
