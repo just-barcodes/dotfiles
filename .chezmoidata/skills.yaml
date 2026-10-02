@@ -1,0 +1,13 @@
+# Agent skills installed globally with the skills.sh CLI (`npx skills`) by
+# .chezmoiscripts/run_onchange_install_agent_skills.sh.tmpl. The canonical
+# copy lands in ~/.agents/skills and is symlinked into every agent dir listed
+# under `agents` (~/.claude/skills, ~/.codex/skills, ~/.config/opencode/skills).
+# Orca's Skills page scans those folders, so everything here shows up there.
+#
+# `source` is anything `npx skills add` accepts (owner/repo, GitHub URL).
+# `skills` defaults to all skills in the source; set a list to pick a subset.
+# Removing an entry does not uninstall it; use `npx skills remove`.
+skills:
+  agents: [claude-code, codex, opencode]
+  core:
+    - source: mattpocock/skills

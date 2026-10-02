@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Install the agent skills listed in .chezmoidata/skills.yaml via the
+# skills.sh CLI. Re-runs whenever that list changes (the loop is unrolled at
+# template time, so the rendered script content changes with the YAML).
+set -euo pipefail
+
+export PATH="$HOME/.local/share/mise/shims:$PATH"
+
+if ! command -v npx >/dev/null 2>&1; then
+	echo "npx not found; skipping agent skill install"
+	exit 0
+fi
+
+# --agent and --skill take space-separated lists.
+agents={{ join " " .skills.agents | quote }}
+{{ range .skills.core }}
+# shellcheck disable=SC2086
+npx -y skills add {{ .source | quote }} --global --yes --agent $agents \
+	--skill{{ range (index . "skills" | default (list "*")) }} {{ . | quote }}{{ end }}
+{{- end }}
+
+# Move already-installed global skills to their latest versions.
+npx -y skills update --global --yes
