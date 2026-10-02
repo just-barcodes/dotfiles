@@ -1,0 +1,188 @@
+#!/usr/bin/env bash
+# chezmoi modify_ script for ~/.claude/settings.json.
+#
+# Claude Code (permission prompts, /config) and Orca (its own hook entries)
+# both write to this file, so chezmoi does not own it outright. This script
+# gets the live file on stdin and prints it back with only the managed keys
+# below enforced:
+#   - objects in $managed are deep-merged (live-only keys survive)
+#   - permissions.allow is the union of live and managed; deny is replaced
+#   - one "sm hook claude" group is ensured per event; other hook groups
+#     (Orca's) are left alone
+#   - everything else (model, theme, autoMode, ...) is live-owned
+# Output is key-sorted (jq -S) so re-applies are byte-stable.
+set -euo pipefail
+
+managed=$(cat <<'EOF'
+{
+  "cleanupPeriodDays": 90,
+  "includeGitInstructions": false,
+  "statusLine": {
+    "type": "command",
+    "command": "bash {{ .chezmoi.homeDir }}/.claude/statusline-command.sh"
+  },
+  "enabledPlugins": {
+    "lua-lsp@claude-plugins-official": true,
+    "dev-team@bfinster": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "gopls-lsp@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "bfinster": {
+      "source": {
+        "source": "git",
+        "url": "https://github.com/bdfinst/agentic-dev-team.git"
+      }
+    }
+  },
+  "permissions": {
+    "allow": [
+      "Read",
+      "Grep",
+      "Glob",
+
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git branch:*)",
+      "Bash(git blame:*)",
+      "Bash(git stash list:*)",
+      "Bash(git remote -v)",
+
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(wc:*)",
+      "Bash(pwd)",
+      "Bash(which:*)",
+      "Bash(file:*)",
+      "Bash(rg:*)",
+      "Bash(fd:*)",
+      "Bash(jq:*)",
+      "Bash(stat:*)",
+      "Bash(realpath:*)",
+      "Bash(readlink:*)",
+      "Bash(basename:*)",
+      "Bash(dirname:*)",
+
+      "Bash(echo:*)",
+      "Bash(printf:*)",
+      "Bash(env)",
+      "Bash(uname:*)",
+      "Bash(hostname)",
+      "Bash(whoami)",
+      "Bash(id:*)",
+      "Bash(uptime)",
+      "Bash(groups)",
+      "Bash(date:*)",
+      "Bash(sort:*)",
+      "Bash(uniq:*)",
+      "Bash(tr:*)",
+      "Bash(cut:*)",
+      "Bash(test:*)",
+      "Bash(true)",
+      "Bash(false)",
+
+      "Bash(df:*)",
+      "Bash(du:*)",
+      "Bash(free:*)",
+      "Bash(ps:*)",
+      "Bash(ss:*)",
+
+      "Bash(dig:*)",
+      "Bash(host:*)",
+      "Bash(nslookup:*)",
+      "Bash(ping:*)",
+
+      "Bash(chezmoi diff:*)",
+      "Bash(chezmoi status:*)",
+      "Bash(chezmoi data:*)",
+      "Bash(chezmoi managed:*)",
+      "Bash(chezmoi execute-template:*)",
+
+      "Bash(pacman -Q:*)",
+      "Bash(pacman -Qi:*)",
+      "Bash(pacman -Qs:*)",
+      "Bash(pacman -Si:*)",
+      "Bash(pacman -Ss:*)",
+      "Bash(pacman -F:*)",
+      "Bash(paru -Q:*)",
+      "Bash(paru -Qi:*)",
+      "Bash(paru -Ss:*)",
+      "Bash(paru -Si:*)",
+
+      "Bash(mise ls:*)",
+      "Bash(mise current:*)",
+      "Bash(mise where:*)",
+      "Bash(mise env:*)",
+      "Bash(mise doctor)",
+
+      "Bash(podman ps:*)",
+      "Bash(podman images:*)",
+      "Bash(podman inspect:*)",
+      "Bash(podman logs:*)",
+      "Bash(docker ps:*)",
+      "Bash(docker images:*)",
+      "Bash(docker inspect:*)",
+      "Bash(docker logs:*)",
+
+      "Bash(gh pr view:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh issue view:*)",
+      "Bash(gh issue list:*)",
+      "Bash(gh repo view:*)",
+      "Bash(gh auth status)",
+
+      "Bash(tmux ls)",
+      "Bash(tmux list-sessions:*)",
+      "Bash(tmux list-windows:*)",
+      "Bash(tmux display-message:*)",
+      "Bash(sesh list:*)",
+      "Bash(atuin search:*)",
+      "Bash(atuin stats:*)",
+
+      "Bash(hyprctl clients)",
+      "Bash(hyprctl monitors)",
+      "Bash(hyprctl getoption:*)",
+      "Bash(systemctl status:*)",
+      "Bash(systemctl --user status:*)",
+      "Bash(journalctl:*)"
+    ],
+    "deny": [
+      "Bash(rm -rf /:*)",
+      "Bash(sudo rm -rf /:*)",
+      "Bash(dd:*)",
+      "Bash(mkfs:*)",
+      "Bash(mkfs.*:*)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(chezmoi purge:*)",
+      "Bash(pacman -Rsn:*)",
+      "Bash(sudo pacman -R:*)",
+      "Bash(paru -R:*)"
+    ]
+  },
+  "spinnerTipsEnabled": false,
+  "editorMode": "vim",
+  "preferredNotifChannel": "notifications_disabled",
+  "remoteControlAtStartup": true,
+  "agentPushNotifEnabled": false
+}
+EOF
+)
+
+input=$(cat)
+[ -n "$input" ] || input='{}'
+
+jq -S --argjson m "$managed" '
+  def sm_group: {"hooks": [{"type": "command", "command": "sm hook claude"}]};
+  def is_sm: any(.hooks[]?; .command == "sm hook claude");
+  . * ($m | del(.permissions))
+  | .permissions.allow = (((.permissions.allow // []) + $m.permissions.allow) | unique)
+  | .permissions.deny = $m.permissions.deny
+  | reduce ("SessionStart", "UserPromptSubmit", "PreToolUse", "Notification", "Stop", "SessionEnd") as $ev
+      (.; .hooks[$ev] = ([sm_group] + ((.hooks[$ev] // []) | map(select(is_sm | not)))))
+' <<<"$input"
