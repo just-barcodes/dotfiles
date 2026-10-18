@@ -35,3 +35,5 @@ x-scheme-handler/http=firefox-developer-edition.desktop
 x-scheme-handler/https=firefox-developer-edition.desktop
 x-scheme-handler/jetbrains=jetbrains-toolbox.desktop
 x-scheme-handler/claude-cli=claude-code-url-handler.desktop
+x-scheme-handler/proton-inbox=proton-mail.desktop
+x-scheme-handler/slack=slack.desktop
