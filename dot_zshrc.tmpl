@@ -184,10 +184,12 @@ hyprctl_restart() {
         return
     fi
     hyprctl --instance 0 eval "hl.config({ misc = {allow_session_lock_restore = true } })" || return
-    pgrep -x qs >/dev/null && { qs kill; sleep 1; }
+    # Stop every qs instance (`qs kill` only stops one, and a wedged one ignores it).
+    pkill -x qs && sleep 2
+    pgrep -x qs >/dev/null && { pkill -9 -x qs; sleep 1; }
     hyprctl dispatch "hl.dsp.exec_cmd(\"qs -d\")"
     sleep 3
-    qs ipc call lock lock
+    timeout 10 qs ipc call lock lock || echo "lock call failed; check: qs list --all"
 }
 
 ###############################################
