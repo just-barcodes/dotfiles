@@ -74,7 +74,8 @@ How the token is stored:
 
 - The PAT lives at `dot_config/private_secrets/encrypted_private_github.env` in this repo as an **age-encrypted** shell fragment. The ciphertext is safe to commit and push.
 - On `chezmoi apply`, it decrypts to `~/.config/secrets/github.env` with mode `0600` using the age key at `~/.config/sops/age/keys.txt`.
-- The first line of `~/.zshrc` sources that file, so `$GITHUB_TOKEN` is set before mise's shim path is wired up. Mise reads `GITHUB_TOKEN` from its process env at API-call time (not from its `[env]` table — that table only forwards env to child processes mise launches, not to mise itself).
+- The first line of `~/.zshrc` sources that file, so `$MISE_GITHUB_TOKEN` is set before mise's shim path is wired up. Mise reads it from its process env at API-call time (not from its `[env]` table — that table only forwards env to child processes mise launches, not to mise itself).
+- The variable is deliberately `MISE_GITHUB_TOKEN`, not `GITHUB_TOKEN`: mise checks it first, and gh ignores it, so gh keeps its own login (`gh auth login`, stored in gnome-keyring). Exporting `GITHUB_TOKEN` would override gh's login.
 
 One-time, per-machine:
 
@@ -96,7 +97,7 @@ One-time, per-machine:
    ```
 3. Open a new shell and verify:
    ```bash
-   echo "${#GITHUB_TOKEN} chars"        # should print "93 chars" (or 40 for classic PAT)
+   mise token github                    # source should be MISE_GITHUB_TOKEN
    mise ls-remote neovim | tail -3      # should print versions, no 403
    ```
 
@@ -104,7 +105,7 @@ To rotate the token (or set it up on a brand-new machine that has the age key bu
 
 ```bash
 # In any shell with the age key present:
-read -rs T && printf 'export GITHUB_TOKEN=%q\nexport GITHUB_API_TOKEN="$GITHUB_TOKEN"\n' "$T" > /tmp/secrets.env && unset T
+read -rs T && printf 'export MISE_GITHUB_TOKEN=%q\n' "$T" > /tmp/secrets.env && unset T
 chezmoi encrypt < /tmp/secrets.env > ~/.local/share/chezmoi/dot_config/private_secrets/encrypted_private_github.env
 shred -u /tmp/secrets.env
 chezmoi apply ~/.config/secrets
@@ -112,7 +113,7 @@ chezmoi apply ~/.config/secrets
 
 Generate the token at <https://github.com/settings/tokens> (classic, no scopes needed for public releases) or <https://github.com/settings/personal-access-tokens/new> (fine-grained, public repo read).
 
-**Gotcha — `vfox:` backend does not honour `$GITHUB_TOKEN`.** mise's vfox bridge (`crates/vfox/src/lua_mod/hooks.rs`) makes its own HTTP calls and never injects the auth header, so vfox-backed tools (notably the default `neovim` plugin) keep 403'ing even with a valid token. The aqua backend authenticates correctly. When a tool is available both ways, prefer `aqua:`. That is why `neovim` is pinned as `"aqua:neovim/neovim" = "latest"` rather than `neovim = "stable"`.
+**Gotcha — `vfox:` backend does not honour the GitHub token.** mise's vfox bridge (`crates/vfox/src/lua_mod/hooks.rs`) makes its own HTTP calls and never injects the auth header, so vfox-backed tools (notably the default `neovim` plugin) keep 403'ing even with a valid token. The aqua backend authenticates correctly. When a tool is available both ways, prefer `aqua:`. That is why `neovim` is pinned as `"aqua:neovim/neovim" = "latest"` rather than `neovim = "stable"`.
 
 ## Claude Code GitHub MCP — PAT setup
 
