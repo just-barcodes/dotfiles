@@ -284,100 +284,140 @@ bind_app_workspace("Y", 95, "class:^YOUTUBE$", "gtk-launch youtube", {
 })
 
 ----------------------------------------------------------------
--- Chat / Teams + Slack (T / 91)
--- each app launches only if installed; tabbed group only when both are
+-- Multi-app slots: Mail (U / 90), Chat (T / 91), Tasks (P / 40)
+-- ~/.config/hypr/local_apps.lua (machine-local, untracked) picks which
+-- catalog apps each slot launches and whether they form a tabbed group;
+-- see local_apps.lua.example. A slot missing from that file launches every
+-- installed app in its default list, grouped. Window rules cover all of a
+-- slot's apps either way, so a manually started one still lands there.
 ----------------------------------------------------------------
-local has_teams = file_exists(os.getenv("HOME") .. "/.local/share/applications/teams.desktop")
-	and file_exists("/usr/bin/chromium")
-local has_slack = file_exists("/usr/bin/slack")
+local apps_dir = os.getenv("HOME") .. "/.local/share/applications/"
 
-hl.bind("SUPER + ALT + T", function()
-	hl.dispatch(hl.dsp.focus({ workspace = 91, on_current_monitor = true }))
-	if has_teams and not hl.get_window("class:^chrome-teams\\.microsoft\\.com.*$") then
-		hl.exec_cmd("gtk-launch teams")
-	end
-	if has_slack and not hl.get_window("class:^Slack$") then
-		hl.exec_cmd("slack")
-	end
-end)
-hl.window_rule({
-	name = "windowrule-teams",
-	match = { class = "^chrome-teams\\.microsoft\\.com.*$" },
-	workspace = "91",
-})
-hl.window_rule({
-	name = "windowrule-slack",
-	match = { class = "^Slack$" },
-	workspace = "91",
-})
-hl.bind("SUPER + ALT + SHIFT + t", hl.dsp.window.move({ workspace = 91, follow = false }))
+-- rule: Hyprland regex on the window class; lua: the same as Lua patterns
+-- (for grouping); needs: files that must exist for the fallback to launch it.
+local app_catalog = {
+	["proton-mail"] = {
+		rule = "^(Proton Mail|proton-mail)$",
+		lua = { "^Proton Mail$", "^proton%-mail$" },
+		launch = "proton-mail",
+		needs = { "/usr/bin/proton-mail" },
+	},
+	outlook = {
+		rule = "^chrome-outlook\\.office\\.com.*$",
+		lua = { "^chrome%-outlook%.office%.com" },
+		launch = "gtk-launch outlook",
+		needs = { apps_dir .. "outlook.desktop", "/usr/bin/chromium" },
+	},
+	teams = {
+		rule = "^chrome-teams\\.microsoft\\.com.*$",
+		lua = { "^chrome%-teams%.microsoft%.com" },
+		launch = "gtk-launch teams",
+		needs = { apps_dir .. "teams.desktop", "/usr/bin/chromium" },
+	},
+	slack = {
+		rule = "^Slack$",
+		lua = { "^Slack$" },
+		launch = "slack",
+		needs = { "/usr/bin/slack" },
+	},
+	tasks = {
+		rule = "^TASKS$",
+		lua = { "^TASKS$" },
+		launch = "gtk-launch tasks",
+		needs = { apps_dir .. "tasks.desktop" },
+	},
+	tududi = {
+		rule = "^TUDUDI$",
+		lua = { "^TUDUDI$" },
+		launch = "gtk-launch tududi",
+		needs = { apps_dir .. "tududi.desktop" },
+	},
+}
 
-if has_teams and has_slack then
-	group_on_open(91, function(w)
-		return w.class == "Slack" or w.class:find("^chrome%-teams%.microsoft%.com") ~= nil
-	end)
+-- apps: pinned to the workspace and grouped; default: launched (if installed)
+-- when local_apps.lua does not configure the slot.
+local app_slots = {
+	{ name = "mail", key = "U", workspace = 90, apps = { "proton-mail", "outlook" }, default = { "proton-mail", "outlook" } },
+	{ name = "chat", key = "T", workspace = 91, apps = { "teams", "slack" }, default = { "slack" } },
+	{ name = "tasks", key = "P", workspace = 40, apps = { "tasks", "tududi" }, default = { "tasks", "tududi" } },
+}
+
+local function notify_error(text)
+	hl.notification.create({ text = text, timeout = 10000, color = "rgb(ff5555)" })
 end
 
-----------------------------------------------------------------
--- Tasks / Donetick + Tududi (P / 40)
--- tabbed group
-----------------------------------------------------------------
-hl.bind("SUPER + ALT + P", function()
-	hl.dispatch(hl.dsp.focus({ workspace = 40, on_current_monitor = true }))
-	if not hl.get_window("class:^TASKS$") then
-		hl.exec_cmd("gtk-launch tasks")
+local ok, local_apps = pcall(require, "local_apps")
+if not ok then
+	if not tostring(local_apps):find("module 'local_apps' not found", 1, true) then
+		notify_error("local_apps.lua: " .. tostring(local_apps))
 	end
-	if not hl.get_window("class:^TUDUDI$") then
-		hl.exec_cmd("gtk-launch tududi")
-	end
-end)
-hl.window_rule({
-	name = "windowrule-tasks",
-	match = { class = "^(TASKS)$" },
-	workspace = "40",
-	group = "set",
-})
-hl.window_rule({
-	name = "windowrule-tududi",
-	match = { class = "^(TUDUDI)$" },
-	workspace = "40",
-	group = "set",
-})
-hl.bind("SUPER + ALT + SHIFT + p", hl.dsp.window.move({ workspace = 40, follow = false }))
+	local_apps = {}
+elseif type(local_apps) ~= "table" then
+	notify_error("local_apps.lua must return a table")
+	local_apps = {}
+end
 
-----------------------------------------------------------------
--- Email / Proton Mail + Outlook (U / 90)
--- each app launches only if installed; tabbed group only when both are
-----------------------------------------------------------------
-local has_proton_mail = file_exists("/usr/bin/proton-mail")
-local has_outlook = file_exists(os.getenv("HOME") .. "/.local/share/applications/outlook.desktop")
-	and file_exists("/usr/bin/chromium")
-
-hl.bind("SUPER + ALT + U", function()
-	hl.dispatch(hl.dsp.focus({ workspace = 90, on_current_monitor = true }))
-	if has_proton_mail and not hl.get_window("class:^(Proton Mail|proton-mail)$") then
-		hl.exec_cmd("proton-mail")
+local function is_installed(app)
+	for _, path in ipairs(app.needs) do
+		if not file_exists(path) then
+			return false
+		end
 	end
-	if has_outlook and not hl.get_window("class:^chrome-outlook\\.office\\.com.*$") then
-		hl.exec_cmd("gtk-launch outlook")
-	end
-end)
-hl.window_rule({
-	name = "windowrule-proton-mail",
-	match = { class = "^(Proton Mail|proton-mail)$" },
-	workspace = "90",
-})
-hl.window_rule({
-	name = "windowrule-outlook",
-	match = { class = "^chrome-outlook\\.office\\.com.*$" },
-	workspace = "90",
-})
-hl.bind("SUPER + ALT + SHIFT + u", hl.dsp.window.move({ workspace = 90, follow = false }))
+	return true
+end
 
-if has_proton_mail and has_outlook then
-	group_on_open(90, function(w)
-		return w.class == "Proton Mail" or w.class == "proton-mail" or w.class:find("^chrome%-outlook%.office%.com") ~= nil
+for _, slot in ipairs(app_slots) do
+	local conf = local_apps[slot.name]
+	local launch = {}
+	if conf then
+		for _, id in ipairs(conf) do
+			if app_catalog[id] then
+				table.insert(launch, app_catalog[id])
+			else
+				notify_error("local_apps.lua: unknown app '" .. id .. "' in " .. slot.name)
+			end
+		end
+	else
+		for _, id in ipairs(slot.default) do
+			if is_installed(app_catalog[id]) then
+				table.insert(launch, app_catalog[id])
+			end
+		end
+	end
+
+	hl.bind("SUPER + ALT + " .. slot.key, function()
+		hl.dispatch(hl.dsp.focus({ workspace = slot.workspace, on_current_monitor = true }))
+		for _, app in ipairs(launch) do
+			if not hl.get_window("class:" .. app.rule) then
+				hl.exec_cmd(app.launch)
+			end
+		end
 	end)
+	hl.bind("SUPER + ALT + SHIFT + " .. slot.key:lower(), hl.dsp.window.move({ workspace = slot.workspace, follow = false }))
+
+	local members = {}
+	for _, id in ipairs(slot.apps) do
+		local app = app_catalog[id]
+		table.insert(members, app)
+		hl.window_rule({
+			name = "windowrule-" .. id,
+			match = { class = app.rule },
+			workspace = tostring(slot.workspace),
+		})
+	end
+
+	if not conf or conf.group ~= false then
+		group_on_open(slot.workspace, function(w)
+			for _, app in ipairs(members) do
+				for _, pattern in ipairs(app.lua) do
+					if w.class:find(pattern) then
+						return true
+					end
+				end
+			end
+			return false
+		end)
+	end
 end
 
 ----------------------------------------------------------------

@@ -1,0 +1,16 @@
+-- Machine-local app selection for the multi-app hotkeys (not tracked by chezmoi).
+-- Copy to ~/.config/hypr/local_apps.lua and edit, then `hyprctl reload`.
+--
+-- Slots: mail (SUPER+ALT+U), chat (SUPER+ALT+T), tasks (SUPER+ALT+P).
+-- Each list names catalog apps from keybindings.lua, launched in order:
+--   mail:  proton-mail, outlook
+--   chat:  teams, slack
+--   tasks: tasks, tududi
+-- An empty list makes the hotkey only switch workspace.
+-- group = false keeps the slot's windows tiled instead of in a tabbed group.
+-- A slot left out launches its installed defaults, grouped:
+--   mail: proton-mail, outlook   chat: slack   tasks: tasks, tududi
+return {
+	mail = { "proton-mail" },
+	chat = { "slack", "teams", group = false },
+}
