@@ -38,6 +38,10 @@ mise:
       "pipx:semgrep": { version: latest, desc: "static analysis; own venv (the AUR semgrep-bin breaks on system python-mcp 2.x)" }
       bat: { version: "0.26.1", desc: "cat with syntax highlighting; television previews (optional pacman package)" }
       herdr: { version: latest, desc: "agent workspace manager; theme-switch reloads it when running" }
+    code-graph:
+      "npm:@colbymchenry/codegraph": { version: latest, desc: "code graph MCP for agents; needs node; per repo: codegraph init ." }
+      "pipx:repowise": { version: latest, desc: "codebase index for agents; per repo: repowise init . --no-prose -y (writes .claude/CLAUDE.md)" }
+      "pipx:graphifyy": { version: latest, desc: "code knowledge graph; per repo: graphify install --project (writes .claude/)" }
     secrets:
       age: { version: "1.3", desc: "file encryption tool" }
       sops: { version: "3.13", desc: "encrypted secrets file editor (age/KMS)" }
