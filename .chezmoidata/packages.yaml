@@ -291,7 +291,6 @@ packages:
         - python-fastmcp-slim # FastMCP, MCP servers in python
         - docker-sbx-bin # docker sandboxes (sbx) for AI agents; versioned tarball, unlike docker-sbx
         - headlamp-bin # kubernetes manage gui
-        - semgrep-bin # static analysis
         - bruno-bin # API client (postman alternative)
         - stably-orca-bin # Orca agentic coding IDE; CLI symlinked as ~/.local/bin/orca-ide
         - claude-code # Claude Code CLI; /usr/bin wrapper sets DISABLE_UPDATES=1, pacman owns updates
