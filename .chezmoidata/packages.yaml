@@ -285,6 +285,7 @@ packages:
         - openshot-bin # video editor
         - ventoy-bin # multi-ISO bootable USB
         - slack-desktop # Slack, official build repackaged
+        - supersonic-desktop-bin # Subsonic/Navidrome music client (SUPER+ALT+M)
       developer:
         - x11docker # run GUI apps in docker
         - nats-cclient-git # NATS C client library

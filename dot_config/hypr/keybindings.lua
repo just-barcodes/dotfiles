@@ -248,15 +248,6 @@ hl.bind("SUPER + CTRL + k", hl.dsp.window.resize({ x = 0, y = -140, relative = t
 hl.bind("SUPER + CTRL + j", hl.dsp.window.resize({ x = 0, y = 140, relative = true }))
 
 ----------------------------------------------------------------
--- Spotify (M / 96)
-----------------------------------------------------------------
-bind_app_workspace("M", 96, "class:^Spotify$", "spotify-launcher", {
-	name = "windowrule-spotify",
-	match = { class = "^(Spotify)$" },
-	workspace = "96",
-})
-
-----------------------------------------------------------------
 -- Obsidian (O / 70)
 ----------------------------------------------------------------
 bind_app_workspace("O", 70, "class:.*[Oo]bsidian$", "obsidian", {
@@ -284,7 +275,8 @@ bind_app_workspace("Y", 95, "class:^YOUTUBE$", "gtk-launch youtube", {
 })
 
 ----------------------------------------------------------------
--- Multi-app slots: Mail (U / 90), Chat (T / 91), Tasks (P / 40)
+-- Multi-app slots: Mail (U / 90), Chat (T / 91), Tasks (P / 40),
+-- Music (M / 96)
 -- ~/.config/hypr/local_apps.lua (machine-local, untracked) picks which
 -- catalog apps each slot launches and whether they form a tabbed group;
 -- see local_apps.lua.example. A slot missing from that file launches every
@@ -332,6 +324,19 @@ local app_catalog = {
 		launch = "gtk-launch tududi",
 		needs = { apps_dir .. "tududi.desktop" },
 	},
+	spotify = {
+		rule = "^(Spotify)$",
+		lua = { "^Spotify$" },
+		launch = "spotify-launcher",
+		needs = { "/usr/bin/spotify-launcher" },
+	},
+	-- Fyne app; class not yet confirmed, so match the likely variants
+	supersonic = {
+		rule = "^([Ss]upersonic|supersonic-desktop|io\\.github\\.dweymouth\\.supersonic)$",
+		lua = { "^[Ss]upersonic$", "^supersonic%-desktop$", "^io%.github%.dweymouth%.supersonic$" },
+		launch = "supersonic-desktop",
+		needs = { "/usr/bin/supersonic-desktop" },
+	},
 }
 
 -- apps: pinned to the workspace and grouped; default: launched (if installed)
@@ -340,6 +345,7 @@ local app_slots = {
 	{ name = "mail", key = "U", workspace = 90, apps = { "proton-mail", "outlook" }, default = { "proton-mail", "outlook" } },
 	{ name = "chat", key = "T", workspace = 91, apps = { "teams", "slack" }, default = { "slack" } },
 	{ name = "tasks", key = "P", workspace = 40, apps = { "tasks", "tududi" }, default = { "tasks", "tududi" } },
+	{ name = "music", key = "M", workspace = 96, apps = { "spotify", "supersonic" }, default = { "spotify", "supersonic" } },
 }
 
 local function notify_error(text)
