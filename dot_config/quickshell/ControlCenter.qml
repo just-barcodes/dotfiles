@@ -42,7 +42,10 @@ PanelWindow {
     // keyboard focus here, which is what makes the shortcuts below work.
     // active is set imperatively: the compositor writes false on dismissal,
     // which would destroy a binding.
-    onShownChanged: focusGrab.active = root.shown
+    onShownChanged: {
+        focusGrab.active = root.shown;
+        Notifications.suppressPopups = root.shown;
+    }
 
     HyprlandFocusGrab {
         id: focusGrab

@@ -13,6 +13,15 @@ Singleton {
     property var history: []
     property var popups: []
 
+    // Set while the control center is open: it lists every notification
+    // itself, so pending popups are dropped and new ones are not raised.
+    property bool suppressPopups: false
+
+    onSuppressPopupsChanged: {
+        if (root.suppressPopups)
+            root.popups = [];
+    }
+
     readonly property int count: history.length
 
     // Popup lifetime in ms, 0 meaning "stays until dismissed". expireTimeout is
@@ -84,7 +93,7 @@ Singleton {
             });
 
             root.history = [entry, ...root.history];
-            if (!root.dnd)
+            if (!root.dnd && !root.suppressPopups)
                 root.popups = [entry, ...root.popups];
         }
     }
