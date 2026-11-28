@@ -137,6 +137,13 @@ hl.window_rule({
     float = true,
 })
 
+-- Screenshot annotation editor (grim | satty)
+hl.window_rule({
+    name  = "float-satty",
+    match = { class = "^(com\\.gabm\\.satty)$" },
+    float = true,
+})
+
 -- Generic file/save dialogs (GTK/Qt portal)
 hl.window_rule({
     name  = "float-portal-dialogs",
